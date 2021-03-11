@@ -40,7 +40,8 @@ Total <- aggregate(select(UserData, -c(type))['balance'], select(UserData, -c(ty
 # Main UI
 ui <- fluidPage(
   
-  theme = shinytheme("superhero"),
+  # Theme theme
+  theme = shinytheme("flatly"),
   
   navbarPage("Personal Expense Analyst",
              tabPanel("About Us"),
