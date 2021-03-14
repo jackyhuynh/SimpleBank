@@ -143,7 +143,10 @@ ui <- fluidPage(
                  plotOutput("distPlot", height = "300px"),
                  plotOutput("lineplot1", height = "300px"),
                  plotOutput("lineplot"),
-                 tags$a(href = "https://github.com/jackyhuynh", "Source: Private Data from Truc"))
+                 tags$a(href = "https://github.com/jackyhuynh", "Source: Private Data from Truc")),
+        tabPanel("Map",
+                 leafletOutput("map"),
+        )
       )
     )
     
@@ -237,6 +240,17 @@ server <- function(input, output) {
             smooth_curve <- lowess(x = as.numeric(selected_User()$date), y = selected_User()$amount, f = input$f)
             lines(smooth_curve, col = "#E6553A", lwd = 3)
         }
+    })
+    
+    points <- eventReactive(input$recalc, {
+        cbind(rnorm(40) * 2 + 13, rnorm(40) + 48)
+    }, ignoreNULL = FALSE)
+    
+    location <- read_csv("location.csv")
+    
+    output$map <- renderLeaflet({
+        leaflet(data = location) %>% addTiles() %>%
+            addMarkers(~long, ~lat, popup =~as.character(Amount), label = ~as.character(store))
     })
 }
 
