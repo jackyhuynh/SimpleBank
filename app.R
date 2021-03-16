@@ -19,6 +19,9 @@ library(plotly)
 library(readr)
 library(shinythemes)
 
+library("tidyverse")
+library("leaflet")
+library("plotrix")
 
 UserDataOrg <-
     read_csv(
