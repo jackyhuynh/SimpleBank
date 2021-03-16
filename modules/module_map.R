@@ -34,11 +34,12 @@ UserTransaction <- UserTransaction[order(-UserTransaction[,2]),]
 UserTransaction$TransPercent <- scales::percent(as.numeric(UserTransaction$Amount/sum(UserTransaction$Amount)))
 
 
-UserBigTransaction <- filter(UserTransaction, UserTransaction$TransPercent>1)
-
-c("other expense",
+UserSmallTransaction <-   data.frame("other expense",
   sum(UserTransaction$Amount)-sum(UserBigTransaction$Amount),
   (sum(UserTransaction$Amount)-sum(UserBigTransaction$Amount))/sum(UserTransaction$Amount))
+
+names() 
+UserBigTransaction<- c('category','Amount','TransPercent') 
 
 
 par(mar = c(1, 1, 1, 1)) # bltr
