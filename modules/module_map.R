@@ -1,22 +1,20 @@
 library("tidyverse")
 library("leaflet")
 library("plotrix")
-library("data.table")
-
 
 data(quakes)
 
-# Show first 20 rows from the `quakes` dataset
-leaflet(data = quakes[1:20,]) %>% addTiles() %>%
-  addMarkers(~long, ~lat, popup = ~as.character(mag), label = ~as.character(mag))
-
-head(quakes)
-
-location <- read_csv("location.csv")
-
-# MAPMODULE
-leaflet(data = location) %>% addTiles() %>%
-  addMarkers(~long, ~lat, popup =~as.character(Amount), label = ~as.character(store))
+# # Show first 20 rows from the `quakes` dataset
+# leaflet(data = quakes[1:20,]) %>% addTiles() %>%
+#   addMarkers(~long, ~lat, popup = ~as.character(mag), label = ~as.character(mag))
+# 
+# head(quakes)
+# 
+# location <- read_csv("location.csv")
+# 
+# # MAPMODULE
+# leaflet(data = location) %>% addTiles() %>%
+#   addMarkers(~long, ~lat, popup =~as.character(Amount), label = ~as.character(store))
 
 # import the data
 transactions <- read_csv("transactions.csv")
@@ -57,10 +55,12 @@ pie(
   clockwise = TRUE, # IMPORTANT
   angle = 45, 
   col = viridis::viridis_pal(option = "magma", direction=-1)(length(SumTransaction$Amount)),  # BETTER COLOR PALETTE
-  labels = tail(piepercent, -4), # NEVER DISPLAY OVERLAPPING LABELS
+  labels = head(piepercent, -3), # NEVER DISPLAY OVERLAPPING LABELS
   cex = 0.7,
   border="white",
 )
 
+legend(1, .5, SumTransaction$category, cex = 0.7, 
+       fill = viridis::viridis_pal(option = "magma", direction=-1)(length(SumTransaction$Amount)),)
 
 
