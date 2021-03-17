@@ -23,23 +23,31 @@ transactions <- read_csv("transactions.csv")
 transactions$Category <- as.factor(transactions$category)
 summary(transactions)
 
-
+# Summary by debit and type
 UserTransaction <-
   aggregate(select(transactions[transactions$type == 'debit', ], -type)['Amount'], by =
               select(transactions[transactions$type == 'debit', ], -type)['category'], sum)
 
 # Sort the User Transaction
 UserTransaction <- UserTransaction[order(-UserTransaction[,2]),]
-
+# Add the % to the transactions
 UserTransaction$TransPercent <- scales::percent(as.numeric(UserTransaction$Amount/sum(UserTransaction$Amount)))
 
+# Filter the big transaction
+SumTransaction <- filter(UserTransaction, UserTransaction$TransPercent > 1)
 
-UserSmallTransaction <-   data.frame("other expense",
-  sum(UserTransaction$Amount)-sum(UserBigTransaction$Amount),
-  (sum(UserTransaction$Amount)-sum(UserBigTransaction$Amount))/sum(UserTransaction$Amount))
+# Calculate the percentage of all Transactions smaller than 1 percent
+OtherTransSaction <- data.frame("other expenses",
+                                sum(UserTransaction$Amount) - sum(BigTransaction$Amount),
+                                scales::percent(as.numeric((sum(UserTransaction$Amount) - sum(BigTransaction$Amount)))/sum(UserTransaction$Amount)))
 
-names() 
-UserBigTransaction<- c('category','Amount','TransPercent') 
+# Rename the value
+names(OtherTransSaction) <- c('category','Amount','TransPercent')
+
+# Get the total transaction
+SumTransaction<- rbind(BigTransaction,OtherTransSaction)
+
+
 
 
 par(mar = c(1, 1, 1, 1)) # bltr
