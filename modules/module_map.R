@@ -20,17 +20,17 @@ leaflet(data = location) %>% addTiles() %>%
 
 # import the data
 transactions <- read_csv("transactions.csv")
-transactions$Category <- as.factor(transactions$category)
-summary(transactions)
+
+# change the category to factor
+# transactions$category <- as.factor(transactions$category)
 
 # Summary by debit and type
 UserTransaction <-
   aggregate(select(transactions[transactions$type == 'debit', ], -type)['Amount'], by =
               select(transactions[transactions$type == 'debit', ], -type)['category'], sum)
 
-
 # Filter the big transaction
-SumTransaction <- filter(UserTransaction, as.numeric(UserTransaction$Amount/sum(UserTransaction$Amount)) > 0.01)
+SumTransaction <- filter(UserTransaction, as.numeric(UserTransaction$Amount/sum(UserTransaction$Amount)) > 0.005)
 
 # Calculate the percentage of all Transactions smaller than 1 percent
 OtherTransaction <- data.frame("Other Expenses",
@@ -39,18 +39,14 @@ OtherTransaction <- data.frame("Other Expenses",
 # Rename the value
 names(OtherTransaction) <- c('category','Amount')
 
-# Get the total transaction
+# Get the total transaction after summary the transaction less than 1 percent
 SumTransaction<- rbind(SumTransaction,OtherTransaction)
 
+# Sort the SumTransaction
 SumTransaction <- SumTransaction[order(-SumTransaction[,2]),]
 
-rm(OtherTransaction,UserTransaction)
+piepercent <- scales::percent(as.numeric(SumTransaction$Amount/sum(SumTransaction$Amount)))
 
-piepercent <- SumTransaction$TransPercent
-
-SumTransaction$TransPercent<- NULL
-
-SumTransaction <- setDT(SumTransaction)
 
 par(mar = c(1, 1, 1, 1)) # bltr
 
@@ -61,20 +57,9 @@ pie(
   clockwise = TRUE, # IMPORTANT
   angle = 45, 
   col = viridis::viridis_pal(option = "magma", direction=-1)(length(SumTransaction$Amount)),  # BETTER COLOR PALETTE
-  labels = tail(piepercent, -7), # NEVER DISPLAY OVERLAPPING LABELS
-  cex = 0.7
-)
-
-legend(
-  x = 1.2, # DELIBERATE POSITION
-  y = 0.5, # DELIBERATE POSITION
-  inset = .05, 
-  title = "Primary Crime Type", 
-  legend = names(SumTransaction), # YOU WERE PASSING IN _ALL_ THE REPEAT NAMES
-  fill = viridis::viridis_pal(option = "magma", direction=-1)(length(SumTransaction)),  # USE THE SAME COLOR PALETTE
-  horiz = FALSE,
-  cex = 0.6, # PROPER PARAMETER FOR TEXT SIZE
-  text.width = 0.7 # SET THE BOX WIDTH
+  labels = tail(piepercent, -4), # NEVER DISPLAY OVERLAPPING LABELS
+  cex = 0.7,
+  border="white",
 )
 
 
