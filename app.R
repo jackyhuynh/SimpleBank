@@ -168,6 +168,7 @@ server <- function(input, output) {
   output$mytable1 <- DT::renderDataTable({
     DT::datatable(UserDataOrg[, input$show_vars, drop = FALSE])
   })
+  
     output$distPlot <- renderPlot({
         # generate bins based on input$bins from ui.R
         x    <- Total[,2]
