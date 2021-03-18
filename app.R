@@ -25,7 +25,7 @@ library(plotrix)
 
 UserDataOrg <-
     read_csv(
-        "data/Chase2107_Activity_20210306.CSV",
+        "data/data.CSV",
         col_types = cols(`Posting Date` = col_date(format = "%m/%d/%Y"))
     )
 
@@ -61,6 +61,7 @@ ui <- fluidPage(
   
   sidebarLayout(
     sidebarPanel(
+      
       conditionalPanel(
         'input.dataset === "User Expense"',
         checkboxGroupInput("show_vars", "Columns To Show:",
@@ -149,8 +150,7 @@ ui <- fluidPage(
                  tags$a(href = "https://github.com/jackyhuynh", "Source: Private Data from Truc")),
         tabPanel("Category Analyst",
                  plotOutput("pieplot"),
-                 height = "300px"
-        ),
+                 height = "300px"  ),
         tabPanel("Map",
                  leafletOutput("map"),
         )
