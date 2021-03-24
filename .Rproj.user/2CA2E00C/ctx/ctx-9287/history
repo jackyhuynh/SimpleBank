@@ -1,0 +1,166 @@
+shiny::runApp('index')
+runApp()
+runApp()
+runApp('index')
+devtools::install_github("paulc91/shinyauthr")
+runApp('index')
+devtools::install_github("paulc91/shinyauthr")
+devtools::install_github("paulc91/shinyauthr")
+devtools::install_github("paulc91/shinyauthr")
+devtools::install_github("paulc91/shinyauthr")
+install.packages(c("boot", "broom", "coin", "cvms", "data.table", "desc", "dplyr", "farver", "gert", "ggsignif", "gmm", "Hmisc", "ipred", "isoband", "libcoin", "lubridate", "MASS", "Matrix", "MatrixModels", "mgcv", "mime", "nlme", "party", "partykit", "pillar", "pkgload", "promises", "ps", "quantreg", "RcppArmadillo", "rgl", "rio", "rmarkdown", "rstatix", "segmented", "SparseM", "standardize", "testthat", "tibble", "tidyr", "tinytex", "usethis", "waldo", "xfun"))
+devtools::install_github("paulc91/shinyauthr")
+install.packages("cachem")
+devtools::install_github("paulc91/shinyauthr")
+shiny::runApp('index')
+runApp('index')
+getwd()
+runApp('index')
+runApp('index')
+runApp('index')
+runApp('index')
+getwd()
+runApp('index')
+runApp('index')
+runApp('index')
+getwd()
+runApp('index')
+runApp('index')
+View(login_ui)
+View(validate_pwd)
+View(login_ui)
+View(validate_pwd)
+#
+# This is the user-interface definition of a Shiny web application. You can
+# run the application by clicking 'Run App' above.
+#
+# Find out more about building applications with Shiny here:
+#
+#    http://shiny.rstudio.com/
+#
+library(shiny)
+# Define UI for application that draws a histogram
+shinyUI(fluidPage(
+# Application title
+titlePanel("Old Faithful Geyser Data"),
+# Sidebar with a slider input for number of bins
+sidebarLayout(
+sidebarPanel(
+sliderInput("bins",
+"Number of bins:",
+min = 1,
+max = 50,
+value = 30)
+),
+# Show a plot of the generated distribution
+mainPanel(
+plotOutput("distPlot")
+)
+)
+))
+# Define server logic required to draw a histogram
+shinyServer(function(input, output) {
+output$distPlot <- renderPlot({
+# generate bins based on input$bins from ui.R
+x    <- faithful[, 2]
+bins <- seq(min(x), max(x), length.out = input$bins + 1)
+# draw the histogram with the specified number of bins
+hist(x, breaks = bins, col = 'darkgray', border = 'white')
+})
+})
+# Define UI for application that draws a histogram
+shinyUI(fluidPage(
+# Application title
+titlePanel("Old Faithful Geyser Data"),
+# Sidebar with a slider input for number of bins
+sidebarLayout(
+sidebarPanel(
+sliderInput("bins",
+"Number of bins:",
+min = 1,
+max = 50,
+value = 30)
+),
+# Show a plot of the generated distribution
+mainPanel(
+plotOutput("distPlot")
+)
+)
+))
+# Define server logic required to draw a histogram
+shinyServer(function(input, output) {
+output$distPlot <- renderPlot({
+# generate bins based on input$bins from ui.R
+x    <- faithful[, 2]
+bins <- seq(min(x), max(x), length.out = input$bins + 1)
+# draw the histogram with the specified number of bins
+hist(x, breaks = bins, col = 'darkgray', border = 'white')
+})
+})
+runApp('index')
+runApp('index')
+runApp('MyMultiApp')
+runApp('MyMultiApp')
+runApp('MyMultiApp')
+runApp('MyMultiApp')
+library(readr)
+Chase2107_Activity_20210306 <- read_csv("data/Chase2107_Activity_20210306.CSV",
+col_types = cols(Details = col_factor(levels = c("DEBIT",
+"CREDIT", "DSLIP")), `Posting Date` = col_date(format = "%m/%d/%Y")))
+View(Chase2107_Activity_20210306)
+# Import Data
+UserData <-
+read_csv(
+"data/Chase2107_Activity_20210306.CSV",+col_types = cols(
+Details = col_factor(levels = c("DEBIT",+"CREDIT", "DSLIP")),
+`Posting Date` = col_date(format = "%m/%d/%Y")
+)
+)
+UserData <-
+read_csv(
+"data/Chase2107_Activity_20210306.CSV",+col_types = cols(
+Details = col_factor(levels = c("DEBIT",+"CREDIT", "DSLIP")),
+`Posting Date` = col_date(format = "%m/%d/%Y")
+)
+)
+UserData <-
+read_csv(
+"data/Chase2107_Activity_20210306.CSV",+col_types = cols(
+Details = col_factor(levels = c("DEBIT",+"CREDIT", "DSLIP")),
+`Posting Date` = col_date(format = "%m/%d/%Y")
+)
+)
+# Import Data
+UserData <- read_csv("data/Chase2107_Activity_20210306.CSV", col_types = cols(Details = col_factor(levels = c("DEBIT",
+"CREDIT", "DSLIP")), `Posting Date` = col_date(format = "%m/%d/%Y")))
+library(shiny)
+library(dplyr)
+library(DT)
+library(ggplot2)
+library(shinydashboard)
+library(plotly)
+library(readr)
+# Import Data
+UserData <- read_csv("data/Chase2107_Activity_20210306.CSV", col_types = cols(Details = col_factor(levels = c("DEBIT",
+"CREDIT", "DSLIP")), `Posting Date` = col_date(format = "%m/%d/%Y")))
+runApp('MyMultiApp')
+shiny::runApp()
+runApp()
+runApp()
+rsconnect::setAccountInfo(name='trucdev', token='062AC7E973A8C102856742C0E7BD2BEE', secret='30hKqESqBZHlNxn0VIvbHPre4qn9EAqjNeCYsT6g')
+library(rsconnect)
+rsconnect::deployApp('C:/Users/Valued Customer/Documents/source/R-MyFirstShinyWebApp/app')
+rsconnect::deployApp('C:/Users/Valued Customer/Documents/source/R-MyFirstShinyWebApp')
+read_csv(
+"data/Chase2107_Activity_20210306.CSV",
+col_types = cols(`Posting Date` = col_date(format = "%m/%d/%Y"))
+)
+rsconnect::deployApp('C:/Users/Valued Customer/Documents/source/R-MyFirstShinyWebApp')
+runApp()
+rsconnect::deployApp('C:/Users/Valued Customer/Documents/source/R-MyFirstShinyWebApp')
+runApp()
+shiny::runApp()
+MAP <- leaflet() %>% addTiles() %>% addMarkers(lng=77.749, lat=12.9698, popup="Location")
+library("tidyverse")
+library("leaflet")
+install.packages("leaflet")

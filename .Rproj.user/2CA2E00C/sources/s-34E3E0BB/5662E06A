@@ -1,0 +1,24 @@
+{
+    "id": "5662E06A",
+    "path": "~/source/R-MyFirstShinyWebApp/app.R",
+    "project_path": "app.R",
+    "type": "r_source",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1615064834470.0,
+    "source_on_save": false,
+    "relative_order": 8,
+    "properties": {
+        "cursorPosition": "98,50",
+        "scrollLine": "71"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1616595933,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1616595933955,
+    "read_only": false,
+    "read_only_alternatives": []
+}
