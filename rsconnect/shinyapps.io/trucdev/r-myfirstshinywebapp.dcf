@@ -5,9 +5,8 @@ account: trucdev
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 3748106
-bundleId: 4355675
+bundleId: 4376812
 url: https://trucdev.shinyapps.io/r-myfirstshinywebapp/
-when: 1615938884.10211
+when: 1616351825.22253
 asMultiple: FALSE
 asStatic: FALSE
-ignoredFiles: ExpenseVer1/server.R|ExpenseVer1/ui.R|modules/module_login.R|modules/module_map.R

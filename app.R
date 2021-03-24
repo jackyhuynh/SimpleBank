@@ -1,318 +1,515 @@
 #
-# This is a Shiny web application. You can run the application by clicking
-# the 'Run App' button above.
+# This is the user-interface definition of a Shiny web application. You can
+# run the application by clicking 'Run App' above.
 #
 # Find out more about building applications with Shiny here:
 #
 #    http://shiny.rstudio.com/
 #
-# library
 
 library(shiny)
 library(shinydashboard)
-library(shinythemes)
+library(shinythemes) # themes for css
 
 library(dplyr)
 library(DT)
-library(ggplot2)
 
-library(plotly)
-library(readr)
+library(ggplot2) # plot
+library(plotly) # plot
+library(readr) # read data in
+library(tidyverse) # pipe
+library(leaflet) # map
 
-library(tidyverse)
-library(leaflet)
-library(plotrix)
+source("modules/pie_chart_module.R")
+source("modules/print_display_module.R")
 
-UserDataOrg <-
-    read_csv(
-        "data/data.CSV",
-        col_types = cols(`Posting Date` = col_date(format = "%m/%d/%Y"))
-    )
 
-UserDataOrg$Type <- NULL
+# The original data is used for display only
+UserData.Tidy  <- read_csv("data/data.CSV", col_types = cols(date = col_date(format = "%m/%d/%Y")))
 
-UserDataOrg <-UserDataOrg %>% rename(c(type = Details,date = `Posting Date`,
-                                       amount = Amount, balance = Balance, description=Description ))
-UserData <- UserDataOrg
+# Get the Transaction Database
+UserTransaction <- read_csv("data/transdata.CSV",col_types = cols(date = col_date(format = "%m/%d/%Y")))
 
-UserData$description <- NULL
+# Set the Type to NULL
+UserData.Tidy$type <- NULL
 
-# Create explicit data frame for modification, and display
-Total <- aggregate(select(UserData, -c(type))['balance'], select(UserData, -c(type))['date'], last)
+TotalBalance <-
+  aggregate(select(UserData.Tidy,-c(details))['balance'], select(UserData.Tidy,-c(details))['date'], last)
 
-# Main UI
-ui <- fluidPage(
-  
-  # Theme theme
-  theme = shinytheme("flatly"),
-  
-  navbarPage("Personal Expense Analyst",
-             tabPanel("About Us"),
-             navbarMenu("Setting",
-                        tabPanel("Summary"),
-                        "----",
-                        "Section header",
-                        tabPanel("Table")
-             )
-  ),
-  # Application title
-  titlePanel("Expense Analyst"),
-  
-  
-  sidebarLayout(
-    sidebarPanel(
-      
-      conditionalPanel(
-        'input.dataset === "User Expense"',
-        checkboxGroupInput("show_vars", "Columns To Show:",
-                           names(UserDataOrg), selected = names(UserDataOrg)),
-        
-        # Add on Feature
-        actionButton("add", "Add Transaction"),
-        actionButton("remove", "Remove transaction"),
-        numericInput("serving", "Number of servings contained", min = 0.01, step = 1, value = 1),
-        
-      ),
-      conditionalPanel(
-        'input.dataset === "Analyst"',
-        
-        #------------------------------------------------------------
-        tags$h3("View by Transaction Amount",class="text-info"),
-        # Show a plot of the generated distribution
-        tags$p("Note: Move the slider to see the frequency of the total balance in your bank account."),
-        sliderInput("bins","Number of bins:",
-                    min = 1,max = 100,value = 30),
-        tags$br(),tags$br(),
-        tags$hr(),
-        
-        #------------------------------------------------------------
-        tags$h3("Total Balance",class="text-info"),
-        # Select date range to be plotted
-        tags$p("Note: Choose date to see the total balance between a specific time!"),
-        dateRangeInput("date1",strong("Date range"),start = "2019-03-06",end = "2021-03-05",
-                       min = "2019-03-06",max = "2021-03-05"),
-        tags$br(),tags$br(),
-        tags$hr(),
-        
-        #------------------------------------------------------------
-        
-        tags$h3("Transaction By Category",class="text-info"),
-        
-        tags$div(
-          tags$p("Select one of the following option:"),
-          tags$li("DEBIT: debit balances include assets, expenses, and losses..."),
-          tags$li("CREDIT: credit balances include incomes, revenue accounts, and gain accounts..."),
-          tags$li("CHECK: Deposit of check(s)."),
-          tags$li("DSLIP: Deposit slips (check or cash)."),
-          tags$br(),),
-        
-        # Select type of trend to plot
-        selectInput(inputId = "type",label = strong("Type of Transaction"),
-                    choices = unique(c('DEBIT', 'CREDIT', 'CHECK', 'DSLIP')), selected = "DEBIT" ),
-        
-        # Select date range to be plotted
-        dateRangeInput("date", strong("Date range"), start = "2019-03-06", end = "2021-03-05",
-                       min = "2019-03-06",max = "2021-03-05"),
-        
-        # Select whether to overlay smooth trend line
-        checkboxInput( inputId = "smoother", label = strong("Overlay smooth trend line"),
-                       value = FALSE),
-        
-        # Display only if the smoother is checked
-        conditionalPanel(condition = "input.smoother == true",
-                         sliderInput( inputId = "f",label = "Smoother span:",
-                                      min = 0.01, max = 1, value = 0.67,step = 0.01,
-                                      animate = animationOptions(interval = 100)),
-                         HTML("Higher values give more smoothness.")),
-        tags$p("Note:"),
-        
-        tags$br(),tags$br(),
-        tags$hr(),
-        #------------------------------------------------------------
-      ),
-      tags$div(
-        tags$p("Support:"),
-        tags$li("Truc Huynh business services: 800-242-7338."),
-        tags$li("For online technical support, please call us at 1-877-242-7372"),
-        tags$li("For help with online banking, please  contact us online"))
-      
+ui <-  fluidPage(
+    # Add UI theme, can easily change theme by change the UI
+    theme = shinytheme("flatly"),
+    
+    # Navigation bar
+    navbarPage(
+      "Personal Expense Analyst",
+      tabPanel("About Us"),
+      navbarMenu(
+        "Setting",
+        tabPanel("Summary"),
+        "----",
+        "Section header",
+        tabPanel("Table")
+      )
     ),
     
+    # Application title
+    titlePanel("Expense Analyst"),
     
-    mainPanel(
-      tabsetPanel(
+    # sidebar Design
+    sidebarLayout(
+      sidebarPanel (
+        width = 3,
+        
+        # Monitor and control action of the User Bank Panel
+        conditionalPanel(
+          'input.dataset === "Checking Account"',
+          checkboxGroupInput(
+            "show_trans",
+            "Selections:",
+            names(UserData.Tidy),
+            selected = names(UserData.Tidy)
+          )
+        ),
+        
+        # Monitor and control the action of all Transactions Panel
+        conditionalPanel(
+          'input.dataset === "All Transaction"',
+          checkboxGroupInput(
+            "show_trans2",
+            "Selections:",
+            names(UserTransaction[, c("date", "description", "amount", "type", "category", "accounts")]),
+            selected = names(UserTransaction[, c("date", "description", "amount", "type", "category", "accounts")])
+          )
+        ),
+        
+        # Monitor and control the action of all Transactions Panel
+        conditionalPanel(
+          'input.dataset === "Expense vs. Income"',
+          tags$h3("Total Income vs. Expense Over Time", class = "text-info"),
+          # Select date range to be plotted
+          tags$p("Note: Choose date to see the total balance between a specific time!"),
+          dateRangeInput(
+            "DebitDate", strong("Date range"),
+            start = min(UserTransaction$date),
+            end = max(UserTransaction$date),
+            min = min(UserTransaction$date),
+            max = max(UserTransaction$date)
+          )),
+        # Simply print the Authority in main pages
+        printMainAuthority()
+      ),
+      
+      mainPanel (tabsetPanel(
         id = 'dataset',
-        tabPanel("User Expense", DT::dataTableOutput("mytable1")),
-        tabPanel("General Analyst", 
-                 plotOutput("distPlot", height = "300px"),
-                 plotOutput("lineplot1", height = "300px"),
-                 plotOutput("lineplot"),
-                 tags$a(href = "https://github.com/jackyhuynh", "Source: Private Data from Truc")),
-        tabPanel("Category Analyst",
-                 plotOutput("pieplot"),
-                 height = "300px"  ),
-        tabPanel("Map",
-                 leafletOutput("map"),
-        )
+        
+        # Checking Account
+        tabPanel(
+          "Checking Account",
+          DT::dataTableOutput("bankTable"),
+          
+          printWhiteSpace(),
+          tags$em(tags$h3("Deep Analyzing", class = "text-primary")),
+          
+          # Inside UI to display the tabset
+          tabsetPanel(
+            id = 'bankset',
+            
+            # Inside bankset tab Transaction Amount Tabset
+            tabPanel(
+              "Analyze by Transaction Amount",
+              sidebarLayout(
+                #side bar Panel
+                sidebarPanel(
+                  tags$h3("View by Transaction Amount", class = "text-info"),
+                  tags$p("Note: Move the slider to see the frequency of the total balance in your bank account."),
+                  sliderInput(
+                    "bins","Number of bins:",min = 1,max = 100,value = 30),),
+                
+                #main Panel of Transaction Amount Tabset
+                mainPanel(plotOutput("distPlot", height = "300px"))
+              )
+            ),
+            # end sidebarLayout "Transaction Amount"
+            
+            # Inside bankset tab Analyze by Total Balance Tabset
+            tabPanel(
+              "Analyze by Total Balance",
+              sidebarLayout(
+                sidebarPanel(
+                  tags$h3("Total Balance Over Time", class = "text-info"),
+                  # Select date range to be plotted
+                  tags$p("Note: Choose date to see the total balance between a specific time!"),
+                  dateRangeInput(
+                    "date1", strong("Date range"),
+                    start = min(UserData.Tidy$date),
+                    end = max(UserData.Tidy$date),
+                    min = min(UserData.Tidy$date),
+                    max = max(UserData.Tidy$date)
+                  ),
+                  
+                  # Select whether to overlay smooth trend line
+                  checkboxInput(
+                    inputId = "smootherTotal",
+                    label = strong("Overlay smooth trend line"),
+                    value = FALSE
+                  ),
+                ),
+                mainPanel(plotOutput("lineplot1", height = "300px",click="lineplot1_click"),
+                          verbatimTextOutput("lineplot1Info"),
+                          tags$p("Note: Please click on the chart to see the amount in US Dollar($)!"),
+                )
+                
+              )
+            ),
+            # end sidebarLayout "Total Balance"
+            
+            tabPanel(
+              "Analyze by Category",
+              sidebarLayout(
+                sidebarPanel(
+                  tags$h3("Transaction By Category", class = "text-info"),
+                  
+                  
+                  
+                  # Select type of trend to plot
+                  selectInput(
+                    inputId = "type",
+                    label = strong("Type of Transaction"),
+                    choices = unique(c('DEBIT', 'CREDIT', 'CHECK', 'DSLIP')),
+                    selected = "DEBIT"
+                  ),
+                  
+                  # Select date range to be plotted
+                  dateRangeInput(
+                    "date",
+                    strong("Date range"),
+                    start = min(TotalBalance$date),
+                    end = max(TotalBalance$date),
+                    min = min(TotalBalance$date),
+                    max = max(TotalBalance$date)
+                  ),
+                  
+                  # Select whether to overlay smooth trend line
+                  checkboxInput(
+                    inputId = "smoother",
+                    label = strong("Overlay smooth trend line"),
+                    value = FALSE
+                  ),
+                  
+                  # Display only if the smoother is checked
+                  conditionalPanel(
+                    condition = "input.smoother == true",
+                    sliderInput(
+                      inputId = "f",
+                      label = "Smoother span:",
+                      min = 0.01,
+                      max = 1,
+                      value = 0.67,
+                      step = 0.01,
+                      animate = animationOptions(interval = 100)
+                    ),
+                    HTML("Higher values give more smoothness.")
+                  ),
+                  
+                  
+                ),
+                mainPanel (plotOutput("lineplot", height = "300px",click = "lineplot_click"),
+                           verbatimTextOutput("lineplotInfo"),
+                           tags$p("Note: Please click on the chart to see the amount in US Dollar($)!")
+                )
+                
+              ),
+              noteCategory(),
+            )
+          )
+        ),
+        
+        ################################################
+        #All Transaction
+        tabPanel(
+          "All Transaction",
+          DT::dataTableOutput("transTable"),
+          
+          printWhiteSpace(),
+          tags$em(tags$h3("Deep Analyzing", class = "text-primary")),
+          
+          tabsetPanel(
+            tabPanel("Map Expense",leafletOutput("map")),
+            tabPanel("Total Income")
+          ) # End tabset Panel
+          
+        ), # End TabPanel All Transaction 
+        tabPanel("Expense vs. Income",
+                 plotOutput("piePlotDebit"),
+                 sidebarLayout(
+                   sidebarPanel (
+                     div(
+                       tags$h4("Goal Analyst"),
+                       tags$p("Will add the goal analyst portion here!")
+                     )
+                   ),
+                   mainPanel(
+                     plotOutput("Total")  
+                   )
+                 )
+                 
+                 
+                 
+        ) # End tab Panel Total Expense
       )
-    )
+      )
+    ),# end all Tabs
+    printWhiteSpace(),
+    tags$hr(),
+    printNote(),
+    printWhiteSpace()         
     
-    
-    
-  )
-)
+  )# End fluid Page
 
-# Define server logic for the web app
-server <- function(input, output) {
-  # choose columns to display
-  output$mytable1 <- DT::renderDataTable({
-    DT::datatable(UserDataOrg[, input$show_vars, drop = FALSE])
+
+server<- function(input, output) {
+  
+  
+  output$bankTable <- DT::renderDataTable({
+    DT::datatable(UserData.Tidy[, input$show_trans, drop = FALSE])
   })
   
-    output$distPlot <- renderPlot({
-        # generate bins based on input$bins from ui.R
-        x    <- Total[,2]
-        bins <- seq(min(x), max(x), length.out = input$bins + 1)
-
-        # draw the histogram with the specified number of bins
-        hist(x, breaks = bins, col = 'azure3', border = 'white', xlab = "Balance")
-    })
+  output$transTable <- DT::renderDataTable({
+    DT::datatable(UserTransaction[, input$show_trans2, drop = FALSE])
+  })
+  
+  # Plot1: Plot the frequency transaction
+  output$distPlot <- renderPlot({
+    # generate bins based on input$bins from ui.R
+    x    <- TotalBalance[, 2]
+    bins <- seq(min(x), max(x), length.out = input$bins + 1)
     
-    # Validate the date before plot
-    selected_User1 <- reactive({
-        req(input$date1)
-        validate(need(!is.na(input$date1[1]) & !is.na(input$date1[2]),"Error: Please provide both a start and an end date."))
-        validate(need(input$date1[1] < input$date1[2],"Error: Start date should be earlier than end date."))
-        Total %>% filter(date > (input$date1[1]) & date < (input$date1[2]))
-    })
-    
-    # Plot the total balance
-    output$lineplot1 <- renderPlot({
-        color = "azure4"
-        par(mar = c(4, 4, 1, 1))
-        plot(x = selected_User1()$date, y = selected_User1()$balance, type = "o",
-                xlab = "Date", ylab = "Total Balance",col = color, fg = color, col.lab = color, col.axis = color)
-        smooth_curve <- lowess(x = as.numeric(selected_User1()$date), y = selected_User1()$balance)
-        lines(smooth_curve, col = "#E6553A", lwd = 3)
-        
-    })
-    
-    # Subset data, validate the input date to make sure user enter the valid date
-    selected_User <- reactive({
-        req(input$date)
-        
-        validate(need(!is.na(input$date[1]) & !is.na(input$date[2]), "Error: Please provide both a start and an end date."))
-        
-        validate(need(input$date[1] < input$date[2], "Error: Start date should be earlier than end date."))
-        
-        if(input$type=='DEBIT')
-        {
-            UserDebit <-
-                aggregate(select(UserData[UserData$type == 'DEBIT', ], -type)['amount'], by =
-                              select(UserData[UserData$type == 'DEBIT', ], -type)['date'], sum)
-            
-            UserDebit%>%
-                filter(date > input$date[1] & date < input$date[2])
-        }else if(input$type=='CREDIT')
-        { 
-            UserCredit <-
-                aggregate(select(UserData[UserData$type == 'CREDIT', ], -type)['amount'], by =
-                              select(UserData[UserData$type == 'CREDIT', ], -type)['date'], sum)
-            UserCredit%>%
-                filter(date > input$date[1] & date < input$date[2])
-        }else if(input$type=='CHECK')
-        {
-            UserCheck <-
-                aggregate(select(UserData[UserData$type == 'CHECK', ], -type)['amount'], by =
-                              select(UserData[UserData$type == 'CHECK', ], -type)['date'], sum)
-            UserCheck%>%
-                filter(date > input$date[1] & date < input$date[2])
-        }else
-        {
-          UserDSLIP <-
-            aggregate(select(UserData[UserData$type == 'DSLIP', ], -type)['amount'], by =
-                        select(UserData[UserData$type == 'DSLIP', ], -type)['date'], sum)
-            UserDSLIP%>%
-                filter(date > input$date[1] & date < input$date[2])
-        }
-    })
-    
-    # Create scatterplot object the plotOutput function is expecting
-    output$lineplot <- renderPlot({
-        color = "#434343"
-        par(mar = c(4, 4, 1, 1))
-        plot(x = selected_User()$date, y = selected_User()$amount, type = "l",
-             xlab = "Date", ylab = "Amount", col = color, fg = color, col.lab = color, col.axis = color)
-        # Display only if smoother is checked
-        if(input$smoother){
-            smooth_curve <- lowess(x = as.numeric(selected_User()$date), y = selected_User()$amount, f = input$f)
-            lines(smooth_curve, col = "#E6553A", lwd = 3)
-        }
-    })
-    
-    points <- eventReactive(input$recalc, {
-        cbind(rnorm(40) * 2 + 13, rnorm(40) + 48)
-    }, ignoreNULL = FALSE)
-    
-    location <- read_csv("data/location.csv")
-    
-    output$map <- renderLeaflet({
-        leaflet(data = location) %>% addTiles() %>%
-            addMarkers(~long, ~lat, popup =~as.character(Amount), label = ~as.character(store))
-    })
-    
-    # import the data
-    transactions <- read_csv("data/transactions.csv")
-    
-    # Summary by debit and type
-    UserTransaction <-
-      aggregate(select(transactions[transactions$type == 'debit', ], -type)['Amount'], by =
-                  select(transactions[transactions$type == 'debit', ], -type)['category'], sum)
-    
-    # Filter the big transaction
-    SumTransaction <- filter(UserTransaction, as.numeric(UserTransaction$Amount/sum(UserTransaction$Amount)) > 0.005)
-    
-    # Calculate the percentage of all Transactions smaller than 1 percent
-    OtherTransaction <- data.frame("Other Expenses",
-                                   sum(UserTransaction$Amount) - sum(SumTransaction$Amount))
-    
-    # Rename the value
-    names(OtherTransaction) <- c('category','Amount')
-    
-    # Get the total transaction after summary the transaction less than 1 percent
-    SumTransaction<- rbind(SumTransaction,OtherTransaction)
-    
-    # Sort the SumTransaction
-    SumTransaction <- SumTransaction[order(-SumTransaction[,2]),]
-    
-    piepercent <- scales::percent(as.numeric(SumTransaction$Amount/sum(SumTransaction$Amount)))
-    
-    output$pieplot <- renderPlot({
-      par(mar = c(1, 1, 1, 1)) # bltr
-      pie(
-        SumTransaction$Amount,
-        edges = 200,
-        radius = 0.8,
-        clockwise = TRUE,
-        # IMPORTANT
-        angle = 45,
-        col = viridis::viridis_pal(option = "magma", direction = -1)(length(SumTransaction$Amount)),
-        # BETTER COLOR PALETTE
-        labels = head(piepercent,-3),
-        # NEVER DISPLAY OVERLAPPING LABELS
-        cex = 0.7,
-        border = "white",
+    # draw the histogram with the specified number of bins
+    hist(
+      x,
+      breaks = bins,
+      col = 'azure3',
+      border = 'white',
+      xlab = "Balance",
+      main = ""
+    )
+  })
+  
+  
+  # Plot2:Validate the date before plot
+  selected_User1 <- reactive({
+    req(input$date1)
+    validate(need(
+      !is.na(input$date1[1]) &
+        !is.na(input$date1[2]),
+      "Error: Please provide both a start and an end date."
+    ))
+    validate(
+      need(
+        input$date1[1] < input$date1[2],
+        "Error: Start date should be earlier than end date."
       )
+    )
+    TotalBalance %>% filter(date > (input$date1[1]) &
+                              date < (input$date1[2]))
+  })
+  
+  # Plot2: Plot the total balance
+  output$lineplot1 <- renderPlot({
+    color = "azure4"
+    par(mar = c(4, 4, 1, 1))
+    plot(
+      x = selected_User1()$date,
+      y = selected_User1()$balance,
+      type = "o",
+      xlab = "Date",
+      ylab = "Total Balance",
+      col = color,
+      fg = color,
+      col.lab = color,
+      col.axis = color
+    )
+    # Add the smooth_curve
+    if (input$smootherTotal) {
+      smooth_curve <-
+        lowess(x = as.numeric(selected_User1()$date),
+               y = selected_User1()$balance)
+      lines(smooth_curve, col = "#E6553A", lwd = 3)}
+    
+  })
+  
+  #Display the total input click
+  output$lineplot1Info <- renderText({
+    paste0("Amount = $ ", round(as.numeric(input$lineplot1_click$y),2))
+  })
+  
+  # plot3:
+  selected_User <- reactive({
+    req(input$date)
+    
+    validate(need(
+      !is.na(input$date[1]) &
+        !is.na(input$date[2]),
+      "Error: Please provide both a start and an end date."
+    ))
+    
+    validate(need(
+      input$date[1] < input$date[2],
+      "Error: Start date should be earlier than end date."
+    ))
+    
+    if (input$type == 'DEBIT')
+    {
+      UserDebit <-
+        aggregate(select(UserData.Tidy[UserData.Tidy$details == 'DEBIT',],-details)['amount'],
+                  by =
+                    select(UserData.Tidy[UserData.Tidy$details == 'DEBIT',],-details)['date'],
+                  sum)
       
-      legend(
-        1,
-        .5,
-        SumTransaction$category,
-        cex = 0.7,
-        fill = viridis::viridis_pal(option = "magma", direction = -1)(length(SumTransaction$Amount))
-      )
-    })
+      UserDebit %>%
+        filter(date > input$date[1] & date < input$date[2])
+    } else if (input$type == 'CREDIT')
+    {
+      UserCredit <-
+        aggregate(select(UserData.Tidy[UserData.Tidy$details == 'CREDIT',],-details)['amount'],
+                  by =
+                    select(UserData.Tidy[UserData.Tidy$details == 'CREDIT',],-details)['date'],
+                  sum)
+      UserCredit %>%
+        filter(date > input$date[1] & date < input$date[2])
+    } else if (input$type == 'CHECK')
+    {
+      UserCheck <-
+        aggregate(select(UserData.Tidy[UserData.Tidy$details == 'CHECK',],-details)['amount'],
+                  by =
+                    select(UserData.Tidy[UserData.Tidy$details == 'CHECK',],-details)['date'],
+                  sum)
+      UserCheck %>%
+        filter(date > input$date[1] & date < input$date[2])
+    } else
+    {
+      UserDSLIP <-
+        aggregate(select(UserData.Tidy[UserData.Tidy$details == 'DSLIP',],-details)['amount'],
+                  by =
+                    select(UserData.Tidy[UserData.Tidy$details == 'DSLIP',],-details)['date'],
+                  sum)
+      UserDSLIP %>%
+        filter(date > input$date[1] & date < input$date[2])
+    }
+  })
+  
+  # Create scatterplot object the plotOutput function is expecting
+  output$lineplot <- renderPlot({
+    color = "#434343"
+    par(mar = c(4, 4, 1, 1))
+    plot(
+      x = selected_User()$date,
+      y = selected_User()$amount,
+      type = "o",
+      xlab = "Date",
+      ylab = "Amount",
+      col = color,
+      fg = color,
+      col.lab = color,
+      col.axis = color
+    )
+    # Display only if smoother is checked
+    if (input$smoother) {
+      smooth_curve <-
+        lowess(
+          x = as.numeric(selected_User()$date),
+          y = selected_User()$amount,
+          f = input$f
+        )
+      lines(smooth_curve, col = "#E6553A", lwd = 3)
+    }
+  })
+  
+  #Display the total input click of lineplot
+  output$lineplotInfo <- renderText({
+    paste0("Amount: $ ", round(as.numeric(input$lineplot_click$y),2))
+  })
+  
+  
+  # Set of methods for the Summary map
+  location <-
+    aggregate(amount ~ lat + long,data = filter(UserTransaction, UserTransaction$type == 'debit'),FUN = sum)
+  
+  output$map <- renderLeaflet({
+    leaflet(data = location) %>% addTiles() %>%
+      addMarkers( ~ long, ~ lat, label =  ~ as.character(amount))
+  })
+  
+  
+  # Validate the date before plot
+  debitTrans <- reactive({
+    req(input$DebitDate)
+    validate(need(!is.na(input$DebitDate[1]) & !is.na(input$DebitDate[2]),"Error: Please provide both a start and an end date."))
+    validate(need(input$DebitDate[1] < input$DebitDate[2],"Error: Start date should be earlier than end date."))
+    debitTrans<-SummaryExpense(UserTransaction %>% filter(date > (input$DebitDate[1]) & date < (input$DebitDate[2])),'debit')
+    creditTrans<-SummaryExpense(UserTransaction %>% filter(date > (input$DebitDate[1]) & date < (input$DebitDate[2])),'credit')
+    
+    old.par <- par(mfrow=c(1, 2))
+    
+    pie(
+      debitTrans$amount, edges = 200, radius = 0.9,clockwise = TRUE,
+      # IMPORTANT
+      angle = 45, col = viridis::viridis_pal(option = "magma", direction = -1)(length(debitTrans$amount)),
+      labels = head(scales::percent(as.numeric(debitTrans$amount/sum(debitTrans$amount))),-3),
+      # NEVER DISPLAY OVERLAPPING LABELS
+      cex = 0.7, border = "white",main="Debit Transactions"
+    )
+    legend(
+      1,.3,debitTrans$category,
+      cex = 0.7,
+      fill = viridis::viridis_pal(option = "magma", direction = -1)(length(debitTrans$amount))
+    )
+    
+    # Credit Transaction
+    pie(
+      creditTrans$amount, edges = 200, radius = 0.9,clockwise = TRUE,
+      # IMPORTANT
+      angle = 45, col = viridis::viridis_pal(option = "magma", direction = -1)(length(creditTrans$amount)),
+      labels = head(scales::percent(as.numeric(creditTrans$amount/sum(creditTrans$amount))),-3),
+      # NEVER DISPLAY OVERLAPPING LABELS
+      cex = 0.7, border = "white", main="Credit Transactions"
+    )
+    legend(
+      1,.3,creditTrans$category,
+      cex = 0.7,
+      fill = viridis::viridis_pal(option = "magma", direction = -1)(length(creditTrans$amount))
+    )
+    par(old.par)
+    
+  })
+  
+  
+  # Plot the total balance
+  output$piePlotDebit <- renderPlot({
+    debitTrans()
+  })
+  
+  
+  totalTrans <- reactive({
+    validate(need(!is.na(input$DebitDate[1]) & !is.na(input$DebitDate[2]),"Error: Please provide both a start and an end date."))
+    validate(need(input$DebitDate[1] < input$DebitDate[2],"Error: Start date should be earlier than end date."))
+    debitTrans<-SummaryExpense(UserTransaction %>% filter(date > (input$DebitDate[1]) & date < (input$DebitDate[2])),'debit')
+    creditTrans<-SummaryExpense(UserTransaction %>% filter(date > (input$DebitDate[1]) & date < (input$DebitDate[2])),'credit')
+    
+    totalS <-data.frame(c(sum(debitTrans$amount),sum(creditTrans$amount)),c("Expense","Income"))
+    
+    colnames(totalS)<- c("amount", "type")
+    
+    ggplot(totalS, aes(y=type, x=amount, fill=type)) + 
+      geom_bar(stat='identity',position = "stack")
+    
+  })
+  
+  output$Total <- renderPlot({
+    totalTrans()
+  })
+  
 }
 
-# Run the application 
-shinyApp(ui = ui, server = server)
+shinyApp(ui, server)
