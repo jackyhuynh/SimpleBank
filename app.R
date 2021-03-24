@@ -28,7 +28,7 @@ source("modules/print_display_module.R")
 UserData.Tidy  <- read_csv("data/data.CSV", col_types = cols(date = col_date(format = "%m/%d/%Y")))
 
 # Get the Transaction Database
-UserTransaction <- read_csv("data/transdata.CSV",col_types = cols(date = col_date(format = "%m/%d/%Y")))
+UserTransaction <- read_csv("data/transdata.csv",col_types = cols(date = col_date(format = "%m/%d/%Y")))
 
 # Set the Type to NULL
 UserData.Tidy$type <- NULL
