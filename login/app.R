@@ -47,7 +47,7 @@ loginpage <-
         shinyjs::hidden(div(
           id = "nomatch",
           tags$p(
-            "Oops! Incorrect username or password!",
+            "Incorrect username or password!",
             style = "color: red; font-weight: 600;
                                             padding-top: 5px;font-size:16px;",
             class = "text-center"
