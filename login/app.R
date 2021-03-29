@@ -16,7 +16,7 @@ library(shinyauthr)
 library(odbc)
 library(RMySQL)
 library(sqldf)
-sort(unique(odbcListDrivers()[[1]]))
+
 # Main login screen
 loginpage <-
   div(
@@ -55,11 +55,12 @@ loginpage <-
         )),
         br()
         
-      
+        
       )
     )
   )
 
+# Ignore lines 64-68 as they contain static user data
 credentials = data.frame(
   username_id = c("myuser", "myuser1"),
   passod   = sapply(c("mypass", "mypass1"), password_store),
@@ -85,7 +86,7 @@ server <- function(input, output, session) {
           Username <- isolate(input$userName)
           Password <- isolate(input$passwd)
           pasverify <-
-            validateCredentails(Username, Password)
+            validateCredentails(Username, Password) # Authentication function
           
           
           if (pasverify) {
@@ -124,6 +125,7 @@ server <- function(input, output, session) {
     )
   })
   
+  #
   output$sidebarpanel <- renderUI({
     if (USER$login == TRUE) {
       sidebarMenu(
@@ -140,6 +142,8 @@ server <- function(input, output, session) {
       )
     }
   })
+  
+  # Please modify code for welcome page in this section
   
   output$body <- renderUI({
     if (USER$login == TRUE) {
@@ -177,7 +181,6 @@ server <- function(input, output, session) {
     print("inside validateCredentails")
     print(userid)
     drv <- dbDriver("MySQL")
-    #con <- dbConnect(odbc(), "DSN name")
     isValid <- FALSE
     mydb <-
       dbConnect(
@@ -187,7 +190,7 @@ server <- function(input, output, session) {
         dbname = 'creditcard_data_analysis',
         host = 'localhost'
       )
-    #SELECT * FROM airports WHERE faa = '", airport_code ,"'
+    
     rs <-
       dbSendQuery(
         mydb,
