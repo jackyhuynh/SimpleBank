@@ -1,12 +1,3 @@
-#
-# This is a Shiny web application. You can run the application by clicking
-# the 'Run App' button above.
-#
-# Find out more about building applications with Shiny here:
-#
-#    http://shiny.rstudio.com/
-#
-
 library(shiny)
 library(shinydashboard)
 library(shinythemes) # themes for css
@@ -98,7 +89,7 @@ credentials = data.frame(
 )
 
 header <-
-  dashboardHeader(title = "Simple Dashboard", uiOutput("logoutbtn"))
+  dashboardHeader(title = "Deep Financial Analysis", uiOutput("logoutbtn"))
 
 sidebar <- dashboardSidebar(uiOutput("sidebarpanel"))
 body <- dashboardBody(shinyjs::useShinyjs(), uiOutput("body"))
@@ -185,17 +176,17 @@ server <- function(input, output, session) {
                   theme = shinytheme("flatly"),
                   
                   # Navigation bar
-                  navbarPage(
-                    "Personal Expense Analyst",
-                    tabPanel("About Us"),
-                    navbarMenu(
-                      "Setting",
-                      tabPanel("Summary"),
-                      "----",
-                      "Section header",
-                      tabPanel("Table")
-                    )
-                  ),
+                  # navbarPage(
+                  #   "Personal Expense Analyst",
+                  #   tabPanel("About Us"),
+                  #   navbarMenu(
+                  #     "Setting",
+                  #     tabPanel("Summary"),
+                  #     "----",
+                  #     "Section header",
+                  #     tabPanel("Table")
+                  #   )
+                  # ),
                   
                   # Application title
                   titlePanel("Expense Analyst"),
