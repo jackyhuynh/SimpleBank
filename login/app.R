@@ -188,7 +188,7 @@ server <- function(input, output, session) {
         drv,
         user = 'root',
         password = 'Myskhongbiet88',
-        dbname = 'creditcard_data_analysis',
+        dbname = 'credit_card_analysis',
         host = 'localhost'
       )
     
