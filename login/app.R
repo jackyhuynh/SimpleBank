@@ -89,7 +89,7 @@ credentials = data.frame(
 )
 
 header <-
-  dashboardHeader(title = "Deep Financial Analysis", uiOutput("logoutbtn"))
+  dashboardHeader(title = "Financial Freedom", uiOutput("logoutbtn"))
 
 sidebar <- dashboardSidebar(uiOutput("sidebarpanel"))
 body <- dashboardBody(shinyjs::useShinyjs(), uiOutput("body"))
@@ -189,7 +189,7 @@ server <- function(input, output, session) {
                   # ),
                   
                   # Application title
-                  titlePanel("Expense Analyst"),
+                  titlePanel("Deep Financial Analysis"),
                   
                   # sidebar Design
                   sidebarLayout(
