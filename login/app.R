@@ -145,6 +145,7 @@ server <- function(input, output, session) {
   
   # Please modify code for welcome page in this section
   
+  
   output$body <- renderUI({
     if (USER$login == TRUE) {
       tabItems(
@@ -186,7 +187,7 @@ server <- function(input, output, session) {
       dbConnect(
         drv,
         user = 'root',
-        password = 'admin',
+        password = 'Myskhongbiet88',
         dbname = 'creditcard_data_analysis',
         host = 'localhost'
       )
