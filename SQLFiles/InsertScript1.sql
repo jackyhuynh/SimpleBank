@@ -55,3 +55,6 @@ insert into locations(sub_category_fk, location_name, location_latitude, locatio
 (19, 'CVS', 41.17784048486054, -85.13196197383137, '770 E Dupont Rd, Fort Wayne, IN 46825'),
 (24, 'Phillips Plumbing Service', 41.212069626848546, -85.8883977603363, '1492 S Wausau St, Warsaw, IN 46580'),
 (25, 'Plumbing Services Inc', 41.034206950331125, -85.20790249057039,'2234 N Clinton St, Fort Wayne, IN 46805');
+
+Insert into users (ID, USERID, PASSWORD) values (1,'user1','pass1'),(2,'user2','pass2'),(3,'user3','pass3'),(4,'user4','pass4'),
+(5,'user5','pass5'),(6,'user6','pass6'),(7,'user7','pass7'),(8,'user8','pass8'),(9,'user9','pass9'),(10,'user10','pass10');
