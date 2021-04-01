@@ -34,9 +34,6 @@ UserData.Tidy$type <- NULL
 TotalBalance <-
   aggregate(select(UserData.Tidy,-c(details))['balance'], select(UserData.Tidy,-c(details))['date'], last)
 
-
-
-
 # Main login screen
 loginpage <-
   div(
@@ -74,8 +71,6 @@ loginpage <-
           )
         )),
         br()
-        
-        
       )
     )
   )
@@ -98,7 +93,8 @@ ui <- dashboardPage(header, sidebar, body, skin = "blue")
 server <- function(input, output, session) {
   login = FALSE
   USER <- reactiveValues(login = login)
-  
+
+    
   observe({
     if (USER$login == FALSE) {
       if (!is.null(input$login)) {
@@ -107,7 +103,6 @@ server <- function(input, output, session) {
           Password <- isolate(input$passwd)
           pasverify <-
             validateCredentails(Username, Password) # Authentication function
-          
           
           if (pasverify) {
             USER$login <- TRUE
@@ -163,7 +158,7 @@ server <- function(input, output, session) {
     }
   })
   
-  # Please modify code for welcome page in this section
+# Please modify code for welcome page in this section
   
   
   output$body <- renderUI({
@@ -171,22 +166,11 @@ server <- function(input, output, session) {
       tabItems(
         # First tab
         tabItem(tabName = "dashboard", class = "active",
+                
+                # Fluid Page for the main User Home Page
                 fluidPage(
                   # Add UI theme, can easily change theme by change the UI
                   theme = shinytheme("flatly"),
-                  
-                  # Navigation bar
-                  # navbarPage(
-                  #   "Personal Expense Analyst",
-                  #   tabPanel("About Us"),
-                  #   navbarMenu(
-                  #     "Setting",
-                  #     tabPanel("Summary"),
-                  #     "----",
-                  #     "Section header",
-                  #     tabPanel("Table")
-                  #   )
-                  # ),
                   
                   # Application title
                   titlePanel("Deep Financial Analysis"),
@@ -392,9 +376,9 @@ server <- function(input, output, session) {
                                
                                
                       ) # End tab Panel Total Expense
-                    )
-                    )
-                  ),# end all Tabs
+                    ))),# end all Tabs
+                  
+                  # Decoration function
                   printWhiteSpace(),
                   tags$hr(),
                   printNote(),
@@ -702,7 +686,9 @@ server <- function(input, output, session) {
     colnames(totalS)<- c("amount", "type")
     
     ggplot(totalS, aes(y=type, x=amount, fill=type)) + 
-      geom_bar(stat='identity',position = "stack")
+      geom_bar(stat='identity',position = "stack") +
+      ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 60, hjust = 1)) +
+      scale_x_continuous(labels=fancy_scientific)
     
   })
   
@@ -710,7 +696,16 @@ server <- function(input, output, session) {
     totalTrans()
   })
   
-  
+  fancy_scientific <- function(l) {
+    # turn in to character string in scientific notation
+    l <- format(l, scientific = TRUE)
+    # quote the part before the exponent to keep all the digits
+    l <- gsub("^(.*)e", "'\\1'e", l)
+    # turn the 'e+' into plotmath format
+    l <- gsub("e", "%*%10^", l)
+    # return this as an expression
+    parse(text=l)
+  }
 }
 
 runApp(list(ui = ui, server = server), launch.browser = TRUE)
