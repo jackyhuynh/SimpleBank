@@ -397,11 +397,6 @@ server <- function(input, output, session) {
     }
   })
   
-  output$results <-  DT::renderDataTable({
-    datatable(iris, options = list(autoWidth = TRUE,
-                                   searching = FALSE))
-  })
-  
   output$results2 <-  DT::renderDataTable({
     datatable(mtcars, options = list(autoWidth = TRUE,
                                      searching = FALSE))
