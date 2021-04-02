@@ -373,8 +373,6 @@ server <- function(input, output, session) {
                                  )
                                )
                                
-                               
-                               
                       ) # End tab Panel Total Expense
                     ))),# end all Tabs
                   
