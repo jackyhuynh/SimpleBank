@@ -74,3 +74,15 @@ create table user_transaction_user_id_1(
     foreign key (locationid_id_fk) references locations(location_id)
 )auto_increment=1;
 
+CREATE TABLE `users` (
+  `ID` int NOT NULL,
+  `USERID` varchar(45) NOT NULL,
+  `PASSWORD` varchar(45) DEFAULT NULL,
+  `CREATED_DATE` datetime DEFAULT NULL,
+  `UPDATED_DATE` datetime DEFAULT NULL,
+  PRIMARY KEY (`ID`,`USERID`),
+  UNIQUE KEY `ID_UNIQUE` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+Insert into users (ID,USERID,PASSWORD)
+			VALUES(4,'user4','pass4');
