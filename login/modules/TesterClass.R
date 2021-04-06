@@ -3,6 +3,8 @@
 ##confrimUserCredentails User confirmation
 obj <- new("user",userid=1, name="Miles Davis", ssn=11234567899,
                        username="davis_miles", password="password123");
+
+### Truc: Unable to test this function. Please Check
 confrimUserCredentails(obj, connection)
 
 connection <- getConnection();
