@@ -54,30 +54,33 @@ View(transactions)
 categoriesList <- getCategoryList(connection);
 View(categoriesList);
 
-
+##ADMIN ONLY
 ##addNewCategory
 categoryObject <- new("category", categoryName="Test Category");
 addNewCategory(connection, categoryObject);
 
+##NEED CAREFUL WITH THIS USER SHOULD NOT BE ABLE TO ADD OR DELETE CATEGORY. ADMIN ONLY
 ##deleteCategory
 categoryObject <- new("category", categoryId=24);
 deleteCategory(connection, categoryObject)
 
-
+##ADMIN ONLY
+## ADD NEW USER TO THE DATABASE
 ##addNewUser
-
 userObj <- new("user", name="Ameet Newton", ssn=5655656, username="inewton", password="pwd123", dob="01/21/1975", address="Londn, England");
 addNewUser(connection, userObj);
 
+##ADMIN ONLY
 ##updateUserDetails
 userObj <- new("user", userid=15, name="Test Name Update", ssn=11234567899, username="test_user12", password="pwd123", dob="01/21/1991", address="Test address 12345");
 updateUserDetails(connection, userObj)
 
-
+##ADMIN ONLY
 ##deleteUser
 userObj <- new("user", userid=18);
 deleteUser(connection, userObj)
 
+##ADMIN ONLY
 ##getAllUsers
 users <- getAllUsers(connection);
 View(users)
