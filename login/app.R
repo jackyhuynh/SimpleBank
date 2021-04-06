@@ -412,7 +412,7 @@ server <- function(input, output, session) {
         drv,
         user = 'root',
         password = 'Myskhongbiet88',
-        dbname = 'credit_card_analysis',
+        dbname = 'credit_card_analysis2',
         host = 'localhost'
       )
     
@@ -420,9 +420,9 @@ server <- function(input, output, session) {
       dbSendQuery(
         mydb,
         paste0(
-          "select userid from users where userid='",
+          "select user_id from user_details where login_username='",
           userid ,
-          "' and password = '",
+          "' and login_password = '",
           passwrd ,
           "'"
         )
