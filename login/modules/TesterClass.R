@@ -4,10 +4,14 @@
 obj <- new("user",userid=1, name="Miles Davis", ssn=11234567899,
                        username="davis_miles", password="password123");
 
+###Get the connection from the database
+connection <- getConnection();
+
 ### Truc: Unable to test this function. Please Check
+### Truc: Update: Test good, just need to run the connection first
 confrimUserCredentails(obj, connection)
 
-connection <- getConnection();
+## Disconnect the connection
 dbDisconnect(connection);
 
 ##1. Get data for all the transactions with store name
@@ -31,7 +35,7 @@ View(transactions);
 transactions <- getTransactionsByCategoryForCurrentMonth(connection);
 View(transactions);
 
-
+# May not need this function
 #6. getTransactionsByACard
 cardObj <- new("card",cardId=1, userId=1, cardNumber=12345678, expirationDate="03/31/2021");
 transactions <- getTransactionsByACard(connection, cardObj);
@@ -45,6 +49,7 @@ View(transactions);
 transactions <- getAggregatedExpenditureByCategory(connection);
 View(transactions)
 
+## Get all the category TRUC
 ##9. getCategoryNames
 categoriesList <- getCategoryList(connection);
 View(categoriesList);
