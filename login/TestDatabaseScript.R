@@ -237,8 +237,8 @@ server <- function(input, output, session) {
   #            the database
   # Variable: Local  
   validateCredentails <- function(userid, passwrd) {
-    print("inside validateCredentails")
-    print(userid)
+    # print("inside validateCredentails")
+    # print(userid)
     drv <- dbDriver("MySQL")
     isValid <- FALSE
     mydb <-
@@ -248,7 +248,6 @@ server <- function(input, output, session) {
         password = 'Myskhongbiet88',
         dbname = 'credit_card_analysis2',
         host = 'localhost')
-    
     rs <-
       dbSendQuery(
         mydb,
@@ -261,16 +260,20 @@ server <- function(input, output, session) {
     if (!dbHasCompleted(rs)) {
       chunk <- dbFetch(rs, n = 1)
       
-      print(nrow(chunk))
-      if (nrow(chunk) == 1) {
-        print("Authentication SUCCESSFUL")
-        isValid <- TRUE
-      }
-      else {
-        print("Authentication FAILED")
-        isValid <- FALSE
-      }
+      # The row below is For Testing, and debugging Only
+      # It will display the status of the component to the Console
+      # print(nrow(chunk))
+      # if (nrow(chunk) == 1) {
+      #   print("Authentication SUCCESSFUL")
+      #   isValid <- TRUE
+      # }
+      # else {
+      #   print("Authentication FAILED")
+      #   isValid <- FALSE
+      # }
     }
+    
+    # Clear the connection
     dbClearResult(rs)
     dbDisconnect(mydb)
     return(isValid)
