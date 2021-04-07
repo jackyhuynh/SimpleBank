@@ -120,11 +120,10 @@ server <- function(input, output, session) {
   # Validate everytime user login
   USER <- reactiveValues(login = login)
   
-  
   # @Swetha 
   #
   # Function: Adding component
-  # Component: Part of user login validation
+  # Component: Logic, Part of user login validation
   # Variable: Local
   observe({
     if (USER$login == FALSE) {
@@ -154,6 +153,11 @@ server <- function(input, output, session) {
   }) 
   # end observe for user login
   
+  ###################
+  # @UI COMPONENTS:
+  ###################
+  
+  # @SET OF LOGIN PAGE UI
   
   # @Swetha 
   #
@@ -207,15 +211,15 @@ server <- function(input, output, session) {
         tabItem(tabName = "dashboard", class = "active",
                 
                 # Fluid Page for the main User Home Page
-                fluidPage()),
+                fluidPage(box(
+                  width = 12, dataTableOutput('results1')
+                ))),
         
         # Second tab
         tabItem(tabName = "second",
                 fluidRow(box(
                   width = 12, dataTableOutput('results2')
-                )))
-      )
-      
+                ))))
     }
     # Call the loginpage agin if fail to identify user
     else {
@@ -224,11 +228,33 @@ server <- function(input, output, session) {
   })
   # End output$body
   
-  #
+  
+  # @Swetha
+  # Function:  renderDataTable 
+  # Component: UI
+  # Variable: Local  
   output$results2 <-  DT::renderDataTable({
     datatable(mtcars, options = list(autoWidth = TRUE,
                                      searching = FALSE))
   })
+  
+
+  # @Swetha
+  # Function:  renderDataTable 
+  # Component: UI
+  # Variable: Local  
+  output$results1 <-  DT::renderDataTable({
+    datatable(mtcars, options = list(autoWidth = TRUE,
+                                     searching = FALSE))
+  })
+  
+  
+  ###################
+  # @LOGIC FUNCTIONS:
+  ###################
+  
+  # @ SET OF LOGIC VALIDATION
+  
   
   
   # @Swetha
@@ -237,8 +263,8 @@ server <- function(input, output, session) {
   #            the database
   # Variable: Local  
   validateCredentails <- function(userid, passwrd) {
-    # print("inside validateCredentails")
-    # print(userid)
+    print("inside validateCredentails")
+    print(userid)
     drv <- dbDriver("MySQL")
     isValid <- FALSE
     mydb <-
@@ -247,7 +273,8 @@ server <- function(input, output, session) {
         user = 'root',
         password = 'Myskhongbiet88',
         dbname = 'credit_card_analysis2',
-        host = 'localhost')
+        host = 'localhost'
+        )
     rs <-
       dbSendQuery(
         mydb,
@@ -255,29 +282,37 @@ server <- function(input, output, session) {
           "select user_id from user_details where login_username='",
           userid ,
           "' and login_password = '",
-          passwrd ,))
+          passwrd,
+          "'"
+          )
+        )
     
     if (!dbHasCompleted(rs)) {
       chunk <- dbFetch(rs, n = 1)
       
+      # ###########################################################
       # The row below is For Testing, and debugging Only
       # It will display the status of the component to the Console
-      # print(nrow(chunk))
-      # if (nrow(chunk) == 1) {
-      #   print("Authentication SUCCESSFUL")
-      #   isValid <- TRUE
-      # }
-      # else {
-      #   print("Authentication FAILED")
-      #   isValid <- FALSE
-      # }
+      print(nrow(chunk))
+      if (nrow(chunk) == 1) {
+        print("Authentication SUCCESSFUL")
+        isValid <- TRUE
+      }
+      else {
+        print("Authentication FAILED")
+        isValid <- FALSE
+      }
+      
     }
     
-    # Clear the connection
+    # Clear the connection and stop the application
     dbClearResult(rs)
     dbDisconnect(mydb)
     return(isValid)
   }
+  # End of validateCredential function
+  
+  
 }
 
 # @Swetha @Truc
