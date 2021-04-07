@@ -44,8 +44,8 @@ transactions <- getTransactionsByACard(connection, cardObj);
 View(transactions)
 
 ##7. getMonthlyExpenditureByCategoryName
-transactions <- getMonthlyExpenditureByCategoryName(connection);
-View(transactions);
+transactions5 <- getMonthlyExpenditureByCategoryName(connection);
+View(transactions5);
 
 ##8. getAggregatedExpenditureByCategory
 transactions <- getAggregatedExpenditureByCategory(connection);
@@ -86,3 +86,4 @@ deleteUser(connection, userObj)
 ##getAllUsers
 users <- getAllUsers(connection);
 View(users)
+
