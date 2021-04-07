@@ -31,43 +31,13 @@ Its function is fairly simple, Expense Tracking allows user to track their expen
 
 
 ### Component (Truc Suggestion):
-    - Back End (Database/Sever): C#, Java
+    - Back End (Database/Sever): MySQL, R
     - Front End (Gui, Database/Client/Machine Learning): R, Python, JavaScript, HTML
     - Development Tool?
 
 ## Technology:
 [Microsoft AI platform](https://docs.microsoft.com/en-us/archive/msdn-magazine/2017/connect/artificial-intelligence-getting-started-with-microsoft-ai)
 
-
-Minutes of Meeting (MOM) 
-
-Date: 02-18-2021 
-
-Client: Dr. Khalifa 
-
-Agenda: Presentation and feedback on Use case diagram, UI prototypes and database plan 
-
-Truc presented Use Case diagram.  
-
-Feedback: All the functions that user has have been covered. However, instead of ‘View Spending Advice’ one could mention only ‘View Charts’. 
-
-Swetha presented UI prototypes.  
-
-Feedback:  The category of the transaction should be displayed as an icon. User can click on the icon and make changes to the category if they want to. This way category is understood visually. 
-
-Wrucha presented database plan. 
-
-Feedback: Encrypt the sensitive data such as SSN or credit card number while storing in database. Also, include location where the transaction takes place. 
-
-Kristina talked about the types of graphs the system plan to display. 
-
-Central idea should be to display maximum expenditure data visually. The criterion for expenditure analysis should include – categorical expenditure, location-based expenditure (using GPS co-ordinates on the map where the user would be able to zoom in on a location), expenditure over time period(s) (week, month, year). 
-
-Classify the transaction on where they were processed – online or at outlet/store locations. 
-
-Future scopes -  
-
-Find patterns and comparisons from user’s previous transactions and by pulling data between all users. 
 
   
 
