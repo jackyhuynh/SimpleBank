@@ -88,7 +88,11 @@ header <-
 
 sidebar <- dashboardSidebar(uiOutput("sidebarpanel"))
 body <- dashboardBody(shinyjs::useShinyjs(), uiOutput("body"))
-ui <- dashboardPage(header, sidebar, body, skin = "blue")
+ui <- dashboardPage(
+  dashboardHeader(title = "Financial Freedom", uiOutput("logoutbtn")),
+  dashboardSidebar(uiOutput("sidebarpanel")), 
+  dashboardBody(shinyjs::useShinyjs(), uiOutput("body")), 
+  skin = "blue")
 
 server <- function(input, output, session) {
   login = FALSE

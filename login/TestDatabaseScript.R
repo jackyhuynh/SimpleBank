@@ -21,15 +21,18 @@ library(leaflet) # map
 source("modules/pie_chart_module.R")
 source("modules/print_display_module.R")
 source("modules/CategoryFunctions.R")
-source("modules/TesterClass.R")
 source("modules/DataClasses.R")
 source("modules/TransactionFunctions.R")
 source("modules/UserFunctions.R")
 
 
 # @Swetha
-# Main login screen
-# UI Component for Login Screen  
+#
+# Name: Main login screen
+# Function: UI Component for Login Screen
+# Component: UI
+# Variable: Global
+
 loginpage <-
   div(
     id = "loginpage",
@@ -68,10 +71,14 @@ loginpage <-
         br()
       )
     )
-  )
+  ) # End Main Login UI
 
 #  @Swetha
-# Ignore lines 64-68 as they contain static user data
+# 
+# Function: Ignore lines 64-68 as they contain static user data
+# Component: UI
+# Variable: Global
+
 credentials = data.frame(
   username_id = c("myuser", "myuser1"),
   passod   = sapply(c("mypass", "mypass1"), password_store),
@@ -79,5 +86,90 @@ credentials = data.frame(
   stringsAsFactors = F
 )
 
+# @Swetha
+#
+# Function: ui dashboard for the main page
+# Component: UI
+# Variable: Global
 
+ui <- dashboardPage(
+  
+  # @Swetha
+  #
+  # Function: Top header, sidebar, and body for the Dashboard
+  # Component: UI
+  # Variable: Global
+  
+  dashboardHeader(title = "Financial Freedom", uiOutput("logoutbtn")),
+  dashboardSidebar(uiOutput("sidebarpanel")),
+  dashboardBody(shinyjs::useShinyjs(), uiOutput("body")),
+  skin = "blue"
+)
 
+# @Swetha @Truc
+#
+# Function: Server logic that handle the application
+# Component: Server and Logic Component
+# Variable: Global
+
+server <- function(input, output, session) {
+  
+  # login variable for user to login
+  login = FALSE
+  
+  # Validate everytime user login
+  USER <- reactiveValues(login = login)
+  
+  # @Swetha 
+  #
+  # Function: Adding component
+  # Component: Part of user login validation
+  # Variable: Local
+  
+  observe({
+    if (USER$login == FALSE) {
+      if (!is.null(input$login)) {
+        if (input$login > 0) {
+          Username <- isolate(input$userName)
+          Password <- isolate(input$passwd)
+          pasverify <-
+            validateCredentails(Username, Password) # Authentication function
+          
+          if (pasverify) {
+            USER$login <- TRUE
+          } else {
+            shinyjs::toggle(
+              id = "nomatch",
+              anim = TRUE,
+              time = 1,
+              animType = "fade"
+            )
+            shinyjs::delay(3000,
+                           shinyjs::toggle(
+                             id = "nomatch",
+                             anim = TRUE,
+                             time = 1,
+                             animType = "fade"
+                           ))}}}}
+  }) # end observe for user login
+  
+  
+  output$logoutbtn <- renderUI({
+    req(USER$login)
+    tags$li(
+      a(icon("fa fa-sign-out"), "Logout",
+        href = "javascript:window.location.reload(true)"),
+      class = "dropdown",
+      style = "background-color: #eee !important; border: 0;
+                    font-weight: bold; margin:5px; padding: 10px;"
+    )
+  })
+}
+
+# @Swetha @Truc
+#
+# Function: Top header, sidebar, and body for the Dashboard
+# Component: UI
+# Variable: Global
+
+runApp(list(ui = ui, server = server), launch.browser = TRUE)
