@@ -18,21 +18,24 @@ dbDisconnect(connection);
 transactions <-getTransactionDataWithStoreName(connection);
 View(transactions);
 
-##2. get transactions for the month
-transactions <- getCurrentMonthTransaction(connection)
-View(transactions)
+## NOT REALLY NEED BECAUSE TRANS SHOW IN LIST 
+##2. get transactions for the current month
+transactions1 <- getCurrentMonthTransaction(connection)
+View(transactions1)
 
+## NOT REALLY NEED BECAUSE TRANS will be extract LATER USING REACTIVE 
 ##3. getTransactions between time 
-transactions <- getTransactionBetweenTimePeriod(connection, "02/01/2021", "03/31/2021");
-View(transactions);
+transactions2 <- getTransactionBetweenTimePeriod(connection, "02/01/2021", "03/31/2021");
+View(transactions2);
 
 ##4. getTransactionCoordinatesForTimePeriod 
-transactions <- getTransactionCoordinatesForTimePeriod(connection, "02/01/2021", "03/31/2021");
-View(transactions);
+transactions3 <- getTransactionCoordinatesForTimePeriod(connection, "02/01/2021", "03/31/2021");
+View(transactions3);
 
+## NOT REALLY NEED
 #5. getTransactionsByCategoryForCurrentMonth
-transactions <- getTransactionsByCategoryForCurrentMonth(connection);
-View(transactions);
+transactions4 <- getTransactionsByCategoryForCurrentMonth(connection);
+View(transactions4);
 
 # May not need this function
 #6. getTransactionsByACard
