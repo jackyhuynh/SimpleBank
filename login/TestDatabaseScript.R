@@ -200,6 +200,7 @@ server <- function(input, output, session) {
   #            List of transactions
   # Variable: Local
   output$body <- renderUI({
+    # Allow user login if suceed
     if (USER$login == TRUE) {
       tabItems(
         # First tab
@@ -216,15 +217,64 @@ server <- function(input, output, session) {
       )
       
     }
+    # Call the loginpage agin if fail to identify user
     else {
       loginpage
     }
   })
+  # End output$body
   
+  #
   output$results2 <-  DT::renderDataTable({
     datatable(mtcars, options = list(autoWidth = TRUE,
                                      searching = FALSE))
   })
+  
+  
+  # @Swetha
+  # Function:  validateCredentails will 
+  # Component: Logic, Validate user login's information and etablish connection to
+  #            the database
+  # Variable: Local  
+  validateCredentails <- function(userid, passwrd) {
+    print("inside validateCredentails")
+    print(userid)
+    drv <- dbDriver("MySQL")
+    isValid <- FALSE
+    mydb <-
+      dbConnect(
+        drv,
+        user = 'root',
+        password = 'Myskhongbiet88',
+        dbname = 'credit_card_analysis2',
+        host = 'localhost')
+    
+    rs <-
+      dbSendQuery(
+        mydb,
+        paste0(
+          "select user_id from user_details where login_username='",
+          userid ,
+          "' and login_password = '",
+          passwrd ,))
+    
+    if (!dbHasCompleted(rs)) {
+      chunk <- dbFetch(rs, n = 1)
+      
+      print(nrow(chunk))
+      if (nrow(chunk) == 1) {
+        print("Authentication SUCCESSFUL")
+        isValid <- TRUE
+      }
+      else {
+        print("Authentication FAILED")
+        isValid <- FALSE
+      }
+    }
+    dbClearResult(rs)
+    dbDisconnect(mydb)
+    return(isValid)
+  }
 }
 
 # @Swetha @Truc

@@ -18,7 +18,6 @@ dbDisconnect(connection);
 transactions <-getTransactionDataWithStoreName(connection);
 View(transactions);
 
-
 ##2. get transactions for the month
 transactions <- getCurrentMonthTransaction(connection)
 View(transactions)
