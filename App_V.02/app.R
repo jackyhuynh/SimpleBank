@@ -308,8 +308,9 @@ server <- function(input, output, session) {
   }
   # End of validateCredential function
   
-  
 }
+# End Server function
+
 
 # @Swetha @Truc
 #
