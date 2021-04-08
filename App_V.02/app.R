@@ -521,9 +521,7 @@ server <- function(input, output, session) {
   
   # @ SET OF ADMIN PANEL UI
   
-  adminPage <- fluidPage(
-    tabsetPanel('adminTabset')
-  )
+
   # @Truc
   # Function:  AdminPage 
   # Component: UI, where the admin user perform admin action interact with data and UI
