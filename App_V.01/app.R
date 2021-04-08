@@ -580,7 +580,7 @@ server <- function(input, output, session) {
     }
   })
   
-  # Create scatterplot object the plotOutput function is expecting
+  # Plot3: Create scatterplot object the plotOutput function is expecting
   output$lineplot <- renderPlot({
     color = "#434343"
     par(mar = c(4, 4, 1, 1))

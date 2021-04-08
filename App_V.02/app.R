@@ -20,22 +20,12 @@ library(leaflet) # map
 # Source file for category
 source("modules/pie_chart_module.R")
 source("modules/print_display_module.R")
-#source("modules/checking_sample.R")
+source("modules/checking_sample.R")
 source("modules/CategoryFunctions.R")
 source("modules/DataClasses.R")
 source("modules/TransactionFunctions.R")
 source("modules/UserFunctions.R")
 
-
-# The original data is used for display only
-UserData.Tidy  <- read_csv("data/data.CSV", col_types = cols(date = col_date(format = "%m/%d/%Y")))
-
-# Set the Type to NULL
-UserData.Tidy$type <- NULL
-
-# The total balance over time
-TotalBalance <-
-  aggregate(select(UserData.Tidy,-c(details))['balance'], select(UserData.Tidy,-c(details))['date'], last)
 
 # @Swetha
 #
@@ -255,7 +245,6 @@ server <- function(input, output, session) {
   # Function:  checkingAccountUI 
   # Component: UI, Monitor and view control of the User Banking List
   # Variable: Local
-  # Monitor and control action of the User Banking Panel
   checkingAccountUI<-conditionalPanel(
     'input.dataset === "Checking Account"',
     checkboxGroupInput(
@@ -266,12 +255,27 @@ server <- function(input, output, session) {
     )
   )
   
+  
+  # @Truc
+  # Function:  allTransactionsUI 
+  # Component: UI, Monitor and view control of the all transaction List
+  # Variable: Local
   allTransactionsUI<-  conditionalPanel(
-          'input.dataset === "All Transaction"',
-          
-        )
-    
-    
+          'input.dataset === "All Transaction"')
+   
+   
+  # @Truc
+  # Function:  expenseVsIncomeUI 
+  # Component: UI, Monitor and view control of the expense vs. Income Analyst
+  # Variable: Local
+  expenseVsIncomeUI <- conditionalPanel(
+    'input.dataset === "Expense vs. Income"',
+    tags$h3("Total Income vs. Expense Over Time", class = "text-info"),
+    # Select date range to be plotted
+    tags$p("Note: Choose date to see the total balance between a specific time!")
+  )
+  
+  
   # @Truc
   # Function:  WelcomePage 
   # Component: UI, where the regular user interact with data and UI
@@ -288,20 +292,14 @@ server <- function(input, output, session) {
     sidebarLayout(
       sidebarPanel(
         width = 3,
-        
         checkingAccountUI,
-      
         allTransactionsUI,
-        conditionalPanel(
-          'input.dataset === "Expense vs. Income"',
-          tags$h3("Total Income vs. Expense Over Time", class = "text-info"),
-          # Select date range to be plotted
-          tags$p("Note: Choose date to see the total balance between a specific time!")
-          ),
+        expenseVsIncomeUI,
         # Simply print the Authority in main pages
         printMainAuthority()
         
       ),
+      
       mainPanel(id = 'dataset',
                 tabPanel(
                   "Checking Account",
@@ -490,6 +488,31 @@ server <- function(input, output, session) {
   }
   # End of validateCredential function
   
+  
+  # @ SET OF LOGIC FOR BANK PANEL
+  
+  # Render Bank Table
+  output$bankTable <- DT::renderDataTable({
+    DT::datatable(UserData.Tidy[, input$show_trans, drop = FALSE])
+  })
+  
+  # Logic to create frequency transaction in Checking Account Panel
+  # Plot1: Plot the frequency transaction
+  output$distPlot <- renderPlot({
+    # generate bins based on input$bins from ui.R
+    x    <- TotalBalance[, 2]
+    bins <- seq(min(x), max(x), length.out = input$bins + 1)
+    
+    # draw the histogram with the specified number of bins
+    hist(
+      x,
+      breaks = bins,
+      col = 'azure3',
+      border = 'white',
+      xlab = "Balance",
+      main = ""
+    )
+  })
 }
 # End Server function
 
