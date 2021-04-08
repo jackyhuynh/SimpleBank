@@ -61,13 +61,14 @@ View(categoriesList);
 categoryObject <- new("category", categoryName="Test Category");
 addNewCategory(connection, categoryObject);
 
-##NEED CAREFUL WITH THIS USER SHOULD NOT BE ABLE TO ADD OR DELETE CATEGORY. ADMIN ONLY
+##NEED CAREFUL WITH THIS USER SHOULD NOT BE ABLE TO ADD OR DELETE CATEGORY. 
+##ADMIN ONLY
 ##deleteCategory
 categoryObject <- new("category", categoryId=24);
 deleteCategory(connection, categoryObject)
 
 ##ADMIN ONLY
-## ADD NEW USER TO THE DATABASE
+##ADD NEW USER TO THE DATABASE
 ##addNewUser
 userObj <- new("user", name="Ameet Newton", ssn=5655656, username="inewton", password="pwd123", dob="01/21/1975", address="Londn, England");
 addNewUser(connection, userObj);
@@ -123,3 +124,13 @@ rs <-
 if (!dbHasCompleted(rs))
   transData <- dbFetch(rs)
 
+
+# Get the user list
+users <- getAllUsers(getConnection())
+dbDisconnect(getConnection())
+View(users)
+
+# Get the user list
+categoriesList <- getCategoryList(getConnection())
+dbDisconnect(getConnection())
+View(categoriesList)
