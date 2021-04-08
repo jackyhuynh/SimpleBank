@@ -87,6 +87,8 @@ deleteUser(connection, userObj)
 users <- getAllUsers(connection);
 View(users)
 
+
+## Set of method to get the user id
 userid='inewton'
 passwrd= 'pwd123'
 
@@ -108,5 +110,16 @@ if (!dbHasCompleted(rs))
 dbClearResult(rs)
 dbDisconnect(connection)
 
+value = chunk[[1]]
 
+rs <-
+  dbSendQuery(
+    getConnection(),
+    paste0(
+      "select * from user_transaction_user_id_1"
+    )
+  )
+
+if (!dbHasCompleted(rs))
+  transData <- dbFetch(rs)
 
