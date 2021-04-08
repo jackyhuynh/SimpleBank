@@ -139,3 +139,13 @@ View(categoriesList)
 
 
 # Get the location list
+rs <-
+  dbSendQuery(
+    getConnection(),
+    paste0(
+      "select * from user_details where user_id='",
+      value ,"'"
+    )
+  )
+
+user <- dbFetch(rs)
