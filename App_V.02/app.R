@@ -20,11 +20,22 @@ library(leaflet) # map
 # Source file for category
 source("modules/pie_chart_module.R")
 source("modules/print_display_module.R")
+#source("modules/checking_sample.R")
 source("modules/CategoryFunctions.R")
 source("modules/DataClasses.R")
 source("modules/TransactionFunctions.R")
 source("modules/UserFunctions.R")
 
+
+# The original data is used for display only
+UserData.Tidy  <- read_csv("data/data.CSV", col_types = cols(date = col_date(format = "%m/%d/%Y")))
+
+# Set the Type to NULL
+UserData.Tidy$type <- NULL
+
+# The total balance over time
+TotalBalance <-
+  aggregate(select(UserData.Tidy,-c(details))['balance'], select(UserData.Tidy,-c(details))['date'], last)
 
 # @Swetha
 #
@@ -211,9 +222,7 @@ server <- function(input, output, session) {
         tabItem(tabName = "dashboard", class = "active",
                 
                 # Fluid Page for the main User Home Page
-                fluidPage(box(
-                  width = 12, dataTableOutput('results1')
-                ))),
+                welcomePage),
         
         # Second tab
         tabItem(tabName = "second",
@@ -238,15 +247,188 @@ server <- function(input, output, session) {
                                      searching = FALSE))
   })
   
+  
+  # @ SET OF MAIN PAGE (WELCOME PAGE) UI
 
-  # @Swetha
-  # Function:  renderDataTable 
-  # Component: UI
-  # Variable: Local  
-  output$results1 <-  DT::renderDataTable({
-    datatable(mtcars, options = list(autoWidth = TRUE,
-                                     searching = FALSE))
-  })
+  
+  # @Truc
+  # Function:  checkingAccountUI 
+  # Component: UI, Monitor and view control of the User Banking List
+  # Variable: Local
+  # Monitor and control action of the User Banking Panel
+  checkingAccountUI<-conditionalPanel(
+    'input.dataset === "Checking Account"',
+    checkboxGroupInput(
+      "show_trans",
+      "Selections:",
+      names(UserData.Tidy),
+      selected = names(UserData.Tidy)
+    )
+  )
+  
+  allTransactionsUI<-  conditionalPanel(
+          'input.dataset === "All Transaction"',
+          
+        )
+    
+    
+  # @Truc
+  # Function:  WelcomePage 
+  # Component: UI, where the regular user interact with data and UI
+  # Variable: Local
+  welcomePage <- fluidPage(
+    # Add CSS UI theme, can easily change theme by change 
+    # the theme name inside shinytheme()
+    theme = shinytheme("flatly"),
+    
+    # Application title
+    titlePanel("Deep Financial Analysis"),
+    
+    # UI Component that hold all 
+    sidebarLayout(
+      sidebarPanel(
+        width = 3,
+        
+        checkingAccountUI,
+      
+        allTransactionsUI,
+        conditionalPanel(
+          'input.dataset === "Expense vs. Income"',
+          tags$h3("Total Income vs. Expense Over Time", class = "text-info"),
+          # Select date range to be plotted
+          tags$p("Note: Choose date to see the total balance between a specific time!")
+          ),
+        # Simply print the Authority in main pages
+        printMainAuthority()
+        
+      ),
+      mainPanel(id = 'dataset',
+                tabPanel(
+                  "Checking Account",
+                  DT::dataTableOutput("bankTable"),
+                  
+                  printWhiteSpace(),
+                  tags$em(tags$h3("Deep Analyzing", class = "text-primary")),
+                  
+                  # Inside UI to display the tabset
+                  tabsetPanel(
+                    id = 'bankset',
+                    
+                    # Inside bankset tab Transaction Amount Tabset
+                    tabPanel(
+                      "Analyze by Transaction Amount",
+                      sidebarLayout(
+                        #side bar Panel
+                        sidebarPanel(
+                          tags$h3("View by Transaction Amount", class = "text-info"),
+                          tags$p("Note: Move the slider to see the frequency of the total balance in your bank account."),
+                          sliderInput(
+                            "bins","Number of bins:",min = 1,max = 100,value = 30),),
+                        
+                        #main Panel of Transaction Amount Tabset
+                        mainPanel(plotOutput("distPlot", height = "300px"))
+                      )
+                    ),
+                    # end sidebarLayout "Transaction Amount"
+                    
+                    # Inside bankset tab Analyze by Total Balance Tabset
+                    tabPanel(
+                      "Analyze by Total Balance",
+                      sidebarLayout(
+                        sidebarPanel(
+                          tags$h3("Total Balance Over Time", class = "text-info"),
+                          # Select date range to be plotted
+                          tags$p("Note: Choose date to see the total balance between a specific time!"),
+                          dateRangeInput(
+                            "date1", strong("Date range"),
+                            start = min(UserData.Tidy$date),
+                            end = max(UserData.Tidy$date),
+                            min = min(UserData.Tidy$date),
+                            max = max(UserData.Tidy$date)
+                          ),
+                          
+                          # Select whether to overlay smooth trend line
+                          checkboxInput(
+                            inputId = "smootherTotal",
+                            label = strong("Overlay smooth trend line"),
+                            value = FALSE
+                          ),),
+                        
+                        mainPanel(plotOutput("lineplot1", height = "300px",click="lineplot1_click"),
+                                  verbatimTextOutput("lineplot1Info"),
+                                  tags$p("Note: Please click on the chart to see the amount in US Dollar($)!"),
+                        ))
+                    ),
+                    # end sidebarLayout "Total Balance"
+                    
+                    tabPanel(
+                      "Analyze by Category",
+                      sidebarLayout(
+                        sidebarPanel(
+                          tags$h3("Transaction By Category", class = "text-info"),
+                          
+                          
+                          
+                          # Select type of trend to plot
+                          selectInput(
+                            inputId = "type",
+                            label = strong("Type of Transaction"),
+                            choices = unique(c('DEBIT', 'CREDIT', 'CHECK', 'DSLIP')),
+                            selected = "DEBIT"
+                          ),
+                          
+                          # Select date range to be plotted
+                          dateRangeInput(
+                            "date",
+                            strong("Date range"),
+                            start = min(TotalBalance$date),
+                            end = max(TotalBalance$date),
+                            min = min(TotalBalance$date),
+                            max = max(TotalBalance$date)
+                          ),
+                          
+                          # Select whether to overlay smooth trend line
+                          checkboxInput(
+                            inputId = "smoother",
+                            label = strong("Overlay smooth trend line"),
+                            value = FALSE
+                          ),
+                          
+                          # Display only if the smoother is checked
+                          conditionalPanel(
+                            condition = "input.smoother == true",
+                            sliderInput(
+                              inputId = "f",
+                              label = "Smoother span:",
+                              min = 0.01,
+                              max = 1,
+                              value = 0.67,
+                              step = 0.01,
+                              animate = animationOptions(interval = 100)
+                            ),
+                            HTML("Higher values give more smoothness.")
+                          ),
+                          
+                          
+                        ),
+                        mainPanel (plotOutput("lineplot", height = "300px",click = "lineplot_click"),
+                                   verbatimTextOutput("lineplotInfo"),
+                                   tags$p("Note: Please click on the chart to see the amount in US Dollar($)!")
+                        )
+                        
+                      ),
+                      noteCategory(),
+                    )
+                  )
+                )
+      )
+      # End mainPanel id = 'dataset'
+    )
+    # End sidebarLayout
+  )
+  
+  
+
   
   
   ###################
