@@ -362,7 +362,9 @@ server <- function(input, output, session) {
                           tabPanel("Total Income")
                         ) # End tabset Panel
                         
-                      ), # End TabPanel All Transaction 
+                      ), # End TabPanel All Transaction
+                      
+                      
                       tabPanel("Expense vs. Income",
                                plotOutput("piePlotDebit"),
                                sidebarLayout(
