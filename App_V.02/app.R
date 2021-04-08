@@ -201,7 +201,6 @@ server <- function(input, output, session) {
   })
   # End output$sidebarpanel
   
-  
   # @Truc
   #
   # Function: UI Component for the welcome page
@@ -463,9 +462,8 @@ server <- function(input, output, session) {
         width = 3,
         checkingAccountUI,
         allTransactionsUI,
-        expenseVsIncomeUI,
-        # Simply print the Authority in main pages
-        printMainAuthority()
+        expenseVsIncomeUI, # Display the Expense Vs Income Panel
+        printMainAuthority() # Display the Authority in main pages
         
       ),
       
@@ -473,85 +471,17 @@ server <- function(input, output, session) {
                 tabPanel(
                   "Checking Account",
                   DT::dataTableOutput("bankTable"),
-                  
                   printWhiteSpace(),
                   tags$em(tags$h3("Deep Analyzing", class = "text-primary")),
-                  
                   # Inside UI to display the tabset
                   tabsetPanel(
                     id = 'bankset',
-<<<<<<< HEAD
                     balanceFrequencyUI, # balance Frequency UI Component
                     totalBalanceUI, # total Balance Overtime
                     AnalyzeByCategoty # Analyze by Category with time frame
-                  ))
-=======
-                    
-                    balanceFrequencyUI, # balance Frequency UI Component
-                    totalBalanceUI, # total Balance Overtime
-
-                    
-                    tabPanel(
-                      "Analyze by Category",
-                      sidebarLayout(
-                        sidebarPanel(
-                          tags$h3("Transaction By Category", class = "text-info"),
-                          
-                          
-                          
-                          # Select type of trend to plot
-                          selectInput(
-                            inputId = "type",
-                            label = strong("Type of Transaction"),
-                            choices = unique(c('DEBIT', 'CREDIT', 'CHECK', 'DSLIP')),
-                            selected = "DEBIT"
-                          ),
-                          
-                          # Select date range to be plotted
-                          dateRangeInput(
-                            "date",
-                            strong("Date range"),
-                            start = min(TotalBalance$date),
-                            end = max(TotalBalance$date),
-                            min = min(TotalBalance$date),
-                            max = max(TotalBalance$date)
-                          ),
-                          
-                          # Select whether to overlay smooth trend line
-                          checkboxInput(
-                            inputId = "smoother",
-                            label = strong("Overlay smooth trend line"),
-                            value = FALSE
-                          ),
-                          
-                          # Display only if the smoother is checked
-                          conditionalPanel(
-                            condition = "input.smoother == true",
-                            sliderInput(
-                              inputId = "f",
-                              label = "Smoother span:",
-                              min = 0.01,
-                              max = 1,
-                              value = 0.67,
-                              step = 0.01,
-                              animate = animationOptions(interval = 100)
-                            ),
-                            HTML("Higher values give more smoothness.")
-                          ),
-                          
-                          
-                        ),
-                        mainPanel (plotOutput("lineplot", height = "300px",click = "lineplot_click"),
-                                   verbatimTextOutput("lineplotInfo"),
-                                   tags$p("Note: Please click on the chart to see the amount in US Dollar($)!")
-                        )
-                        
-                      ),
-                      noteCategory(),
-                    )
                   )
                 )
->>>>>>> 83d9a1123e0732eb73f9b844d3ed4cc9fc9288ea
+
       )
       # End mainPanel id = 'dataset'
     )

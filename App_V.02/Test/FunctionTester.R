@@ -87,3 +87,26 @@ deleteUser(connection, userObj)
 users <- getAllUsers(connection);
 View(users)
 
+userid='inewton'
+passwrd= 'pwd123'
+
+rs <-
+  dbSendQuery(
+    getConnection(),
+    paste0(
+      "select user_id from user_details where login_username='",
+      userid ,
+      "' and login_password = '",
+      passwrd,
+      "'"
+    )
+  )
+
+if (!dbHasCompleted(rs))
+  chunk <- dbFetch(rs, n = 1)
+
+dbClearResult(rs)
+dbDisconnect(connection)
+
+
+
