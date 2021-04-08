@@ -390,7 +390,6 @@ server <- function(input, output, session) {
       mainPanel (plotOutput("lineplot", height = "300px",click = "lineplot_click"),
                  verbatimTextOutput("lineplotInfo"),
                  tags$p("Note: Please click on the chart to see the amount in US Dollar($)!"))
-      
     ),
     noteCategory(),
   )
@@ -467,26 +466,60 @@ server <- function(input, output, session) {
         
       ),
       
-      mainPanel(id = 'dataset',
-                tabPanel(
-                  "Checking Account",
-                  DT::dataTableOutput("bankTable"),
-                  printWhiteSpace(),
-                  tags$em(tags$h3("Deep Analyzing", class = "text-primary")),
-                  # Inside UI to display the tabset
-                  tabsetPanel(
-                    id = 'bankset',
-                    balanceFrequencyUI, # balance Frequency UI Component
-                    totalBalanceUI, # total Balance Overtime
-                    AnalyzeByCategoty # Analyze by Category with time frame
-                  )
-                )
-
-      )
+      mainPanel(
+        tabsetPanel(
+          id = 'dataset',
+          
+          # @ Truc
+          # Checking Account main Panel
+          tabPanel(
+            "Checking Account",
+            DT::dataTableOutput("bankTable"),
+            
+            printWhiteSpace(),
+            tags$em(tags$h3("Deep Analyzing", class = "text-primary")),
+            
+            # Inside UI to display the tabset
+            tabsetPanel(
+              id = 'bankset',
+              balanceFrequencyUI, # balance Frequency UI Component
+              totalBalanceUI, # total Balance Overtime
+              AnalyzeByCategoty # Analyze by Category with time frame
+            )),
+          # End "Checking Account"
+          
+          # @ Truc
+          # All Transaction main panel
+          tabPanel(
+            "All Transaction",
+            DT::dataTableOutput("transTable"),
+                  
+            printWhiteSpace(), # Display Decoration
+            tags$em(tags$h3("Deep Analyzing", class = "text-primary")),
+                  
+            tabsetPanel(
+              tabPanel("Map Expense",leafletOutput("map")),
+              tabPanel("Total Income")
+            )), 
+          # End TabPanel All Transaction 
+                
+          tabPanel(
+            "Expense vs. Income",
+            plotOutput("piePlotDebit"),
+            sidebarLayout(
+              sidebarPanel (
+                div(tags$h4("Goal Analyst"),
+                    tags$p("Will add the goal analyst portion here!"))),
+              mainPanel(plotOutput("Total"))))
+          # End "Expense vs. Income"
+      ))
       # End mainPanel id = 'dataset'
     )
     # End sidebarLayout
   )
+  
+  
+  # @ SET OF ADMIN PANEL UI
   
   
   ###################
