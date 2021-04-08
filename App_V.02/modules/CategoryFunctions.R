@@ -1,6 +1,5 @@
 
 ##GET ALL CATEGORY NAMES 
-
 getCategoryList <- function(connection){
   query <- sprintf("select category_id as cid, category_name as Category from category where deleted=1;");
   rs = dbSendQuery(connection, query);
