@@ -276,6 +276,54 @@ server <- function(input, output, session) {
   )
   
   
+  # Inside bankset tab Transaction Amount Tabset
+  balanceFrequencyUI<-tabPanel(
+    "Analyze by Balance Frequency",
+    sidebarLayout(
+      #side bar Panel
+      sidebarPanel(
+        tags$h3("View by Transaction Amount", class = "text-info"),
+        tags$p("Note: Move the slider to see the frequency of the total balance in your bank account."),
+        sliderInput(
+          "bins","Number of bins:",min = 1,max = 100,value = 30),),
+      
+      #main Panel of Transaction Amount Tabset
+      mainPanel(plotOutput("distPlot", height = "300px"))
+    )
+  )
+  
+  
+  # Inside bankset tab Analyze by Total Balance Tabset
+  totalBalanceUI<-tabPanel(
+    "Analyze by Total Balance",
+    sidebarLayout(
+      sidebarPanel(
+        tags$h3("Total Balance Over Time", class = "text-info"),
+        # Select date range to be plotted
+        tags$p("Note: Choose date to see the total balance between a specific time!"),
+        dateRangeInput(
+          "date1", strong("Date range"),
+          start = min(UserData.Tidy$date),
+          end = max(UserData.Tidy$date),
+          min = min(UserData.Tidy$date),
+          max = max(UserData.Tidy$date)
+        ),
+        
+        # Select whether to overlay smooth trend line
+        checkboxInput(
+          inputId = "smootherTotal",
+          label = strong("Overlay smooth trend line"),
+          value = FALSE
+        ),),
+      
+      mainPanel(plotOutput("lineplot1", height = "300px",click="lineplot1_click"),
+                verbatimTextOutput("lineplot1Info"),
+                tags$p("Note: Please click on the chart to see the amount in US Dollar($)!"),
+      ))
+  )
+  # end sidebarLayout "Total Balance"
+  
+  
   # @Truc
   # Function:  WelcomePage 
   # Component: UI, where the regular user interact with data and UI
@@ -312,52 +360,9 @@ server <- function(input, output, session) {
                   tabsetPanel(
                     id = 'bankset',
                     
-                    # Inside bankset tab Transaction Amount Tabset
-                    tabPanel(
-                      "Analyze by Transaction Amount",
-                      sidebarLayout(
-                        #side bar Panel
-                        sidebarPanel(
-                          tags$h3("View by Transaction Amount", class = "text-info"),
-                          tags$p("Note: Move the slider to see the frequency of the total balance in your bank account."),
-                          sliderInput(
-                            "bins","Number of bins:",min = 1,max = 100,value = 30),),
-                        
-                        #main Panel of Transaction Amount Tabset
-                        mainPanel(plotOutput("distPlot", height = "300px"))
-                      )
-                    ),
-                    # end sidebarLayout "Transaction Amount"
-                    
-                    # Inside bankset tab Analyze by Total Balance Tabset
-                    tabPanel(
-                      "Analyze by Total Balance",
-                      sidebarLayout(
-                        sidebarPanel(
-                          tags$h3("Total Balance Over Time", class = "text-info"),
-                          # Select date range to be plotted
-                          tags$p("Note: Choose date to see the total balance between a specific time!"),
-                          dateRangeInput(
-                            "date1", strong("Date range"),
-                            start = min(UserData.Tidy$date),
-                            end = max(UserData.Tidy$date),
-                            min = min(UserData.Tidy$date),
-                            max = max(UserData.Tidy$date)
-                          ),
-                          
-                          # Select whether to overlay smooth trend line
-                          checkboxInput(
-                            inputId = "smootherTotal",
-                            label = strong("Overlay smooth trend line"),
-                            value = FALSE
-                          ),),
-                        
-                        mainPanel(plotOutput("lineplot1", height = "300px",click="lineplot1_click"),
-                                  verbatimTextOutput("lineplot1Info"),
-                                  tags$p("Note: Please click on the chart to see the amount in US Dollar($)!"),
-                        ))
-                    ),
-                    # end sidebarLayout "Total Balance"
+                    balanceFrequencyUI, # balance Frequency UI Component
+                    totalBalanceUI, # total Balance Overtime
+
                     
                     tabPanel(
                       "Analyze by Category",
