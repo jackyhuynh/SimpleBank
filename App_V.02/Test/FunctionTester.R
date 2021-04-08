@@ -130,7 +130,12 @@ users <- getAllUsers(getConnection())
 dbDisconnect(getConnection())
 View(users)
 
-# Get the user list
+# Get the category list
 categoriesList <- getCategoryList(getConnection())
 dbDisconnect(getConnection())
 View(categoriesList)
+
+# Get the card list
+
+
+# Get the location list
