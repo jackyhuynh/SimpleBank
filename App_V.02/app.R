@@ -1,3 +1,6 @@
+# @ Author: Truc, Swetha
+
+
 # Require library
 library(shiny)
 library(shinydashboard)
@@ -254,6 +257,7 @@ server <- function(input, output, session) {
       selected = names(UserData.Tidy)
     )
   )
+  # End checkingAccountUI
   
   
   # @Truc
@@ -273,6 +277,121 @@ server <- function(input, output, session) {
     tags$h3("Total Income vs. Expense Over Time", class = "text-info"),
     # Select date range to be plotted
     tags$p("Note: Choose date to see the total balance between a specific time!")
+  )
+  # End expenseVsIncomeUI
+  
+  
+  # @Truc
+  # Function:  balanceFrequencyUI 
+  # Component: UI, Monitor, view control plot control Balance Frequecy tab
+  # Variable: Local
+  balanceFrequencyUI<-tabPanel(
+    "Analyze by Balance Frequency",
+    sidebarLayout(
+      #side bar Panel
+      sidebarPanel(
+        tags$h3("View by Transaction Amount", class = "text-info"),
+        tags$p("Note: Move the slider to see the frequency of the total balance in your bank account."),
+        sliderInput(
+          "bins","Number of bins:",min = 1,max = 100,value = 30),),
+      
+      #main Panel of Transaction Amount Tabset
+      mainPanel(plotOutput("distPlot", height = "300px"))
+    )
+  )
+  # End balanceFrequencyUI
+  
+  
+  # @Truc
+  # Function:  totalBalanceUI 
+  # Component: UI, Monitor, view control plot control Balance Total tab
+  # Variable: Local
+  totalBalanceUI<-tabPanel(
+    "Analyze by Total Balance",
+    sidebarLayout(
+      sidebarPanel(
+        tags$h3("Total Balance Over Time", class = "text-info"),
+        # Select date range to be plotted
+        tags$p("Note: Choose date to see the total balance between a specific time!"),
+        dateRangeInput(
+          "date1", strong("Date range"),
+          start = min(UserData.Tidy$date),
+          end = max(UserData.Tidy$date),
+          min = min(UserData.Tidy$date),
+          max = max(UserData.Tidy$date)
+        ),
+        
+        # Select whether to overlay smooth trend line
+        checkboxInput(
+          inputId = "smootherTotal",
+          label = strong("Overlay smooth trend line"),
+          value = FALSE
+        ),),
+      
+      mainPanel(plotOutput("lineplot1", height = "300px",click="lineplot1_click"),
+                verbatimTextOutput("lineplot1Info"),
+                tags$p("Note: Please click on the chart to see the amount in US Dollar($)!"),
+      ))
+  )
+  # End totalBalanceUI
+  
+  
+  # @Truc
+  # Function:  AnalyzeByCategoty 
+  # Component: UI, Monitor, view control plot control Analyze by Category tab
+  # Variable: Local
+  AnalyzeByCategoty<-tabPanel(
+    "Analyze by Category",
+    sidebarLayout(
+      sidebarPanel(
+        tags$h3("Transaction By Category", class = "text-info"),
+
+        # Select type of trend to plot
+        selectInput(
+          inputId = "type",
+          label = strong("Type of Transaction"),
+          choices = unique(c('DEBIT', 'CREDIT', 'CHECK', 'DSLIP')),
+          selected = "DEBIT"
+        ),
+        
+        # Select date range to be plotted
+        dateRangeInput(
+          "date",
+          strong("Date range"),
+          start = min(TotalBalance$date),
+          end = max(TotalBalance$date),
+          min = min(TotalBalance$date),
+          max = max(TotalBalance$date)
+        ),
+        
+        # Select whether to overlay smooth trend line
+        checkboxInput(
+          inputId = "smoother",
+          label = strong("Overlay smooth trend line"),
+          value = FALSE
+        ),
+        
+        # Display only if the smoother is checked
+        conditionalPanel(
+          condition = "input.smoother == true",
+          sliderInput(
+            inputId = "f",
+            label = "Smoother span:",
+            min = 0.01,
+            max = 1,
+            value = 0.67,
+            step = 0.01,
+            animate = animationOptions(interval = 100)
+          ),
+          HTML("Higher values give more smoothness.")
+        ),
+      ),
+      mainPanel (plotOutput("lineplot", height = "300px",click = "lineplot_click"),
+                 verbatimTextOutput("lineplotInfo"),
+                 tags$p("Note: Please click on the chart to see the amount in US Dollar($)!"))
+      
+    ),
+    noteCategory(),
   )
   
   
@@ -311,114 +430,10 @@ server <- function(input, output, session) {
                   # Inside UI to display the tabset
                   tabsetPanel(
                     id = 'bankset',
-                    
-                    # Inside bankset tab Transaction Amount Tabset
-                    tabPanel(
-                      "Analyze by Transaction Amount",
-                      sidebarLayout(
-                        #side bar Panel
-                        sidebarPanel(
-                          tags$h3("View by Transaction Amount", class = "text-info"),
-                          tags$p("Note: Move the slider to see the frequency of the total balance in your bank account."),
-                          sliderInput(
-                            "bins","Number of bins:",min = 1,max = 100,value = 30),),
-                        
-                        #main Panel of Transaction Amount Tabset
-                        mainPanel(plotOutput("distPlot", height = "300px"))
-                      )
-                    ),
-                    # end sidebarLayout "Transaction Amount"
-                    
-                    # Inside bankset tab Analyze by Total Balance Tabset
-                    tabPanel(
-                      "Analyze by Total Balance",
-                      sidebarLayout(
-                        sidebarPanel(
-                          tags$h3("Total Balance Over Time", class = "text-info"),
-                          # Select date range to be plotted
-                          tags$p("Note: Choose date to see the total balance between a specific time!"),
-                          dateRangeInput(
-                            "date1", strong("Date range"),
-                            start = min(UserData.Tidy$date),
-                            end = max(UserData.Tidy$date),
-                            min = min(UserData.Tidy$date),
-                            max = max(UserData.Tidy$date)
-                          ),
-                          
-                          # Select whether to overlay smooth trend line
-                          checkboxInput(
-                            inputId = "smootherTotal",
-                            label = strong("Overlay smooth trend line"),
-                            value = FALSE
-                          ),),
-                        
-                        mainPanel(plotOutput("lineplot1", height = "300px",click="lineplot1_click"),
-                                  verbatimTextOutput("lineplot1Info"),
-                                  tags$p("Note: Please click on the chart to see the amount in US Dollar($)!"),
-                        ))
-                    ),
-                    # end sidebarLayout "Total Balance"
-                    
-                    tabPanel(
-                      "Analyze by Category",
-                      sidebarLayout(
-                        sidebarPanel(
-                          tags$h3("Transaction By Category", class = "text-info"),
-                          
-                          
-                          
-                          # Select type of trend to plot
-                          selectInput(
-                            inputId = "type",
-                            label = strong("Type of Transaction"),
-                            choices = unique(c('DEBIT', 'CREDIT', 'CHECK', 'DSLIP')),
-                            selected = "DEBIT"
-                          ),
-                          
-                          # Select date range to be plotted
-                          dateRangeInput(
-                            "date",
-                            strong("Date range"),
-                            start = min(TotalBalance$date),
-                            end = max(TotalBalance$date),
-                            min = min(TotalBalance$date),
-                            max = max(TotalBalance$date)
-                          ),
-                          
-                          # Select whether to overlay smooth trend line
-                          checkboxInput(
-                            inputId = "smoother",
-                            label = strong("Overlay smooth trend line"),
-                            value = FALSE
-                          ),
-                          
-                          # Display only if the smoother is checked
-                          conditionalPanel(
-                            condition = "input.smoother == true",
-                            sliderInput(
-                              inputId = "f",
-                              label = "Smoother span:",
-                              min = 0.01,
-                              max = 1,
-                              value = 0.67,
-                              step = 0.01,
-                              animate = animationOptions(interval = 100)
-                            ),
-                            HTML("Higher values give more smoothness.")
-                          ),
-                          
-                          
-                        ),
-                        mainPanel (plotOutput("lineplot", height = "300px",click = "lineplot_click"),
-                                   verbatimTextOutput("lineplotInfo"),
-                                   tags$p("Note: Please click on the chart to see the amount in US Dollar($)!")
-                        )
-                        
-                      ),
-                      noteCategory(),
-                    )
-                  )
-                )
+                    balanceFrequencyUI, # balance Frequency UI Component
+                    totalBalanceUI, # total Balance Overtime
+                    AnalyzeByCategoty # Analyze by Category with time frame
+                  ))
       )
       # End mainPanel id = 'dataset'
     )
@@ -426,17 +441,16 @@ server <- function(input, output, session) {
   )
   
   
-
-  
-  
   ###################
   # @LOGIC FUNCTIONS:
   ###################
   
+  
   # @ SET OF LOGIC VALIDATION
   
+  
   # @Swetha
-  # Function:  validateCredentails will 
+  # Function:  validateCredentails
   # Component: Logic, Validate user login's information and etablish connection to
   #            the database
   # Variable: Local  
@@ -478,7 +492,6 @@ server <- function(input, output, session) {
         #print("Authentication FAILED")
         isValid <- FALSE
       }
-      
     }
     
     # Clear the connection and stop the application
@@ -489,29 +502,167 @@ server <- function(input, output, session) {
   # End of validateCredential function
   
   
-  # @ SET OF LOGIC FOR BANK PANEL
+  # @ SET OF LOGIC FOR CHECKING ACCOUNT PANEL
   
-  # Render Bank Table
+  # @Truc
+  # Function:  output$bankTable 
+  # Component: Logic, Render Bank Table to the UI List
+  # Variable: Local 
   output$bankTable <- DT::renderDataTable({
     DT::datatable(UserData.Tidy[, input$show_trans, drop = FALSE])
   })
+  # End output$bankTable
   
-  # Logic to create frequency transaction in Checking Account Panel
-  # Plot1: Plot the frequency transaction
+  
+  # @Truc
+  # Function:  output$distPlot
+  # Component: Logic, create frequency transaction in Checking Account Panel
+  #            Plot1: Plot the frequency transaction
+  # Variable: Local 
   output$distPlot <- renderPlot({
     # generate bins based on input$bins from ui.R
     x    <- TotalBalance[, 2]
     bins <- seq(min(x), max(x), length.out = input$bins + 1)
     
     # draw the histogram with the specified number of bins
-    hist(
-      x,
-      breaks = bins,
-      col = 'azure3',
-      border = 'white',
-      xlab = "Balance",
-      main = ""
+    hist( x,breaks = bins,col = 'azure3',border = 'white',xlab = "Balance",main = "")
+  })
+  # End output$distPlot
+  
+  
+  # @Truc
+  # Function:  selected_User1
+  # Component: Logic, take 2 date from user input and validate them
+  #            Plot2:Validate the date before create the plot
+  # Variable: Local 
+  selected_User1 <- reactive({
+    req(input$date1)
+    validate(need(
+      !is.na(input$date1[1]) &
+        !is.na(input$date1[2]),
+      "Error: Please provide both a start and an end date."
+    ))
+    validate(
+      need(
+        input$date1[1] < input$date1[2],
+        "Error: Start date should be earlier than end date."
+      )
     )
+    TotalBalance %>% filter(date > (input$date1[1]) &
+                              date < (input$date1[2]))
+  })
+  
+  
+  # @Truc
+  # Function:  output$lineplot1
+  # Component: Logic, Plot2: create the plot the total balance
+  # Variable: Local 
+  output$lineplot1 <- renderPlot({
+    color = "azure4"
+    par(mar = c(4, 4, 1, 1))
+    plot(
+      x = selected_User1()$date,
+      y = selected_User1()$balance,
+      type = "o",
+      xlab = "Date",
+      ylab = "Total Balance",
+      col = color,
+      fg = color,
+      col.lab = color,
+      col.axis = color
+    )
+    # Add the smooth_curve
+    if (input$smootherTotal) {
+      smooth_curve <-
+        lowess(x = as.numeric(selected_User1()$date),
+               y = selected_User1()$balance)
+      lines(smooth_curve, col = "#E6553A", lwd = 3)}
+  })
+  # output$lineplot1
+  
+  
+  # @Truc
+  # Function:  output$lineplot1Info
+  # Component: Logic, create the click on static to get the transaction amount 
+  # Variable: Local 
+  output$lineplot1Info <- renderText({
+    paste0("Amount = $ ", round(as.numeric(input$lineplot1_click$y),2))
+  })
+  # End 
+  
+  
+  # @Truc
+  # Function:  selected_User1
+  # Component: Logic, take 2 date from user input and validate them for plot3
+  #            Plot3:Validate the date before create the plot
+  # Variable: Local 
+  selected_User <- reactive({
+    req(input$date)
+    validate(need(!is.na(input$date[1]) &!is.na(input$date[2]),
+      "Error: Please provide both a start and an end date."))
+    validate(need(input$date[1] < input$date[2],
+      "Error: Start date should be earlier than end date."))
+    
+    if (input$type == 'DEBIT'){
+      UserDebit <-aggregate(select(UserData.Tidy[UserData.Tidy$details == 'DEBIT',],-details)['amount'],
+                  by = select(UserData.Tidy[UserData.Tidy$details == 'DEBIT',],-details)['date'],sum)
+      UserDebit %>%filter(date > input$date[1] & date < input$date[2])
+    } 
+    else if (input$type == 'CREDIT'){
+      UserCredit <-aggregate(select(UserData.Tidy[UserData.Tidy$details == 'CREDIT',],-details)['amount'],
+                  by = select(UserData.Tidy[UserData.Tidy$details == 'CREDIT',],-details)['date'], sum)
+      UserCredit %>%filter(date > input$date[1] & date < input$date[2])
+    } 
+    else if (input$type == 'CHECK'){
+      UserCheck <-aggregate(select(UserData.Tidy[UserData.Tidy$details == 'CHECK',],-details)['amount'],
+                  by = select(UserData.Tidy[UserData.Tidy$details == 'CHECK',],-details)['date'],sum)
+      UserCheck %>%filter(date > input$date[1] & date < input$date[2])
+    } 
+    else{
+      UserDSLIP <- aggregate(select(UserData.Tidy[UserData.Tidy$details == 'DSLIP',],-details)['amount'],
+                  by = select(UserData.Tidy[UserData.Tidy$details == 'DSLIP',],-details)['date'], sum)
+      UserDSLIP %>% filter(date > input$date[1] & date < input$date[2])
+    }
+  })
+  # End selected_User function
+  
+  # @Truc
+  # Function:  output$lineplot
+  # Component: Logic, Plot3: create the plot of analyze by type
+  # Variable: Local 
+  output$lineplot <- renderPlot({
+    color = "#434343"
+    par(mar = c(4, 4, 1, 1))
+    plot(
+      x = selected_User()$date,
+      y = selected_User()$amount,
+      type = "o",
+      xlab = "Date",
+      ylab = "Amount",
+      col = color,
+      fg = color,
+      col.lab = color,
+      col.axis = color
+    )
+    # Display only if smoother is checked
+    if (input$smoother) {
+      smooth_curve <-
+        lowess(
+          x = as.numeric(selected_User()$date),
+          y = selected_User()$amount,
+          f = input$f
+        )
+      lines(smooth_curve, col = "#E6553A", lwd = 3)
+    }
+  })
+  
+  
+  # @Truc
+  # Function:  output$lineplotInfo
+  # Component: Logic, create the click on static to get the transaction amount 
+  # Variable: Local 
+  output$lineplotInfo <- renderText({
+    paste0("Amount: $ ", round(as.numeric(input$lineplot_click$y),2))
   })
 }
 # End Server function
