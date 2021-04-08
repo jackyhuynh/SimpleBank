@@ -97,7 +97,6 @@ credentials = data.frame(
 # Component: UI
 # Variable: Global
 ui <- dashboardPage(
-  
   # @Swetha
   #
   # Function: Top header, sidebar, and body for the Dashboard
@@ -110,6 +109,7 @@ ui <- dashboardPage(
 )
 # end ui function
 
+
 # @Swetha @Truc
 #
 # Function: Server logic that handle the application
@@ -119,7 +119,6 @@ server <- function(input, output, session) {
   
   # login variable for user to login
   login = FALSE
-  
   
   # Validate everytime user login
   USER <- reactiveValues(login = login)
@@ -161,7 +160,9 @@ server <- function(input, output, session) {
   # @UI COMPONENTS:
   ###################
   
+  
   # @SET OF LOGIN PAGE UI
+  
   
   # @Swetha 
   #
@@ -199,6 +200,7 @@ server <- function(input, output, session) {
           icon = icon("th")))}
   })
   # End output$sidebarpanel
+  
   
   # @Truc
   #
