@@ -124,11 +124,11 @@ server <- function(input, output, session) {
   
   # login variable for user to login
   login = FALSE
-  Data = NULL
+  
   
   # Validate everytime user login
   USER <- reactiveValues(login = login )
-  userInfo <- reactiveValues(Data = Data)
+  
   
   # @Swetha 
   #
@@ -146,7 +146,7 @@ server <- function(input, output, session) {
           
           if (pasverify) {
             USER$login <- TRUE
-            userInfo$Data <-  getUserInfo(Username, Password)
+            #userInfo$Data <-  getUserInfo(Username, Password)
           } else {
             shinyjs::toggle(
               id = "nomatch",
@@ -522,53 +522,7 @@ server <- function(input, output, session) {
               mainPanel(plotOutput("Total")))),
           # End "Expense vs. Income"
           
-          tabPanel(
-            "User Account",tags$div(
-              sidebarLayout(
-                sidebarPanel(),
-                mainPanel(
-                  id="User Information",
-                  
-                  tags$h2("Personal Information"),br(),
-                  tags$div(
-                    splitLayout(
-                      cellWidths = c("200px","20", "250px"),
-                      cellArgs = list(style = "vertical-align: top"),
-                      textInput(
-                        "fullName",labelMandatory("Full Name"), placeholder = USER$Data[[2]],width = '200px'),
-                      tags$div(),
-                      textInput(
-                        "address","Address", placeholder = USER$Data[[3]],width = '200px')
-                    )
-                  ),
-                  tags$div(
-                    splitLayout(
-                      cellWidths = c("200px","20", "250px"),
-                      cellArgs = list(style = "vertical-align: top"),
-                      textInput(
-                        "fullName","Birthday", placeholder = USER$Data[[5]],width = '200px'),
-                      tags$div(),
-                      textInput(
-                        "address","SSN", placeholder = '*********',width = '200px')
-                    )
-                  ),
-                  tags$h2("Account Information"),br(),
-                  tags$div(
-                    splitLayout(
-                      cellWidths = c("200px","20", "250px"),
-                      cellArgs = list(style = "vertical-align: top"),
-                      textInput(
-                        "fullName",labelMandatory("User Name"), placeholder = USER$Data[[6]],width = '200px'),
-                      tags$div(),
-                      textInput(
-                        "address",labelMandatory("Password Name"), placeholder = USER$Data[[7]],width = '200px')
-                    )
-                  ),
-                )
-              )
-            )
-            
-          )
+          tabPanel("Analyze by Card")
       ))
       # End mainPanel id = 'dataset'
     )
@@ -625,7 +579,6 @@ server <- function(input, output, session) {
       if (nrow(chunk) == 1) {
         #print("Authentication SUCCESSFUL")
         isValid <- TRUE
-        USER$id<-chunk
       }
       else {
         #print("Authentication FAILED")
@@ -634,9 +587,6 @@ server <- function(input, output, session) {
     }
     
     # Clear the connection and stop the application
-
-    
-
     dbClearResult(rs)
     dbDisconnect(connection)
     return(isValid)
@@ -807,27 +757,28 @@ server <- function(input, output, session) {
     paste0("Amount: $ ", round(as.numeric(input$lineplot_click$y),2))
   })
   
-  getUserInfo<- function(userid){
-    
-    # Etablish Connection
-    connection<-getConnection(username, passwrd)
-    rs <-dbSendQuery(
-      connection,
-      paste0(
-        "select user_id from user_details where login_username='",
-        username ,
-        "' and login_password = '",
-        passwrd,
-        "'"
-      ))
-    
-    # Assign the connection to
-    userData <- dbFetch(rs)
-    dbClearResult(rs)
-    dbDisconnect(connection)
-    
-    return (userData)
-  }
+  # getUserInfo<- function(userid){
+  #   
+  #   # Etablish Connection
+  #   connection<-getConnection(username, passwrd)
+  #   rs <-dbSendQuery(
+  #     connection,
+  #     paste0(
+  #       "select user_id from user_details where login_username='",
+  #       username ,
+  #       "' and login_password = '",
+  #       passwrd,
+  #       "'"
+  #     ))
+  #   
+  #   # Assign the connection to
+  #   userData <- dbFetch(rs)
+  #   dbClearResult(rs)
+  #   dbDisconnect(connection)
+  #   
+  #   return (userData)
+  # }
+  
 }
 # End Server function
 
