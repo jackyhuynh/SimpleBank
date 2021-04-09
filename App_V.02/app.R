@@ -91,6 +91,11 @@ credentials = data.frame(
 )
 
 
+labelMandatory <- function(label) {
+  tagList(label,span("*", class = "mandatory_star")
+  )}
+
+
 # @Swetha
 #
 # Function: ui dashboard for the main page
@@ -119,9 +124,12 @@ server <- function(input, output, session) {
   
   # login variable for user to login
   login = FALSE
+  id = 1
+  Data <- NULL
   
   # Validate everytime user login
-  USER <- reactiveValues(login = login)
+  USER <- reactiveValues(login = login , id = id, Data = Data)
+
   
   # @Swetha 
   #
@@ -139,6 +147,7 @@ server <- function(input, output, session) {
           
           if (pasverify) {
             USER$login <- TRUE
+            USER$Data <-  getUserInfo(Username, Password)
           } else {
             shinyjs::toggle(
               id = "nomatch",
@@ -155,6 +164,7 @@ server <- function(input, output, session) {
                            ))}}}}
   }) 
   # end observe for user login
+  
   
   ###################
   # @UI COMPONENTS:
@@ -510,8 +520,56 @@ server <- function(input, output, session) {
               sidebarPanel (
                 div(tags$h4("Goal Analyst"),
                     tags$p("Will add the goal analyst portion here!"))),
-              mainPanel(plotOutput("Total"))))
+              mainPanel(plotOutput("Total")))),
           # End "Expense vs. Income"
+          
+          tabPanel(
+            "User Account",tags$div(
+              sidebarLayout(
+                sidebarPanel(),
+                mainPanel(
+                  id="User Information",
+                  
+                  tags$h2("Personal Information"),br(),
+                  tags$div(
+                    splitLayout(
+                      cellWidths = c("200px","20", "250px"),
+                      cellArgs = list(style = "vertical-align: top"),
+                      textInput(
+                        "fullName",labelMandatory("Full Name"), placeholder = USER$Data[[2]],width = '200px'),
+                      tags$div(),
+                      textInput(
+                        "address","Address", placeholder = USER$Data[[3]],width = '200px')
+                    )
+                  ),
+                  tags$div(
+                    splitLayout(
+                      cellWidths = c("200px","20", "250px"),
+                      cellArgs = list(style = "vertical-align: top"),
+                      textInput(
+                        "fullName","Birthday", placeholder = USER$Data[[5]],width = '200px'),
+                      tags$div(),
+                      textInput(
+                        "address","SSN", placeholder = '*********',width = '200px')
+                    )
+                  ),
+                  tags$h2("Account Information"),br(),
+                  tags$div(
+                    splitLayout(
+                      cellWidths = c("200px","20", "250px"),
+                      cellArgs = list(style = "vertical-align: top"),
+                      textInput(
+                        "fullName",labelMandatory("User Name"), placeholder = USER$Data[[6]],width = '200px'),
+                      tags$div(),
+                      textInput(
+                        "address",labelMandatory("Password Name"), placeholder = USER$Data[[7]],width = '200px')
+                    )
+                  ),
+                )
+              )
+            )
+            
+          )
       ))
       # End mainPanel id = 'dataset'
     )
@@ -541,39 +599,34 @@ server <- function(input, output, session) {
   # Component: Logic, Validate user login's information and etablish connection to
   #            the database
   # Variable: Local  
-  validateCredentails <- function(userid, passwrd) {
+  validateCredentails <- function(username, passwrd) {
     
     # print("inside validateCredentails")
     # print(userid)
     drv <- dbDriver("MySQL")
     isValid <- FALSE
-    mydb <-
-      dbConnect(
-        drv,
-        user = 'root',
-        password = 'Myskhongbiet88',
-        dbname = 'credit_card_analysis2',
-        host = 'localhost'
-        )
+    connection <- getConnection()
+    
     rs <-
       dbSendQuery(
-        mydb,
+        connection,
         paste0(
           "select user_id from user_details where login_username='",
-          userid ,
+          username ,
           "' and login_password = '",
           passwrd,
           "'"
           )
         )
-    
+
     if (!dbHasCompleted(rs)) {
+      
       chunk <- dbFetch(rs, n = 1)
-  
-      print(nrow(chunk))
+      
       if (nrow(chunk) == 1) {
         #print("Authentication SUCCESSFUL")
         isValid <- TRUE
+        USER$id<-chunk
       }
       else {
         #print("Authentication FAILED")
@@ -582,8 +635,11 @@ server <- function(input, output, session) {
     }
     
     # Clear the connection and stop the application
+
+    
+
     dbClearResult(rs)
-    dbDisconnect(mydb)
+    dbDisconnect(connection)
     return(isValid)
   }
   # End of validateCredential function
@@ -751,6 +807,28 @@ server <- function(input, output, session) {
   output$lineplotInfo <- renderText({
     paste0("Amount: $ ", round(as.numeric(input$lineplot_click$y),2))
   })
+  
+  getUserInfo<- function(userid){
+    
+    # Etablish Connection
+    connection<-getConnection(username, passwrd)
+    rs <-dbSendQuery(
+      connection,
+      paste0(
+        "select user_id from user_details where login_username='",
+        username ,
+        "' and login_password = '",
+        passwrd,
+        "'"
+      ))
+    
+    # Assign the connection to
+    userData <- dbFetch(rs)
+    dbClearResult(rs)
+    dbDisconnect(connection)
+    
+    return (userData)
+  }
 }
 # End Server function
 
