@@ -124,12 +124,11 @@ server <- function(input, output, session) {
   
   # login variable for user to login
   login = FALSE
-  id = 1
-  Data <- NULL
+  Data = NULL
   
   # Validate everytime user login
-  USER <- reactiveValues(login = login , id = id, Data = Data)
-
+  USER <- reactiveValues(login = login )
+  userInfo <- reactiveValues(Data = Data)
   
   # @Swetha 
   #
@@ -147,7 +146,7 @@ server <- function(input, output, session) {
           
           if (pasverify) {
             USER$login <- TRUE
-            USER$Data <-  getUserInfo(Username, Password)
+            userInfo$Data <-  getUserInfo(Username, Password)
           } else {
             shinyjs::toggle(
               id = "nomatch",
