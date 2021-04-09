@@ -148,4 +148,9 @@ rs <-
     )
   )
 
-user <- dbFetch(rs)
+currentUser <- dbFetch(rs)
+
+dbDisconnect(getConnection())
+
+connection<-getConnection()
+dbDisconnect(connection)
