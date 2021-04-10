@@ -25,7 +25,7 @@ getTransactionDataWithStoreName <- function(connection){
   
   ##Change format from string to date
   transactionDataWithStoreName$Date <-format(as.Date(transactionDataWithStoreName$Date, "%Y-%m-%d"), "%m/%d/%y");
-  print(paste("Log: Data returned for all transactions: ", nrow(transactionDataWithStoreName)));
+  #print(paste("Log: Data returned for all transactions: ", nrow(transactionDataWithStoreName)));
   return(transactionDataWithStoreName);
 }
 
