@@ -96,6 +96,21 @@ ui <-  fluidPage(
             min = min(UserTransaction$date),
             max = max(UserTransaction$date)
           )),
+        
+        conditionalPanel(
+          'input.dataset === "Analyze by Card"',
+          tags$h3("Total Income vs. Expense Over Time", class = "text-info"),
+          # Select date range to be plotted
+          tags$p("Note: Choose date to see the total balance between a specific time!"),
+          dateRangeInput(
+            "DebitDate", strong("Date range"),
+            start = min(UserTransaction$date),
+            end = max(UserTransaction$date),
+            min = min(UserTransaction$date),
+            max = max(UserTransaction$date)
+          )
+          
+        ),
         # Simply print the Authority in main pages
         printMainAuthority()
       ),
@@ -169,8 +184,6 @@ ui <-  fluidPage(
               sidebarLayout(
                 sidebarPanel(
                   tags$h3("Transaction By Category", class = "text-info"),
-                  
-                  
                   
                   # Select type of trend to plot
                   selectInput(
@@ -253,10 +266,9 @@ ui <-  fluidPage(
                      plotOutput("Total")  
                    )
                  )
-                 
-                 
-                 
-        ) # End tab Panel Total Expense
+   
+        ), # End tab Panel Total Expense
+        tabPanel("Analyze by Card")
       )
       )
     ),# end all Tabs
