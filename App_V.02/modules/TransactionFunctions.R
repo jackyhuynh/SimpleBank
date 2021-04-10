@@ -34,6 +34,7 @@ getTransactions <- function(user_id, connection){
   query <- sprintf("select * from user_transaction_sample")
   rs <- dbSendQuery(connection, query)
   allTransaction <- dbFetch(rs, n=-1)
+  allTransaction$date <-as.Date(allTransaction$date,format = "%m/%d/%Y")
   dbClearResult(rs)
   dbDisconnect(connection)
   
@@ -50,4 +51,18 @@ getFortWayneLocations <- function(connection){
   dbDisconnect(connection)
   
   return(FWlocations)
+}
+
+getAllUserCards<-function(userid, connection){
+  query <- paste0(
+    "select * from card_details where user_id_fk='",
+    userid,
+    "'"
+  )
+  rs <- dbSendQuery(connection, query)
+  cards <- dbFetch(rs, n=-1)
+  dbClearResult(rs)
+  dbDisconnect(connection)
+  
+  return(cards)
 }
