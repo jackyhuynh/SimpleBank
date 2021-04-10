@@ -61,7 +61,8 @@ getAllUsers <- function(connection){
 
 ##USER AUTHENTICATION
 getUserID <- function(username, password, connection){
-  query <- sprintf("select user_id from user_details where login_username= '%s' and login_password= '%s' and deleted=1;", username, password);
+  query <- sprintf("select user_id from user_details where login_username= '%s' 
+                   and login_password= '%s' and deleted=1;", username, password);
   
   rs = dbSendQuery(connection, query);
   data = fetch(rs, n= -1);  
