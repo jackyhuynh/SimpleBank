@@ -58,3 +58,19 @@ getAllUsers <- function(connection){
   print(paste("Log: Number of records found : ", nrow(data)));
   return(data);
 }
+
+##USER AUTHENTICATION
+getUserID <- function(username, password, connection){
+  query <- sprintf("select user_id from user_details where login_username= '%s' and login_password= '%s' and deleted=1;", username, password);
+  
+  rs = dbSendQuery(connection, query);
+  data = fetch(rs, n= -1);  
+  
+  if(nrow(data) == 1){
+    print(paste("Log: Success found user:", username));
+    return(data)
+  } else{
+    print(paste("Log : Not found user:", username));
+    return(NULL)
+  }
+}
