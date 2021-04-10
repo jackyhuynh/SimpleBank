@@ -91,9 +91,14 @@ credentials = data.frame(
 )
 
 
-labelMandatory <- function(label) {
-  tagList(label,span("*", class = "mandatory_star")
-  )}
+# @TrucHuynh
+#
+# Function: ui dashboard for the main page
+# Component: UI
+# Variable: Global
+connection<-getConnection()
+
+
 
 
 # @Swetha
@@ -209,6 +214,7 @@ server <- function(input, output, session) {
           icon = icon("th")))}
   })
   # End output$sidebarpanel
+  
   
   # @Truc
   #
