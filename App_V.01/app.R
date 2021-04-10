@@ -293,8 +293,6 @@ server <- function(input, output, session) {
                               sidebarPanel(
                                 tags$h3("Transaction By Category", class = "text-info"),
                                 
-                                
-                                
                                 # Select type of trend to plot
                                 selectInput(
                                   inputId = "type",
