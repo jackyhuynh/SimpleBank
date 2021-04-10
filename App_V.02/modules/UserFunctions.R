@@ -71,6 +71,6 @@ getUserID <- function(username, password, connection){
     return(data)
   } else{
     print(paste("Log : Not found user:", username));
-    return(NULL)
+    return(0)
   }
 }
