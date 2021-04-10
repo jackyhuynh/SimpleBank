@@ -17,9 +17,9 @@ getTransactionDataWithStoreName <- function(connection){
   inner join locations as l on (t.locationid_id_fk = l.location_id)
   inner join category as c  on (c.category_id = t.category_id_fk)
   where l.deleted=1 and t.deleted=1  and c.deleted=1
-  order by t.transaction_id");  
-  rs = dbSendQuery(connection, query);
-  transactionDataWithStoreName = dbFetch(rs, n=-1);
+  order by t.transaction_id")  
+  rs = dbSendQuery(connection, query)
+  transactionDataWithStoreName = dbFetch(rs, n=-1)
   dbClearResult(rs)
   dbDisconnect(connection)
   
@@ -29,6 +29,16 @@ getTransactionDataWithStoreName <- function(connection){
   return(transactionDataWithStoreName);
 }
 
+getTransactions <- function(user_id, connection){
+  user_id=1
+  query <- sprintf("select * from user_transaction_sample")
+  rs <- dbSendQuery(connection, query)
+  allTransaction <- dbFetch(rs, n=-1)
+  dbClearResult(rs)
+  dbDisconnect(connection)
+  
+  return(allTransaction)
+}
 
 # ##2. GET TRANSACTION DATA FOR EXISTING MONTH
 # getCurrentMonthTransaction <- function(connection){
