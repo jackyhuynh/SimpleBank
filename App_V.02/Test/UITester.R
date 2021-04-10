@@ -5,7 +5,12 @@ connection<-getConnection()
 UserTransaction<-getTransactions(1,connection)
 
 connection<-getConnection()
+
 FWlocation <- getFortWayneLocations(connection)
+
+connection<-getConnection()
+
+getAllUserCards(2,connection)
 
 ui<-fluidPage(
   sidebarLayout(
@@ -19,9 +24,24 @@ ui<-fluidPage(
           names(UserTransaction[, c("date", "description", "amount", "type", "category", "accounts")]),
           selected = names(UserTransaction[, c("date", "description", "amount", "type", "category", "accounts")])
         )
-      )
+      ),
+      conditionalPanel(
+        'input.dataset === "Expense vs. Income"',
+        tags$h3("Total Income vs. Expense Over Time", class = "text-info"),
+        # Select date range to be plotted
+        tags$p("Note: Choose date to see the total balance between a specific time!"),
+        dateRangeInput(
+          "DebitDate", strong("Date range"),
+          start = min(UserTransaction$date),
+          end = max(UserTransaction$date),
+          min = min(UserTransaction$date),
+          max = max(UserTransaction$date)
+        ))
+      
     ),
     mainPanel(
+      tabsetPanel(
+      id = 'dataset',
       #All Transaction
       tabPanel(
         "All Transaction",
@@ -31,15 +51,54 @@ ui<-fluidPage(
         tags$em(tags$h3("Deep Analyzing", class = "text-primary")),
         
         tags$div(
+          # Select date range to be plotted
+          dateRangeInput(
+            "dateTransMap",
+            strong("Date range"),
+            start = min(UserTransaction$date),
+            end = max(UserTransaction$date),
+            min = min(UserTransaction$date),
+            max = max(UserTransaction$date)
+          ),
           
         ),
+        br(),
         tabsetPanel(
           tabPanel("Map Expense",leafletOutput("map")),
-          tabPanel("Total Income")
+          tabPanel("Analyze By Accounts",
+                   sidebarLayout(
+                     sidebarPanel(
+                       dateRangeInput(
+                         "dateTransMap",
+                         strong("Date range"),
+                         start = min(UserTransaction$date),
+                         end = max(UserTransaction$date),
+                         min = min(UserTransaction$date),
+                         max = max(UserTransaction$date)
+                       ),
+                     ),
+                     mainPanel(
+                       
+                     )
+                   ))
         ) # End tabset Panel
+      ),
+      tabPanel("Expense vs. Income",
+               plotOutput("piePlotDebit"),
+               sidebarLayout(
+                 sidebarPanel (
+                   div(
+                     tags$h4("Goal Analyst"),
+                     tags$p("Will add the goal analyst portion here!")
+                   )
+                 ),
+                 mainPanel(
+                   plotOutput("Total")  
+                 )
+               )
       )
     )
-  )
+  ))
 )
 
 server<-function(input,output, session){
@@ -48,11 +107,21 @@ server<-function(input,output, session){
   })
   
   # Set of methods for the Summary map
+  
+  TransactionByCard <- reactive({
+    req(input$dateTransMap)
+    validate(need(!is.na(input$dateTransMap[1]) &!is.na(input$dateTransMap[2]),
+      "Error: Please provide both a start and an end date."))
+    validate(need(input$dateTransMap[1] < input$dateTransMap[2],
+        "Error: Start date should be earlier than end date."))
+    TotalBalance %>% filter(date > (input$dateTransMap[1]) &date < (input$dateTransMap[2]))
+  })
+  
   location <-
     aggregate(amount ~ lat + long,data = UserTransaction,FUN = sum)
-
+  
   location <- merge(location, FWlocation)
-  titles<-location$store
+
   output$map <- renderLeaflet({
     leaflet(data = location) %>% addTiles() %>%
       addMarkers( ~ long, ~ lat, label =  ~ as.character(store), popup = ~ as.character(paste('$',amount)))
@@ -97,7 +166,6 @@ server<-function(input,output, session){
       fill = viridis::viridis_pal(option = "magma", direction = -1)(length(creditTrans$amount))
     )
     par(old.par)
-    
   })
   
   
@@ -113,7 +181,7 @@ server<-function(input,output, session){
     debitTrans<-SummaryExpense(UserTransaction %>% filter(date > (input$DebitDate[1]) & date < (input$DebitDate[2])),'debit')
     creditTrans<-SummaryExpense(UserTransaction %>% filter(date > (input$DebitDate[1]) & date < (input$DebitDate[2])),'credit')
     
-    totalS <-data.frame(c(sum(debitTrans$amount),sum(creditTrans$amount)),c("Expense","Income"))
+    totalS <-data.frame(c(sum(debitTrans$amount),sum(creditTrans$amount)),c("Expense (debit)","Income (credit)"))
     
     colnames(totalS)<- c("amount", "type")
     
@@ -136,6 +204,7 @@ server<-function(input,output, session){
     # turn the 'e+' into plotmath format
     l <- gsub("e", "%*%10^", l)
     # return this as an expression
+
     parse(text=l)
   }
 }
