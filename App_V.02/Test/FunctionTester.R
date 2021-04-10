@@ -86,7 +86,7 @@ deleteUser(connection, userObj)
 ##ADMIN ONLY
 ##getAllUsers
 users <- getAllUsers(connection);
-View(users)
+View(users['Name'])
 
 
 ## Set of method to get the user id
@@ -150,7 +150,30 @@ rs <-
 
 currentUser <- dbFetch(rs)
 
-dbDisconnect(getConnection())
 
 connection<-getConnection()
 dbDisconnect(connection)
+
+# 
+getUserID(username="davis_miles", password="password123",connection)[[1]]
+
+transQuery <-"select t.transaction_id as tid, t.amount as Amount, t.date_of_transaction as 'Date',
+t.time_of_transaction as 'Time', t.transaction_type as 'Type', c.category_name as 'Category',
+l.location_name as 'Store Name' , l.location_latitude as 'Latitude', l.location_longitude as 'Longitude'
+from user_transaction_user_id_1 as t
+inner join locations as l on (t.locationid_id_fk = l.location_id)
+inner join category as c  on (c.category_id = t.category_id_fk)
+where l.deleted=1 and t.deleted=1  and c.deleted=1
+order by t.transaction_id"
+
+rs <-
+  dbSendQuery(
+    connection,
+    paste0(transQuery
+    )
+  )
+
+AllTraction<-dbFetch(rs)
+dbDisconnect(connection)
+getMonthlyExpenditureByCategoryName(connection)
+AllTraction<-getTransactionDataWithStoreName(connection)
