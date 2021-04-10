@@ -100,7 +100,6 @@ connection<-getConnection()
 
 
 
-
 # @Swetha
 #
 # Function: ui dashboard for the main page
