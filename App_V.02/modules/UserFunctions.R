@@ -10,7 +10,6 @@ addNewUser <- function(connection, userObject){
 
 
 ##UPDATE EXISTING USER 
-
 updateUserDetails <- function(connection, userObject){
   
   ##Update user_details
@@ -21,9 +20,8 @@ updateUserDetails <- function(connection, userObject){
   
 };
 
-
+# Admin Panel
 ##DELETE EXISTING USER
-
 deleteUser <- function(connection, userObject){
   
   ##delete from user_details
@@ -49,7 +47,7 @@ confrimUserCredentails <- function(userObject, connection){
   }
 }
 
-
+##Admin Panel
 ##GET ALL USERS LIST
 getAllUsers <- function(connection){
   query <- sprintf("select user_id as uid, name_on_card as 'Name', address as 'Address' from user_details where deleted=1;");
@@ -58,6 +56,7 @@ getAllUsers <- function(connection){
   print(paste("Log: Number of records found : ", nrow(data)));
   return(data);
 }
+
 
 ##USER AUTHENTICATION
 getUserID <- function(username, password, connection){
