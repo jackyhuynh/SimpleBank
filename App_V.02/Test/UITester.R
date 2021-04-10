@@ -1,7 +1,8 @@
 library(shiny)
 
-connection <- getConnection()
-UserTransaction<-getTransactionDataWithStoreName(connection)
+connection<-getConnection()
+
+UserTransaction<-getTransactions(1,connection)
 
 ui<-fluidPage(
   sidebarLayout(
@@ -12,7 +13,7 @@ ui<-fluidPage(
         checkboxGroupInput(
           "show_trans2",
           "Selections:",
-          names(UserTransaction[, c("Date", "Time", "Type", "Amount", "Category", "accounts")]),
+          names(UserTransaction[, c("date", "description", "amount", "type", "category", "accounts")]),
           selected = names(UserTransaction[, c("date", "description", "amount", "type", "category", "accounts")])
         )
       )
