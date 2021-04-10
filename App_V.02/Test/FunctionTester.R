@@ -1,8 +1,5 @@
-
-
 connection <- getConnection()
 dbDisconnect(connection)
-
 
 ##1. Get data for all the transactions with store name
 getTransactionDataWithStoreName(connection)
@@ -13,3 +10,5 @@ View(categoriesList)
 
 ##2. get USer ID based on username and password
 getUserID('inewton', 'pwd123', connection)
+
+View()
