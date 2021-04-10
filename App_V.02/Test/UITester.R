@@ -30,6 +30,9 @@ ui<-fluidPage(
         printWhiteSpace(),
         tags$em(tags$h3("Deep Analyzing", class = "text-primary")),
         
+        tags$div(
+          
+        ),
         tabsetPanel(
           tabPanel("Map Expense",leafletOutput("map")),
           tabPanel("Total Income")
