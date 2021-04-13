@@ -12,3 +12,32 @@ View(categoriesList)
 getUserID('inewton', 'pwd123', connection)
 
 View()
+
+
+connection<-getConnection()
+
+UserTransaction<-getTransactionDataWithStoreName(connection,1)
+
+head(UserTransaction)
+UserTransaction[, c("Type","Date", "Time", "Category","Card","Store Name","Amount")]
+
+UserTransaction1<-getTransactions(connection)
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Testing purpose only
+# This is the final query requirement
+connection<-getConnection()
+UserCategory<-aggregate(amount~accounts, data=UserTransaction, FUN=sum)
+getTransactions2(1,connection)
+
