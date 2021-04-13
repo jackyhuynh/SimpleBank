@@ -57,25 +57,24 @@ getTransactions <- function(user_id, connection){
 }
 
 
-getTransactions2 <- function(user_id, connection){
-  user_id=1
+getTransactionDataWithStoreName <- function(connection, userId){
+  # connection <- getConnection();
   query <- sprintf("select t.transaction_id as tid, t.amount as Amount, t.date_of_transaction as 'Date',
-  t.time_of_transaction as 'Time', t.transaction_type as 'Type', c.category_name as 'Category', cd.name_of_card as 'Card',
+  t.time_of_transaction as 'Time', t.transaction_type as 'Type', c.category_name as 'Category',
   l.location_name as 'Store Name' , l.location_latitude as 'Latitude', l.location_longitude as 'Longitude'
-  from user_transaction_user_id_1 as t
+  from user_transaction_user_id_%s as t
   inner join locations as l on (t.locationid_id_fk = l.location_id)
   inner join category as c  on (c.category_id = t.category_id_fk)
-  inner join card_details as cd on (cd.card_id = t.card_id_fk)
-  where l.deleted=1 and t.deleted=1  and c.deleted=1 and cd.deleted=1
-  order by t.transaction_id;")
-  
-  rs <- dbSendQuery(connection, query)
-  allTransaction <- dbFetch(rs, n=-1)
-  allTransaction$date <-as.Date(allTransaction$date,format = "%m/%d/%Y")
+  where l.deleted=1 and t.deleted=1  and c.deleted=1
+  order by t.transaction_id", userId)
+  rs = dbSendQuery(connection, query)
+  transactionDataWithStoreName = dbFetch(rs, n=-1)
   dbClearResult(rs)
   dbDisconnect(connection)
-  
-  return(allTransaction)
+  ##Change format from string to date
+  transactionDataWithStoreName$Date <-format(as.Date(transactionDataWithStoreName$Date, "%Y-%m-%d"), "%m/%d/%y");
+  #print(paste("Log: Data returned for all transactions: ", nrow(transactionDataWithStoreName)));
+  return(transactionDataWithStoreName);
 }
 
 
