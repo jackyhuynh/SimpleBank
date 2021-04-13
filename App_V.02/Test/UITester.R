@@ -12,11 +12,16 @@ connection<-getConnection()
 
 getAllUserCards(2,connection)
 
+# Testing purpose only
+
 connection<-getConnection()
 
 UserCategory<-aggregate(amount~accounts, data=UserTransaction, FUN=sum)
 
 getTransactions2(1,connection)
+
+getTransactionDataWithStoreName(connection)
+
 
 SummaryExpense <-function(dataInput, TraType){
   UserTransaction <- aggregate(amount~category, data=filter(dataInput,dataInput$type==TraType ), FUN=sum)
