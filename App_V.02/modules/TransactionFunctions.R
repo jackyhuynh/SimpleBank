@@ -30,7 +30,7 @@ getTransactionDataWithStoreName <- function(connection, userId){
 }
 
 
-# This is the function that I used for prototype.
+# This is the function that I used for prototype only.
 getTransactions <- function(user_id, connection){
   user_id=1
   query <- sprintf("select * from user_transaction_sample")
@@ -39,7 +39,6 @@ getTransactions <- function(user_id, connection){
   allTransaction$date <-as.Date(allTransaction$date,format = "%m/%d/%Y")
   dbClearResult(rs)
   dbDisconnect(connection)
-  
   return(allTransaction)
 }
 
@@ -58,16 +57,6 @@ getTransactions <- function(user_id, connection){
 }
 
 
-##8. GET AGGRGATED EXPENDITURE IN CATEGORY FOR CURRENT MONTH
-
-getAggregatedExpenditureByCategory <- function(connection){
-  
-  query <- sprintf("select sum(t.amount) as 'Sum', c.category_name as Category from user_transaction_user_id_1 as t left join category as c on t.category_id_fk = c.category_id where month(t.date_of_transaction) = month(sysdate()) and t.deleted=1 and c.deleted=1 group by c.category_name; ");
-  rs = dbSendQuery(connection, query);
-  aggregateTransactionDetails = dbFetch(rs, n=-1);
-  print(paste("Log: Number of categories: ", nrow(aggregateTransactionDetails)));
-  return(aggregateTransactionDetails);
-}
 
 # @Truc
 # Get all the locations in FW
