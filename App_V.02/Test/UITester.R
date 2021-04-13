@@ -2,23 +2,7 @@ library(shiny)
 
 connection<-getConnection()
 
-#UserTransactionSample<-getTransactions(1,connection)
-
-connection<-getConnection()
-
-UserTransaction<-getTransactionDataWithStoreName2(connection,1)
-
-
-# Testing purpose only
-# This is the final query requirement
-
-connection<-getConnection()
-
-UserCategory<-aggregate(amount~accounts, data=UserTransaction, FUN=sum)
-
-getTransactions2(1,connection)
-
-
+UserTransaction<-getTransactionDataWithStoreName(connection,1)
 
 
 ui<-fluidPage(
@@ -30,8 +14,8 @@ ui<-fluidPage(
         checkboxGroupInput(
           "show_trans2",
           "Selections:",
-          names(UserTransaction[, c("date", "description", "amount", "type", "category", "accounts")]),
-          selected = names(UserTransaction[, c("date", "description", "amount", "type", "category", "accounts")])
+          names(UserTransaction[, c("Type","Date", "Time", "Category","Card","Store Name","Amount")]),
+          selected = names(UserTransaction[, c("Type","Date", "Time", "Category","Card","Store Name","Amount")])
         )
       ),
       conditionalPanel(
@@ -41,10 +25,10 @@ ui<-fluidPage(
         tags$p("Note: Choose date to see the total balance between a specific time!"),
         dateRangeInput(
           "DebitDate", strong("Date range"),
-          start = min(UserTransaction$date),
-          end = max(UserTransaction$date),
-          min = min(UserTransaction$date),
-          max = max(UserTransaction$date)
+          start = min(UserTransaction$Date),
+          end = max(UserTransaction$Date),
+          min = min(UserTransaction$Date),
+          max = max(UserTransaction$Date)
         ))
       
     ),
@@ -64,10 +48,10 @@ ui<-fluidPage(
           dateRangeInput(
             "dateTransMap",
             strong("Date range"),
-            start = min(UserTransaction$date),
-            end = max(UserTransaction$date),
-            min = min(UserTransaction$date),
-            max = max(UserTransaction$date)
+            start = min(UserTransaction$Date),
+            end = max(UserTransaction$Date),
+            min = min(UserTransaction$Date),
+            max = max(UserTransaction$Date)
           ),
           
         ),
@@ -80,10 +64,10 @@ ui<-fluidPage(
                        dateRangeInput(
                          "dateAccount",
                          strong("Date range"),
-                         start = min(UserTransaction$date),
-                         end = max(UserTransaction$date),
-                         min = min(UserTransaction$date),
-                         max = max(UserTransaction$date)
+                         start = min(UserTransaction$Date),
+                         end = max(UserTransaction$Date),
+                         min = min(UserTransaction$Date),
+                         max = max(UserTransaction$Date)
                        ),
                      ),
                      mainPanel(
