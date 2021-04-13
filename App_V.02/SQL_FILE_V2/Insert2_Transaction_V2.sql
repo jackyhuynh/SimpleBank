@@ -1,3 +1,5 @@
+use credit_card_analysis2;
+
 insert into  user_transaction_user_id_1 (card_id_fk, category_id_fk, locationid_id_fk, amount, date_of_transaction, time_of_transaction, transaction_type) values (1, 18, 25, 72, MAKEDATE(2021,58), MAKETIME(9,47,15), 'Debit');
 insert into  user_transaction_user_id_1 (card_id_fk, category_id_fk, locationid_id_fk, amount, date_of_transaction, time_of_transaction, transaction_type) values (1, 2, 2, 121, MAKEDATE(2021,32), MAKETIME(16,14,33), 'Credit');
 insert into  user_transaction_user_id_1 (card_id_fk, category_id_fk, locationid_id_fk, amount, date_of_transaction, time_of_transaction, transaction_type) values (1, 16, 19, 299, MAKEDATE(2021,119), MAKETIME(4,3,33), 'Credit');
