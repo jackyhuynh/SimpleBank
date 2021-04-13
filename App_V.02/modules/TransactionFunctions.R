@@ -26,7 +26,7 @@ order by t.transaction_id;", userId)
   dbDisconnect(connection)
   ##Change format from string to date
   transactionDataWithStoreName$Date <-format(as.Date(transactionDataWithStoreName$Date, "%Y-%m-%d"), "%Y-%m-%d");
-  transactionDataWithStoreName$Date
+  transactionDataWithStoreName$Date <- as.Date(transactionDataWithStoreName$Date,format = "%Y-%m-%d")
   #print(paste("Log: Data returned for all transactions: ", nrow(transactionDataWithStoreName)));
   return(transactionDataWithStoreName);
 }
