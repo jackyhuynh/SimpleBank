@@ -2,17 +2,15 @@ library(shiny)
 
 connection<-getConnection()
 
-UserTransaction<-getTransactions(1,connection)
+#UserTransactionSample<-getTransactions(1,connection)
 
 connection<-getConnection()
 
-FWlocation <- getFortWayneLocations(connection)
+UserTransaction<-getTransactionDataWithStoreName2(connection,1)
 
-connection<-getConnection()
-
-getAllUserCards(2,connection)
 
 # Testing purpose only
+# This is the final query requirement
 
 connection<-getConnection()
 
@@ -20,26 +18,8 @@ UserCategory<-aggregate(amount~accounts, data=UserTransaction, FUN=sum)
 
 getTransactions2(1,connection)
 
-getTransactionDataWithStoreName(connection)
 
 
-SummaryExpense <-function(dataInput, TraType){
-  UserTransaction <- aggregate(amount~category, data=filter(dataInput,dataInput$type==TraType ), FUN=sum)
-  SumTransaction <- filter(UserTransaction, as.numeric(UserTransaction$amount/sum(UserTransaction$amount)) > 0.005)
-  
-  # Calculate the percentage of all Transactions smaller than 1 percent
-  OtherTransaction <- data.frame("Other Expenses",
-                                 sum(UserTransaction$amount) - sum(SumTransaction$amount))
-  
-  # Rename the value
-  names(OtherTransaction) <- c('category','amount')
-  
-  # Get the total transaction after summary the transaction less than 1 percent
-  SumTransaction<- rbind(SumTransaction,OtherTransaction)
-  
-  # Sort the SumTransaction
-  return (SumTransaction[order(-SumTransaction[,2]),])
-}
 
 ui<-fluidPage(
   sidebarLayout(
