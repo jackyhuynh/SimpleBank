@@ -21,7 +21,7 @@ library(leaflet) # map
 
 
 # Source file for category
-source("modules/pie_chart_module.R")
+source("modules/chart_module.R")
 source("modules/print_display_module.R")
 source("modules/user_checking_accounts.R")
 source("modules/CategoryFunctions.R")
