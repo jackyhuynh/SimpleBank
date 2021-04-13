@@ -19,16 +19,19 @@ library(readr) # read data in
 library(tidyverse) # pipe
 library(leaflet) # map
 
-
-# Source file for category
+# @ Truc
+# Source Script to support application
 source("modules/charts_modules.R")
 source("modules/print_display_module.R")
 source("modules/user_checking_accounts.R")
+
+# @Wrucha
+# Source for setup and communicate with database system
 source("modules/CategoryFunctions.R")
 source("modules/DataClasses.R")
 source("modules/TransactionFunctions.R")
 source("modules/UserFunctions.R")
-
+source("modules/TransacationCategoryFunction.R")
 
 # @Swetha
 #
