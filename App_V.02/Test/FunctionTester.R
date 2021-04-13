@@ -21,19 +21,20 @@ UserTransaction<-getTransactionDataWithStoreName(connection,1)
 head(UserTransaction)
 UserTransaction[, c("Type","Date", "Time", "Category","Card","Store Name","Amount")]
 
-UserTransaction1<-getTransactions(connection)
+UserTransaction1<-getTransactions(1,connection)
+
+min(UserTransaction1$date)
 
 
 
+str(UserTransaction1$date)
 
 
+UserTransaction$Date<-as.Date(UserTransaction$Date)
 
+max(UserTransaction$Date)
 
-
-
-
-
-
+min(UserTransaction1$Date)
 
 # Testing purpose only
 # This is the final query requirement
