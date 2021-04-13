@@ -12,6 +12,28 @@ connection<-getConnection()
 
 getAllUserCards(2,connection)
 
+connection<-getConnection()
+
+UserCategory<-aggregate(amount~accounts, data=UserTransaction, FUN=sum)
+
+SummaryExpense <-function(dataInput, TraType){
+  UserTransaction <- aggregate(amount~category, data=filter(dataInput,dataInput$type==TraType ), FUN=sum)
+  SumTransaction <- filter(UserTransaction, as.numeric(UserTransaction$amount/sum(UserTransaction$amount)) > 0.005)
+  
+  # Calculate the percentage of all Transactions smaller than 1 percent
+  OtherTransaction <- data.frame("Other Expenses",
+                                 sum(UserTransaction$amount) - sum(SumTransaction$amount))
+  
+  # Rename the value
+  names(OtherTransaction) <- c('category','amount')
+  
+  # Get the total transaction after summary the transaction less than 1 percent
+  SumTransaction<- rbind(SumTransaction,OtherTransaction)
+  
+  # Sort the SumTransaction
+  return (SumTransaction[order(-SumTransaction[,2]),])
+}
+
 ui<-fluidPage(
   sidebarLayout(
     sidebarPanel(
@@ -69,7 +91,7 @@ ui<-fluidPage(
                    sidebarLayout(
                      sidebarPanel(
                        dateRangeInput(
-                         "dateTransMap",
+                         "dateAccount",
                          strong("Date range"),
                          start = min(UserTransaction$date),
                          end = max(UserTransaction$date),
@@ -134,7 +156,6 @@ server<-function(input,output, session){
     validate(need(input$DebitDate[1] < input$DebitDate[2],"Error: Start date should be earlier than end date."))
     debitTrans<-SummaryExpense(UserTransaction %>% filter(date > (input$DebitDate[1]) & date < (input$DebitDate[2])),'debit')
     creditTrans<-SummaryExpense(UserTransaction %>% filter(date > (input$DebitDate[1]) & date < (input$DebitDate[2])),'credit')
-    
     old.par <- par(mfrow=c(1, 2))
     
     pie(
@@ -207,6 +228,8 @@ server<-function(input,output, session){
 
     parse(text=l)
   }
+  
+  
 }
 
 shinyApp(ui,server)
