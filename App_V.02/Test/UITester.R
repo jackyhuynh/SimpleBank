@@ -16,6 +16,8 @@ connection<-getConnection()
 
 UserCategory<-aggregate(amount~accounts, data=UserTransaction, FUN=sum)
 
+getTransactions2(1,connection)
+
 SummaryExpense <-function(dataInput, TraType){
   UserTransaction <- aggregate(amount~category, data=filter(dataInput,dataInput$type==TraType ), FUN=sum)
   SumTransaction <- filter(UserTransaction, as.numeric(UserTransaction$amount/sum(UserTransaction$amount)) > 0.005)
