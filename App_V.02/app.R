@@ -91,13 +91,13 @@ credentials = data.frame(
 )
 
 
-# @TrucHuynh
+# @Truc
 #
-# Function: ui dashboard for the main page
-# Component: UI
+# Function: getConnection, Create User data
+# Component: Logic
 # Variable: Global
 connection<-getConnection()
-
+UserData.Tidy<-geUsertBankTrans(connection)
 
 # @Swetha
 #
