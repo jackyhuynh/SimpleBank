@@ -1,4 +1,4 @@
-use credit_card_analysis2;
+use credit_card_analysis;
 
 ##GET ALL TRANSACTION DATA getTransactionDataWithStoreName
 
