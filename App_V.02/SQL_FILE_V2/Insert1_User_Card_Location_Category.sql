@@ -16,6 +16,9 @@ values('Miles Davis', '123 E Fort Wayne Street, Warsaw, IN', '1234567890', '1984
 insert into card_details(user_id_fk, credit_card_number, expiration_date, name_of_card) values 
 (1, '9988776655443322', '2021-07-07', 'Visa Card 1 '),
 (1, '3322114455669988', '2022-01-01', 'Discovery Card'),
+(1, '1234114455669988', '2022-01-01', 'Chase Freedom'),
+(1, '1244114455669988', '2022-15-01', 'Amreican Express Blue Cash'),
+(1, '9900114455669988', '2022-10-01', 'NFCU Debit'),
 (2, '5566449977883322', '2023-05-30', 'Mastercard 1'),
 (3, '9865321245784679', '2021-12-30', 'Visa'),
 (4, '5957515358525456', '2022-06-16', 'Chase'),
