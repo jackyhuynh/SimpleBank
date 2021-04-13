@@ -98,6 +98,7 @@ credentials = data.frame(
 # Variable: Global
 connection<-getConnection()
 UserData.Tidy<-geUsertBankTrans(connection)
+TotalBalance<-getTotalBalance(UserData.Tidy)
 
 # @Swetha
 #
