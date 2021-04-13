@@ -8,7 +8,7 @@ Its function is fairly simple, Expense Tracking allows user to track their expen
     - Truc Huynh (TrucDev)
     - Wrucha Nanal
     - Kristina Bond
-    - Swetha Gidigu
+    - Swetha Gidugu
 
 ## Meeting 1
 * Minutes of the meeting(MOM): 
