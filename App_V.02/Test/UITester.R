@@ -1,207 +1,48 @@
 library(shiny)
-
-connection<-getConnection()
-
-UserTransaction<-getTransactionDataWithStoreName(connection,1)
+library(DBI)
 
 
-ui<-fluidPage(
-  sidebarLayout(
-    sidebarPanel(
-      # Monitor and control the action of all Transactions Panel
-      conditionalPanel(
-        'input.dataset === "All Transaction"',
-        checkboxGroupInput(
-          "show_trans2",
-          "Selections:",
-          names(UserTransaction[, c("Type","Date", "Time", "Category","Card","Store Name","Amount")]),
-          selected = names(UserTransaction[, c("Type","Date", "Time", "Category","Card","Store Name","Amount")])
-        )
-      ),
-      conditionalPanel(
-        'input.dataset === "Expense vs. Income"',
-        tags$h3("Total Income vs. Expense Over Time", class = "text-info"),
-        # Select date range to be plotted
-        tags$p("Note: Choose date to see the total balance between a specific time!"),
-        dateRangeInput(
-          "DebitDate", strong("Date range"),
-          start = min(UserTransaction$Date),
-          end = max(UserTransaction$Date),
-          min = min(UserTransaction$Date),
-          max = max(UserTransaction$Date)
-        ))
-      
-    ),
-    mainPanel(
-      tabsetPanel(
-      id = 'dataset',
-      #All Transaction
-      tabPanel(
-        "All Transaction",
-        DT::dataTableOutput("transTable"),
-        
-        printWhiteSpace(),
-        tags$em(tags$h3("Deep Analyzing", class = "text-primary")),
-        
-        tags$div(
-          # Select date range to be plotted
-          dateRangeInput(
-            "dateTransMap",
-            strong("Date range"),
-            start = min(UserTransaction$Date),
-            end = max(UserTransaction$Date),
-            min = min(UserTransaction$Date),
-            max = max(UserTransaction$Date)
-          ),
-          
-        ),
-        br(),
-        tabsetPanel(
-          tabPanel("Map Expense",leafletOutput("map")),
-          tabPanel("Analyze By Accounts",
-                   sidebarLayout(
-                     sidebarPanel(
-                       dateRangeInput(
-                         "dateAccount",
-                         strong("Date range"),
-                         start = min(UserTransaction$Date),
-                         end = max(UserTransaction$Date),
-                         min = min(UserTransaction$Date),
-                         max = max(UserTransaction$Date)
-                       ),
-                     ),
-                     mainPanel(
-                       
-                     )
-                   ))
-        ) # End tabset Panel
-      ),
-      tabPanel("Expense vs. Income",
-               plotOutput("piePlotDebit"),
-               sidebarLayout(
-                 sidebarPanel (
-                   div(
-                     tags$h4("Goal Analyst"),
-                     tags$p("Will add the goal analyst portion here!")
-                   )
-                 ),
-                 mainPanel(
-                   plotOutput("Total")  
-                 )
-               )
-      )
-    )
-  ))
+
+ui <- fluidPage(
+  textInput("ID1", "First ID:", "1"),
+  DT::dataTableOutput("transtable1"),
+  br(),
+  DT::dataTableOutput("transtable2")
 )
 
-server<-function(input,output, session){
-  output$transTable <- DT::renderDataTable({
-    DT::datatable(UserTransaction[, input$show_trans2, drop = FALSE])
-  })
+server <- function(input, output, session) {
+  id=1
+  UserTransaction<-reactive({
+    conn <- getConnection()
+    getTransactionDataWithStoreName(conn,id)})
   
-  # Set of methods for the Summary map
-  
-  TransactionByCard <- reactive({
-    req(input$dateTransMap)
-    validate(need(!is.na(input$dateTransMap[1]) &!is.na(input$dateTransMap[2]),
-      "Error: Please provide both a start and an end date."))
-    validate(need(input$dateTransMap[1] < input$dateTransMap[2],
-        "Error: Start date should be earlier than end date."))
-    TotalBalance %>% filter(date > (input$dateTransMap[1]) &date < (input$dateTransMap[2]))
-  })
-  
-  location <-
-    aggregate(amount ~ lat + long,data = UserTransaction,FUN = sum)
-  
-  location <- merge(location, FWlocation)
-
-  output$map <- renderLeaflet({
-    leaflet(data = location) %>% addTiles() %>%
-      addMarkers( ~ long, ~ lat, label =  ~ as.character(store), popup = ~ as.character(paste('$',amount)))
-  })
-  
-  # Validate the date before plot
-  debitTrans <- reactive({
-    req(input$DebitDate)
-    validate(need(!is.na(input$DebitDate[1]) & !is.na(input$DebitDate[2]),"Error: Please provide both a start and an end date."))
-    validate(need(input$DebitDate[1] < input$DebitDate[2],"Error: Start date should be earlier than end date."))
-    debitTrans<-SummaryExpense(UserTransaction %>% filter(date > (input$DebitDate[1]) & date < (input$DebitDate[2])),'debit')
-    creditTrans<-SummaryExpense(UserTransaction %>% filter(date > (input$DebitDate[1]) & date < (input$DebitDate[2])),'credit')
-    old.par <- par(mfrow=c(1, 2))
+  output$transtable1 <- DT::renderDataTable({
     
-    pie(
-      debitTrans$amount, edges = 200, radius = 0.9,clockwise = TRUE,
-      # IMPORTANT
-      angle = 45, col = viridis::viridis_pal(option = "magma", direction = -1)(length(debitTrans$amount)),
-      labels = head(scales::percent(as.numeric(debitTrans$amount/sum(debitTrans$amount))),-3),
-      # NEVER DISPLAY OVERLAPPING LABELS
-      cex = 0.7, border = "white",main="Debit Transactions"
-    )
-    legend(
-      1,.3,debitTrans$category,
-      cex = 0.7,
-      fill = viridis::viridis_pal(option = "magma", direction = -1)(length(debitTrans$amount))
-    )
     
-    # Credit Transaction
-    pie(
-      creditTrans$amount, edges = 200, radius = 0.9,clockwise = TRUE,
-      # IMPORTANT
-      angle = 45, col = viridis::viridis_pal(option = "magma", direction = -1)(length(creditTrans$amount)),
-      labels = head(scales::percent(as.numeric(creditTrans$amount/sum(creditTrans$amount))),-3),
-      # NEVER DISPLAY OVERLAPPING LABELS
-      cex = 0.7, border = "white", main="Credit Transactions"
-    )
-    legend(
-      1,.3,creditTrans$category,
-      cex = 0.7,
-      fill = viridis::viridis_pal(option = "magma", direction = -1)(length(creditTrans$amount))
-    )
-    par(old.par)
+    conn <- getConnection()
+    
+    on.exit(dbDisconnect(conn), add = TRUE)
+    sql <-
+      sprintf(
+        "select t.transaction_id as tid, t.amount as Amount, t.date_of_transaction as 'Date',
+t.time_of_transaction as 'Time', t.transaction_type as 'Type', c.category_name as 'Category', cd.name_of_card as 'Card',
+l.location_name as 'Store Name' , l.location_latitude as 'Latitude', l.location_longitude as 'Longitude'
+from user_transaction_user_id_%s as t
+inner join locations as l on (t.locationid_id_fk = l.location_id)
+inner join category as c  on (c.category_id = t.category_id_fk)
+inner join card_details as cd on (cd.card_id = t.card_id_fk)
+where l.deleted=1 and t.deleted=1  and c.deleted=1 and cd.deleted=1
+order by t.transaction_id;",
+        input$ID1
+      )
+    query <- sqlInterpolate(conn, sql)
+    dbGetQuery(conn, query)
   })
   
-  
-  # Plot the total balance
-  output$piePlotDebit <- renderPlot({
-    debitTrans()
+  output$transtable2 <- DT::renderDataTable({
+    df<-UserTransaction()
+    df
   })
-  
-  
-  totalTrans <- reactive({
-    validate(need(!is.na(input$DebitDate[1]) & !is.na(input$DebitDate[2]),"Error: Please provide both a start and an end date."))
-    validate(need(input$DebitDate[1] < input$DebitDate[2],"Error: Start date should be earlier than end date."))
-    debitTrans<-SummaryExpense(UserTransaction %>% filter(date > (input$DebitDate[1]) & date < (input$DebitDate[2])),'debit')
-    creditTrans<-SummaryExpense(UserTransaction %>% filter(date > (input$DebitDate[1]) & date < (input$DebitDate[2])),'credit')
-    
-    totalS <-data.frame(c(sum(debitTrans$amount),sum(creditTrans$amount)),c("Expense (debit)","Income (credit)"))
-    
-    colnames(totalS)<- c("amount", "type")
-    
-    ggplot(totalS, aes(y=type, x=amount, fill=type)) + 
-      geom_bar(stat='identity',position = "stack") +
-      ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 60, hjust = 1)) +
-      scale_x_continuous(labels=fancy_scientific)
-    
-  })
-  
-  output$Total <- renderPlot({
-    totalTrans()
-  })
-  
-  fancy_scientific <- function(l) {
-    # turn in to character string in scientific notation
-    l <- format(l, scientific = TRUE)
-    # quote the part before the exponent to keep all the digits
-    l <- gsub("^(.*)e", "'\\1'e", l)
-    # turn the 'e+' into plotmath format
-    l <- gsub("e", "%*%10^", l)
-    # return this as an expression
-
-    parse(text=l)
-  }
-  
-  
 }
 
-shinyApp(ui,server)
-
+shinyApp(ui, server)
