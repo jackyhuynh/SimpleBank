@@ -129,12 +129,15 @@ ui <- dashboardPage(
 # Variable: Global
 server <- function(input, output, session) {
   
-  # login variable for user to login
   login = FALSE
+  id = 1
+  Data <- NULL
   
   
   # Validate everytime user login
-  USER <- reactiveValues(login = login )
+  USER <- reactiveValues(login = login,
+                         id=id,
+                         Data=Data)
   
   
   # @Swetha 
@@ -153,6 +156,12 @@ server <- function(input, output, session) {
           
           if (pasverify) {
             USER$login <- TRUE
+            
+            connection<-getConnection()
+            
+            USER$id <- getUserID(Username, Password, connection)
+            
+            
             #userInfo$Data <-  getUserInfo(Username, Password)
           } else {
             shinyjs::toggle(
@@ -171,6 +180,8 @@ server <- function(input, output, session) {
   }) 
   # end observe for user login
   
+  
+
   
   ###################
   # @UI COMPONENTS:
@@ -285,6 +296,8 @@ server <- function(input, output, session) {
   allTransactionsUI<-  conditionalPanel(
           'input.dataset === "All Transaction"')
    
+  
+
    
   # @Truc
   # Function:  expenseVsIncomeUI 
@@ -294,9 +307,12 @@ server <- function(input, output, session) {
     'input.dataset === "Expense vs. Income"',
     tags$h3("Total Income vs. Expense Over Time", class = "text-info"),
     # Select date range to be plotted
-    tags$p("Note: Choose date to see the total balance between a specific time!")
+    tags$p("Note: Choose date to see the total balance between a specific time!"),
   )
   # End expenseVsIncomeUI
+  
+  
+
   
   
   # @Truc
@@ -476,6 +492,7 @@ server <- function(input, output, session) {
     sidebarLayout(
       sidebarPanel(
         width = 3,
+        textInput("ID1", "First ID:", "1"),
         checkingAccountUI,
         allTransactionsUI,
         expenseVsIncomeUI, # Display the Expense Vs Income Panel
@@ -509,7 +526,7 @@ server <- function(input, output, session) {
           # All Transaction main panel
           tabPanel(
             "All Transaction",
-            DT::dataTableOutput("transTable"),
+            tableOutput("transTable"),
                   
             printWhiteSpace(), # Display Decoration
             tags$em(tags$h3("Deep Analyzing", class = "text-primary")),
@@ -765,27 +782,23 @@ server <- function(input, output, session) {
     paste0("Amount: $ ", round(as.numeric(input$lineplot_click$y),2))
   })
   
-  # getUserInfo<- function(userid){
-  #   
-  #   # Etablish Connection
-  #   connection<-getConnection(username, passwrd)
-  #   rs <-dbSendQuery(
-  #     connection,
-  #     paste0(
-  #       "select user_id from user_details where login_username='",
-  #       username ,
-  #       "' and login_password = '",
-  #       passwrd,
-  #       "'"
-  #     ))
-  #   
-  #   # Assign the connection to
-  #   userData <- dbFetch(rs)
-  #   dbClearResult(rs)
-  #   dbDisconnect(connection)
-  #   
-  #   return (userData)
-  # }
+
+  output$transtable <- renderTable({
+    conn <- getConnection()
+    
+    on.exit(dbDisconnect(conn), add = TRUE)
+    sql <- sprintf("select t.transaction_id as tid, t.amount as Amount, t.date_of_transaction as 'Date',
+t.time_of_transaction as 'Time', t.transaction_type as 'Type', c.category_name as 'Category', cd.name_of_card as 'Card',
+l.location_name as 'Store Name' , l.location_latitude as 'Latitude', l.location_longitude as 'Longitude'
+from user_transaction_user_id_%s as t
+inner join locations as l on (t.locationid_id_fk = l.location_id)
+inner join category as c  on (c.category_id = t.category_id_fk)
+inner join card_details as cd on (cd.card_id = t.card_id_fk)
+where l.deleted=1 and t.deleted=1  and c.deleted=1 and cd.deleted=1
+order by t.transaction_id;", input$ID1)
+    query <- sqlInterpolate(conn, sql)
+    dbGetQuery(conn, query)
+  })
   
 }
 # End Server function
