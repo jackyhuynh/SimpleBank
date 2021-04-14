@@ -123,10 +123,25 @@ server <- function(input, output, session) {
     # end observe for user login
     
     
+    # @Truc
+    #
+    # Function: IMPORTANT: GET USER DATA FOR ALL TRANSACTION
+    # Component: Logic
+    # Variable: Local
     UserTransaction<-reactive({
         conn <- getConnection()
         getTransactionDataWithStoreName(conn,USER$id)})
     
+    
+    # @Truc 
+    #
+    # Function: IMPORTANT: GET USER DATA FOR USER INFORMATION
+    # Component: Logic
+    # Variable: Local
+    UserInformation<-reactive({
+        conn <- getConnection()
+        getUserInfo(USER$id,conn)
+    })
     
     
     ###################
@@ -195,7 +210,19 @@ server <- function(input, output, session) {
                 # Second tab
                 tabItem(tabName = "second",
                         fluidRow(box(
-                            width = 12, dataTableOutput('results2')
+                            width = 12, 
+                            tags$div(
+                                width='1000px',
+                                tags$h2("Account Information"),
+                                DT::dataTableOutput("userInformation")
+                            ),
+                            tags$div(
+                                width='1000px',
+                                tags$h2("Account Information"),
+                                DT::dataTableOutput("cardInformation")
+                            )
+
+                            
                         ))))
         }
         # Call the loginpage agin if fail to identify user
@@ -205,13 +232,17 @@ server <- function(input, output, session) {
     })
     # End output$body
     
-    # @Swetha
+    
+    # @Truc
     # Function:  renderDataTable 
     # Component: UI
     # Variable: Local  
-    output$results2 <-  DT::renderDataTable({
-        datatable(mtcars, options = list(autoWidth = TRUE,
-                                         searching = FALSE))
+    output$userInformation <- DT::renderDataTable({
+        df<-UserInformation()
+        datatable(
+            df[,c("name_on_card", "address", "date_of_birth", "login_username", "login_password", "income")],
+            options = list(autoWidth = TRUE,searching = FALSE)
+        )
     })
     
     
@@ -290,6 +321,8 @@ server <- function(input, output, session) {
         df<-UserTransaction()
         df
     })
+    
+    
 }
 
 
