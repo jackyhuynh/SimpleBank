@@ -269,7 +269,13 @@ server <- function(input, output, session) {
         DT::dataTableOutput("transtable2"),
         printWhiteSpace(),
         tags$em(tags$h3("Deep Analyzing", class = "text-primary")),
-        leafletOutput("transMap")
+        sidebarLayout(
+            sidebarPanel(),
+            mainPanel(
+                leafletOutput("transMap"))
+        ),
+        printMainAuthority()
+        
     )
     
     
