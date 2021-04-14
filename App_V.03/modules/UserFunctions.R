@@ -40,3 +40,23 @@ getUserInfo <- function(userid, connection){
   
   return (currentUser)
 }
+
+
+# @Truc
+# Get all the user cards
+getAllUserCards<-function(userid, connection){
+  query <- paste0(
+    "select * from card_details where user_id_fk='",
+    userid,
+    "'"
+  )
+  rs <- dbSendQuery(connection, query)
+  cards <- dbFetch(rs, n=-1)
+  
+  # Clean up the connection
+  # Prevent Open Connection and injection
+  dbClearResult(rs)
+  dbDisconnect(connection)
+  
+  return(cards)
+}
