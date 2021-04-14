@@ -4,7 +4,7 @@ library(shiny)
 # Get the connection from the database
 connection <- getConnection()
 
-value<-getUserID('inewton','pwd123', connection)
+value<-getUserID('davis_miles','password123', connection)
 
 # Get the location list
 rs <-dbSendQuery(connection,
