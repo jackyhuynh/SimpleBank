@@ -205,6 +205,11 @@ server <- function(input, output, session) {
     # End output$sidebarpanel
     
     
+    # @Truc 
+    #
+    # Function: UI Component for the User Information Page
+    # Component: UI, Hold UI Component for UserInformation
+    # Variable: Local
     UserInformationUI <- fluidRow(box(
         width = 12, 
         tags$div(
@@ -218,6 +223,9 @@ server <- function(input, output, session) {
         ),
         printMainAuthority()
     ))
+    
+    
+    UserBankingUI <- fluidRow()
     
     
     # @Truc @Swetha
@@ -264,7 +272,10 @@ server <- function(input, output, session) {
     # Component: UI, where the regular user interact with data and UI
     # Variable: Local
     welcomePage <- fluidPage(
-        DT::dataTableOutput("transtable2")
+        DT::dataTableOutput("transtable2"),
+        printWhiteSpace(),
+        tags$em(tags$h3("Deep Analyzing", class = "text-primary")),
+        leafletOutput("transMap")
     )
     
     
@@ -365,6 +376,15 @@ server <- function(input, output, session) {
     })
     
     
+    output$transMap <- renderLeaflet({
+        userLocation <- UserTransaction()
+        userLocation <-
+            aggregate(Amount ~ Latitude + Longitude + `Store Name`,data = userLocation ,FUN = sum)
+            
+        leaflet(data = userLocation) %>% addTiles() %>%
+            addMarkers( ~ as.numeric(Longitude),~ as.numeric(Latitude), 
+                        label = ~ as.character(`Store Name`),popup =  ~ as.character(paste('$ ',Amount)))
+    })
 }
 
 
