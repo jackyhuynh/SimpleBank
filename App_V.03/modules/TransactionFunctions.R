@@ -7,6 +7,7 @@ getConnection <- function(){
   return(connection);
 };
 
+
 # @ Wrucha
 ## 1. GET ALL TRANSACTION DATA
 getTransactionDataWithStoreName <- function(connection, userId){
@@ -50,7 +51,7 @@ getTransactions <- function(user_id, connection){
 
 
 # @Truc
-# Get all the locations in FW
+# Get all the locations
 getLocations <- function(connection){
   query <- sprintf("select * from locations")
   rs <- dbSendQuery(connection, query)
@@ -61,6 +62,8 @@ getLocations <- function(connection){
 }
 
 
+# @Truc
+# Get all the user cards
 getAllUserCards<-function(userid, connection){
   query <- paste0(
     "select * from card_details where user_id_fk='",
