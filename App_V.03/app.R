@@ -30,6 +30,13 @@ source("modules/user_checking_accounts.R")
 source("modules/login_module.R")
 
 
+# @Wrucha
+# Source for setup and communicate with database system
+source("modules/DataClasses.R")
+source("modules/TransactionFunctions.R")
+source("modules/UserFunctions.R")
+
+
 # @Truc
 #
 # Function: getConnection, Create User data banking Account
@@ -73,6 +80,8 @@ ui <- dashboardPage(
 # Variable: Global
 server <- function(input, output, session) {
     
+
+    
     # @Swetha 
     #
     # Function: Adding component
@@ -114,7 +123,9 @@ server <- function(input, output, session) {
     # end observe for user login
     
     
-    
+    UserTransaction<-reactive({
+        conn <- getConnection()
+        getTransactionDataWithStoreName(conn,USER$id)})
     
     
     
@@ -211,7 +222,9 @@ server <- function(input, output, session) {
     # Function:  WelcomePage 
     # Component: UI, where the regular user interact with data and UI
     # Variable: Local
-    welcomePage <- fluidPage()
+    welcomePage <- fluidPage(
+        DT::dataTableOutput("transtable2")
+    )
     
     
     
@@ -280,6 +293,12 @@ server <- function(input, output, session) {
         return(isValid)
     }
     # End of validateCredential function
+    
+    
+    output$transtable2 <- DT::renderDataTable({
+        df<-UserTransaction()
+        df
+    })
 }
 
 
