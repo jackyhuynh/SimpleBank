@@ -2,7 +2,6 @@ library(shiny)
 library(DBI)
 
 
-
 ui <- fluidPage(
   textInput("ID1", "First ID:", "1"),
   DT::dataTableOutput("transtable1"),
@@ -17,8 +16,7 @@ server <- function(input, output, session) {
     getTransactionDataWithStoreName(conn,id)})
   
   output$transtable1 <- DT::renderDataTable({
-    
-    
+
     conn <- getConnection()
     
     on.exit(dbDisconnect(conn), add = TRUE)
