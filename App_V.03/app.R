@@ -168,7 +168,7 @@ server <- function(input, output, session) {
                     icon = icon("dashboard")
                 ),
                 menuItem(
-                    "Admin Page",
+                    "User Information",
                     tabName = "second",
                     icon = icon("th")))}
     })
@@ -261,20 +261,11 @@ server <- function(input, output, session) {
         isValid <- FALSE
         connection <- getConnection()
         
-        rs <-
-            dbSendQuery(
-                connection,
-                paste0(
-                    "select user_id from user_details where login_username='",
-                    username ,
-                    "' and login_password = '",
-                    passwrd,
-                    "'"
-                )
-            )
+        rs <-dbSendQuery(connection,
+            paste0( "select user_id from user_details where login_username='",
+                username ,"' and login_password = '",passwrd,"'"))
         
         if (!dbHasCompleted(rs)) {
-            
             chunk <- dbFetch(rs, n = 1)
             
             if (nrow(chunk) == 1) {
