@@ -244,14 +244,13 @@ server <- function(input, output, session) {
                         
                         # Fluid Page for the main User Home Page
                         welcomePage),
+                
                 # Second tab
-                tabItem(tabName = "second"
-                ),
+                tabItem(tabName = "second"),
                 
                 # Third tab
                 tabItem(tabName = "third",
-                        UserInformationUI
-                        ))
+                        UserInformationUI))
         }
         # Call the loginpage again if fail to identify user
         else {
@@ -259,11 +258,6 @@ server <- function(input, output, session) {
         }
     })
     # End output$body
-    
-    
-
-    
-    
 
     
     
@@ -277,10 +271,6 @@ server <- function(input, output, session) {
         tags$em(tags$h3("Deep Analyzing", class = "text-primary")),
         leafletOutput("transMap")
     )
-    
-    
-    
-    
     
     
     # @ SET OF ADMIN PANEL UI
