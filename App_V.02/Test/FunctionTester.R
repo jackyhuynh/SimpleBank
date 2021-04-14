@@ -17,15 +17,15 @@ connection<-getConnection()
 
 UserTransaction<-getTransactionDataWithStoreName(connection,1)
 
-head(UserTransaction)
+userLocation <- UserTransaction
 
-UserTransaction[, c("Type","Date", "Time", "Category","Card","Store Name","Amount")]
+userLocation <-
+  aggregate(Amount ~ Latitude + Longitude + `Store Name`,data = userLocation ,FUN = sum)
 
 
-str(UserTransaction$Date)
 
-UserTransaction$Date
-min(UserTransaction$Date)
+
+
 
 # Testing purpose only
 # This is the final query requirement
