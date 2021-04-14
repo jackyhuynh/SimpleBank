@@ -144,6 +144,18 @@ server <- function(input, output, session) {
     })
     
     
+    # @Truc 
+    #
+    # Function: IMPORTANT: GET USER CARDS FOR USER INFORMATION
+    # Component: Logic
+    # Variable: Local
+    UserCards<-reactive({
+        conn <- getConnection()
+        getAllUserCards(USER$id,conn)
+    })
+    
+    
+    
     ###################
     # @UI COMPONENTS:
     ###################
@@ -178,16 +190,34 @@ server <- function(input, output, session) {
         if (USER$login == TRUE) {
             sidebarMenu(
                 menuItem(
-                    "Main Page",
+                    "All Transaction",
                     tabName = "dashboard",
-                    icon = icon("dashboard")
-                ),
+                    icon = icon("dashboard")),
+                menuItem(
+                    "Banking Information",
+                    tabName = "second",
+                    icon = icon("th")),
                 menuItem(
                     "User Information",
-                    tabName = "second",
-                    icon = icon("th")))}
+                    tabName = "third",
+                    icon = icon("info-circle")))}
     })
     # End output$sidebarpanel
+    
+    
+    UserInformationUI <- fluidRow(box(
+        width = 12, 
+        tags$div(
+            tags$h2("User Account Information"),
+            DT::dataTableOutput("userInformation")
+        ),
+        br(),tags$hr(),
+        tags$div(
+            tags$h2("User Cards Info"),
+            DT::dataTableOutput("cardInformation")
+        ),
+        printMainAuthority()
+    ))
     
     
     # @Truc @Swetha
@@ -206,26 +236,16 @@ server <- function(input, output, session) {
                         
                         # Fluid Page for the main User Home Page
                         welcomePage),
-                
                 # Second tab
-                tabItem(tabName = "second",
-                        fluidRow(box(
-                            width = 12, 
-                            tags$div(
-                                width='1000px',
-                                tags$h2("Account Information"),
-                                DT::dataTableOutput("userInformation")
-                            ),
-                            tags$div(
-                                width='1000px',
-                                tags$h2("Account Information"),
-                                DT::dataTableOutput("cardInformation")
-                            )
-
-                            
-                        ))))
+                tabItem(tabName = "second"
+                ),
+                
+                # Third tab
+                tabItem(tabName = "third",
+                        UserInformationUI
+                        ))
         }
-        # Call the loginpage agin if fail to identify user
+        # Call the loginpage again if fail to identify user
         else {
             loginpage
         }
@@ -233,20 +253,10 @@ server <- function(input, output, session) {
     # End output$body
     
     
-    # @Truc
-    # Function:  renderDataTable 
-    # Component: UI
-    # Variable: Local  
-    output$userInformation <- DT::renderDataTable({
-        df<-UserInformation()
-        datatable(
-            df[,c("name_on_card", "address", "date_of_birth", "login_username", "login_password", "income")],
-            options = list(autoWidth = TRUE,searching = FALSE)
-        )
-    })
+
     
     
-    
+
     
     
     # @Truc
@@ -317,9 +327,41 @@ server <- function(input, output, session) {
     # End of validateCredential function
     
     
+    # @Truc
+    # Function:  output$userInformation 
+    # Component: Logic, UI
+    # Variable: Local  
+    output$userInformation <- DT::renderDataTable({
+        df<-UserInformation()
+        datatable(
+            df[,c("name_on_card", "address", "date_of_birth", "login_username", "login_password", "income")],
+            options = list(autoWidth = TRUE,searching = FALSE)
+        )
+    })
+    # End output$userInformation
+    
+    
+    # @Truc
+    # Function:  output$cardInformation 
+    # Component: Logic, UI
+    # Variable: Local  
+    output$cardInformation <- DT::renderDataTable({
+        df<-UserCards()
+        datatable(
+            df[,c('card_id','credit_card_number','expiration_date','name_of_card')],
+            options = list(autoWidth = TRUE,searching = FALSE)
+        )
+    })
+    # End output$cardInformation 
+    
+   
+    # @Truc
+    # Function:  output$transtable2 
+    # Component: Logic, UI
+    # Variable: Local
     output$transtable2 <- DT::renderDataTable({
         df<-UserTransaction()
-        df
+        df[,c('Type','Date','Time','Store Name', 'Card','Category','Amount')]
     })
     
     
