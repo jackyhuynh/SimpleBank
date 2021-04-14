@@ -62,18 +62,3 @@ getLocations <- function(connection){
 }
 
 
-# @Truc
-# Get all the user cards
-getAllUserCards<-function(userid, connection){
-  query <- paste0(
-    "select * from card_details where user_id_fk='",
-    userid,
-    "'"
-  )
-  rs <- dbSendQuery(connection, query)
-  cards <- dbFetch(rs, n=-1)
-  dbClearResult(rs)
-  dbDisconnect(connection)
-  
-  return(cards)
-}
