@@ -43,7 +43,7 @@ create table user_transaction_user_id_1(
     category_id_fk int,
     locationid_id_fk int,
     amount double,
-	date_of_transaction date,
+	date_of_transaction text,
     time_of_transaction time,
     transaction_type enum('Store', 'Online'),
     primary key (transaction_id),
