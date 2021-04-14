@@ -11,7 +11,6 @@ View(categoriesList)
 ##2. get USer ID based on username and password
 getUserID('inewton', 'pwd123', connection)
 
-View()
 
 
 connection<-getConnection()
@@ -19,22 +18,14 @@ connection<-getConnection()
 UserTransaction<-getTransactionDataWithStoreName(connection,1)
 
 head(UserTransaction)
+
 UserTransaction[, c("Type","Date", "Time", "Category","Card","Store Name","Amount")]
 
-UserTransaction1<-getTransactions(1,connection)
 
-min(UserTransaction1$date)
+str(UserTransaction$Date)
 
-
-
-str(UserTransaction1$date)
-
-
-UserTransaction$Date<-as.Date(UserTransaction$Date)
-
-max(UserTransaction$Date)
-
-min(UserTransaction1$Date)
+UserTransaction$Date
+min(UserTransaction$Date)
 
 # Testing purpose only
 # This is the final query requirement
