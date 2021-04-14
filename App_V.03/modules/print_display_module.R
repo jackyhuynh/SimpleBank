@@ -27,6 +27,7 @@ noteCategory <- function(){
     tags$br(),)
 }
 
+
 printNote <- function(){
   tags$div(
     tags$a(href = "https://github.com/jackyhuynh", "Source: Private Data from Truc GitHub"),
@@ -34,3 +35,9 @@ printNote <- function(){
     tags$a(href = "https://www.linkedin.com/in/truchuynhbusiness/", "Source: Linkedln")    
   )
 }
+
+
+#Label mandatory fields
+labelMandatory <- function(label) {
+  tagList(label,span("*", class = "mandatory_star")
+  )}
