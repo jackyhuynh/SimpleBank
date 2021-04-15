@@ -79,10 +79,39 @@ getLocations <- function(connection){
   return(FWlocations)
 }
 
+
+# @Truc
+# Get the Total Income and Total Expense during a time period
 getIncomeAndExpense <- function(connection, user_id){
   
+  # Get the total Expense since account is open
   query1<-sprintf("SELECT sum(amount) FROM credit_card_analysis2.user_transaction_user_id_%s;",user_id)
-  rs <- dbSendQuery(connection, query)
+  rs <- dbSendQuery(connection, query1)
+  Expense<-dbFetch(rs)
+  dbClearResult(rs)
   
+  # Get the months between 2 date
   query2<-sprintf("SELECT date_of_transaction FROM credit_card_analysis2.user_transaction_user_id_%s;",user_id)
-}
+  rs <- dbSendQuery(connection, query2)
+  DateBetween<-dbFetch(rs)
+  dbClearResult(rs)
+  DateBetween$date_of_transaction <- as.Date(DateBetween$date_of_transaction,format = "%Y-%m-%d")
+  MonthBetween<- interval(min(DateBetween$date_of_transaction),max(DateBetween$date_of_transaction))%/% months(1)
+  
+  # Get the total Income between 2 date
+  query3<-sprintf("SELECT income FROM credit_card_analysis2.user_details where user_id=%s;",user_id)
+  rs <- dbSendQuery(connection, query3)
+  Income<-dbFetch(rs)
+  dbClearResult(rs)
+  
+  # Combine the value into 1 data frame
+  Income$income <- Income$income*MonthBetween
+  df <- cbind(Income,Expense)
+  colnames(df)<- c('Income','Expense')
+  dbDisconnect(connection)
+  
+  Type<-c('Income','Expense')
+  Amount<- c(df[,1],df[,2])
+  
+  return(data.frame(Type,Amount))
+  }
