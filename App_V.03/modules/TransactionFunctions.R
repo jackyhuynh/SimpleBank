@@ -79,4 +79,10 @@ getLocations <- function(connection){
   return(FWlocations)
 }
 
-
+getIncomeAndExpense <- function(connection, user_id){
+  
+  query1<-sprintf("SELECT sum(amount) FROM credit_card_analysis2.user_transaction_user_id_%s;",user_id)
+  rs <- dbSendQuery(connection, query)
+  
+  query2<-sprintf("SELECT date_of_transaction FROM credit_card_analysis2.user_transaction_user_id_%s;",user_id)
+}
