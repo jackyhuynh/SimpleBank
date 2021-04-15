@@ -253,9 +253,6 @@ server <- function(input, output, session) {
   # End expenseVsIncomeUI
   
   
-
-  
-  
   # @Truc
   # Function:  balanceFrequencyUI 
   # Component: UI, Monitor, view control plot control Balance Frequecy tab
@@ -433,7 +430,6 @@ server <- function(input, output, session) {
     sidebarLayout(
       sidebarPanel(
         width = 3,
-        textInput("ID1", "First ID:", "1"),
         checkingAccountUI,
         allTransactionsUI,
         expenseVsIncomeUI, # Display the Expense Vs Income Panel
