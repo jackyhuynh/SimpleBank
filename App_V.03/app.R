@@ -389,8 +389,8 @@ server <- function(input, output, session) {
         tags$em(tags$h3("Cards Analyzing by Total", class = "text-primary")),
         box(width = 12,
             tags$p('View up to date Spending Summary by Cards:'),
-            plotOutput("AnalyzeByCard", height = "100px")),
-        box(width=12,verbatimTextOutput("DisplayTotal")),
+            plotOutput("AnalyzeByCard", height = "180px")),
+        box(width=12,tableOutput("DisplayTotalCards")),
         br(),
         tags$em(tags$h3("Cards Analyzing by Category", class = "text-primary")),
         box(width = 12,
@@ -816,12 +816,16 @@ server <- function(input, output, session) {
     
     output$Diffrential<-renderText({
         # User Information
-        
         Income<- as.numeric(UserInformation()$income*(interval(min(UserTransaction()$Date),max(UserTransaction()$Date))%/% months(1)))
         Expense<-as.numeric(sum(UserTransaction()$Amount))
         paste0("Amount = $ ", round(as.numeric(Income-Expense),2),
                ", From ",  min(UserTransaction()$Date),
                " To ",max(UserTransaction()$Date))
+    })
+    
+    
+    output$DisplayTotalCards<-renderTable({
+        UserCards <- aggregate(Amount~Card,data=UserTransaction(), FUN=sum)
     })
     
     
