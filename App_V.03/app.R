@@ -151,7 +151,7 @@ server <- function(input, output, session) {
     # Variable: Local
     UserDebitTransaction<-reactive({
         connection<-getConnection()
-        debitTrans<-getTransactionWithType(connection,USER$id,"Debit")
+        getTransactionWithType(connection,USER$id,"Debit")
     })
     
     
@@ -162,8 +162,9 @@ server <- function(input, output, session) {
     # Variable: Local
     UserCreditTransaction<-reactive({
         connection<-getConnection()
-        creditTrans<-getTransactionWithType(connection,USER$id,"Credit")
+        getTransactionWithType(connection,USER$id,"Credit")
     })
+    
     
     
     ###################
@@ -221,7 +222,7 @@ server <- function(input, output, session) {
         # the theme name inside shinytheme()
         theme = shinytheme("flatly"),
         tags$em(tags$h3("User Account Information", class = "text-primary")),
-        box( width = 12,tags$div(DT::dataTableOutput("userInformation"))),
+        box( width = 12,tags$div(DT::dataTableOutput("userInformationDisplay"))),
         br(),
         tags$em(tags$h3("User Cards Info", class = "text-primary")),
         box(width = 12,tags$div(DT::dataTableOutput("cardInformation"))),
@@ -373,10 +374,16 @@ server <- function(input, output, session) {
         tags$em(tags$h3("Income vs. Expense", class = "text-primary")),
         box(width=12,
             tags$p('View up to date Spending Summary by Income vs. Expense:'),
-            plotOutput("IncomeExpense", height = "300px")),
+            box(width = 6,tags$h3('Total Expense'),verbatimTextOutput("Expense")),
+            box(width = 6,tags$h3('Total Income'),verbatimTextOutput("Income")),
+            tags$h3('Balance Diffrential'),
+            tags$p('View up to date Spending Summary by Income vs. Expense:'),
+            verbatimTextOutput("Diffrential"),
+            ),
         printMainAuthority()
     )
     
+
     
     CardsAnalystUI<- fluidPage(
         
@@ -490,7 +497,7 @@ server <- function(input, output, session) {
     # Function:  output$userInformation 
     # Component: Logic, UI
     # Variable: Local  
-    output$userInformation <- DT::renderDataTable({
+    output$userInformationDisplay <- DT::renderDataTable({
         df<-UserInformation()
         datatable(
             df[,c("name_on_card", "address", "date_of_birth", "login_username", "login_password", "income")],
@@ -775,31 +782,34 @@ server <- function(input, output, session) {
     })
     
     
-    TotalAmount<-reactive({
-        UserInfo<-UserInformation()
-
-        # User Transaction
-        UserTrans<-UserTransaction()
-
-        Type<-c('Income','Expense')
-        Amount<-c((UserInfo$income*3),
-            sum(UserTrans$Amount))
-
-        df<-data.frame(Type,Amount)
-    })
-    
-    
     # @Truc
-    output$IncomeExpense<-plotOutput({
+    output$Expense<-renderText({
         # User Information
-
-        df<-TotalAmount()
-
-        ggplot(df, aes(y=Type, x=Amount, fill=Type)) +
-            geom_bar(stat='identity',position = "stack") +
-            ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 60, hjust = 1))
-    })
+        paste0("Amount = $ ", round(as.numeric(sum(UserTransaction()$Amount)),2),
+               ", From ",  min(UserTransaction()$Date),
+               " To ",max(UserTransaction()$Date)
+               
+               )})
     
+    
+    output$Income<-renderText({
+        # User Information
+        
+        Income<- UserInformation()$income*(interval(min(UserTransaction()$Date),max(UserTransaction()$Date))%/% months(1))
+        paste0("Amount = $ ", round(as.numeric(Income),2),
+               ", From ",  min(UserTransaction()$Date),
+               " To ",max(UserTransaction()$Date))
+        })
+    
+    output$Diffrential<-renderText({
+        # User Information
+        
+        Income<- as.numeric(UserInformation()$income*(interval(min(UserTransaction()$Date),max(UserTransaction()$Date))%/% months(1)))
+        Expense<-as.numeric(sum(UserTransaction()$Amount))
+        paste0("Amount = $ ", round(as.numeric(Income-Expense),2),
+               ", From ",  min(UserTransaction()$Date),
+               " To ",max(UserTransaction()$Date))
+    })
 }
 
 
