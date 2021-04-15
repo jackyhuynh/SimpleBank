@@ -815,6 +815,21 @@ server <- function(input, output, session) {
                ", From ",  min(UserTransaction()$Date),
                " To ",max(UserTransaction()$Date))
     })
+    
+    
+    output$AnalyzeByCard<-renderPlot({
+        SpendingByCard <- aggregate(Amount ~ Category + Card ,data = UserTransaction() ,FUN = sum)
+        
+        SpendingByCard$Card<-as.factor(SpendingByCard$Card)
+        
+        for (var in unique(SpendingByCard$Card)) {
+            dev.new()
+            print( ggplot(SpendingByCard[SpendingByCard$Card==var,], aes(x=Category, y=Amount, fill=Category)) + 
+                       geom_bar(stat="identity")+
+                       ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 60, hjust = 1))+
+                       ggtitle (as.character(var))  )
+        }
+    })
 }
 
 
