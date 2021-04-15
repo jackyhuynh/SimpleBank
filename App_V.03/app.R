@@ -144,17 +144,27 @@ server <- function(input, output, session) {
     })
     
     
-    
+    # @Truc 
+    #
+    # Function: get user debit transaction
+    # Component: Logic
+    # Variable: Local
     UserDebitTransaction<-reactive({
         connection<-getConnection()
         debitTrans<-getTransactionWithType(connection,USER$id,"Debit")
     })
     
     
+    # @Truc 
+    #
+    # Function: get user credit transaction
+    # Component: Logic
+    # Variable: Local
     UserCreditTransaction<-reactive({
         connection<-getConnection()
         creditTrans<-getTransactionWithType(connection,USER$id,"Credit")
     })
+    
     
     ###################
     # @UI COMPONENTS:
@@ -353,12 +363,17 @@ server <- function(input, output, session) {
     CategoryAnalystUI<-fluidPage(
         tags$em(tags$h3("Spending Summary by Category", class = "text-primary")),
         box(width = 12,
-            tags$p('View up to date Spending Summary:'),
+            tags$p('View up to date Spending Summary by Category:'),
             plotOutput("categoryBarPlot", height = "500px")),
         br(),
         tags$em(tags$h3("Type & Category Analyzing", class = "text-primary")),
         box(width=12,
+            tags$p('View up to date Spending Summary by Category and Transaction Type:'),
             plotOutput("piePlotDebit", height = "400px")),
+        tags$em(tags$h3("Income vs. Expense", class = "text-primary")),
+        box(width=12,
+            tags$p('View up to date Spending Summary by Income vs. Expense:'),
+            plotOutput("IncomeExpense", height = "300px")),
         printMainAuthority()
     )
     
@@ -711,6 +726,58 @@ server <- function(input, output, session) {
             ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 60, hjust = 1)) 
     })
     # End output$categoryBarPlot
+    
+    
+    # @Truc
+    # Function:  output$piePlotDebit
+    # Component: Logic, create CATEGORY & Type Pie Plot
+    # Variable: Local
+    output$piePlotDebit <- renderPlot({
+        
+        # Prepare Debit data and summary
+        debitTrans<-UserDebitTransaction()
+        debitTrans <- aggregate(Amount~Category, data=debitTrans, FUN=sum)
+        debitTrans<- debitTrans[order(-debitTrans$Amount),]
+        
+        # Prepare Credit data and summary
+        creditTrans<-UserCreditTransaction()
+        creditTrans <- aggregate(Amount~Category, data=creditTrans, FUN=sum)
+        creditTrans<- creditTrans[order(-creditTrans$Amount),]
+        
+        old.par <- par(mfrow=c(1, 2))
+        pie(
+            debitTrans$Amount, edges = 200, radius = 1,clockwise = TRUE,
+            # IMPORTANT
+            angle = 45, col = viridis::viridis_pal(option = "magma", direction = -1)(length(debitTrans$Amount)),
+            labels = head(scales::percent(as.numeric(debitTrans$Amount/sum(debitTrans$Amount))),-1),
+            # NEVER DISPLAY OVERLAPPING LABELS
+            cex = 0.7, border = "white",main="Debit Transactions"
+        )
+        legend(
+            1.5,.7,debitTrans$Category,
+            cex = 1,
+            fill = viridis::viridis_pal(option = "magma", direction = -1)(length(debitTrans$Amount))
+        )
+        pie(
+            creditTrans$Amount, edges = 200, radius = 1,clockwise = TRUE,
+            # IMPORTANT
+            angle = 45, col = viridis::viridis_pal(option = "magma", direction = -1)(length(creditTrans$Amount)),
+            labels = head(scales::percent(as.numeric(creditTrans$Amount/sum(creditTrans$Amount))),-1),
+            # NEVER DISPLAY OVERLAPPING LABELS
+            cex = 0.7, border = "white",main="Debit Transactions"
+        )
+        legend(
+            1.5,.7,creditTrans$Category,
+            cex = 1,
+            fill = viridis::viridis_pal(option = "magma", direction = -1)(length(creditTrans$Amount))
+        )
+        par(old.par)
+    })
+    
+    output$IncomeExpense<-plotOutput({
+        
+    })
+    
 }
 
 
