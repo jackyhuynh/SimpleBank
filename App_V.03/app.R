@@ -145,6 +145,17 @@ server <- function(input, output, session) {
     
     
     
+    UserDebitTransaction<-reactive({
+        connection<-getConnection()
+        debitTrans<-getTransactionWithType(connection,USER$id,"Debit")
+    })
+    
+    
+    UserCreditTransaction<-reactive({
+        connection<-getConnection()
+        creditTrans<-getTransactionWithType(connection,USER$id,"Credit")
+    })
+    
     ###################
     # @UI COMPONENTS:
     ###################
@@ -345,8 +356,9 @@ server <- function(input, output, session) {
             tags$p('View up to date Spending Summary:'),
             plotOutput("categoryBarPlot", height = "500px")),
         br(),
-        tags$em(tags$h3("Spending & Category Analyzing", class = "text-primary")),
-        box(width=12,),
+        tags$em(tags$h3("Type & Category Analyzing", class = "text-primary")),
+        box(width=12,
+            plotOutput("piePlotDebit", height = "400px")),
         printMainAuthority()
     )
     
