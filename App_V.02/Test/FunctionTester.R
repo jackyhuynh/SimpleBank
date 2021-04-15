@@ -8,8 +8,7 @@ getTransactionDataWithStoreName(connection)
 categoriesList <- getCategoryList(connection)
 View(categoriesList)
 
-##2. get USer ID based on username and password
-getUserID('inewton', 'pwd123', connection)
+
 
 
 
@@ -17,10 +16,6 @@ connection<-getConnection()
 
 UserTransaction<-getTransactionDataWithStoreName(connection,1)
 
-userLocation <- UserTransaction
-
-userLocation <-
-  aggregate(Amount ~ Latitude + Longitude + `Store Name`,data = userLocation ,FUN = sum)
 
 
 
