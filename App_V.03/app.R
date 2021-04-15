@@ -169,7 +169,7 @@ server <- function(input, output, session) {
     # End output$logoutbtn 
     
     
-    # @Swetha 
+    # @Swetha @Truc
     #
     # Function: Log out button for Welcome Page
     # Component: UI, part of user Welcome Page UI
@@ -177,18 +177,14 @@ server <- function(input, output, session) {
     output$sidebarpanel <- renderUI({
         if (USER$login == TRUE) {
             sidebarMenu(
-                menuItem(
-                    "All Transaction",
-                    tabName = "dashboard",
-                    icon = icon("dashboard")),
-                menuItem(
-                    "Banking Information",
-                    tabName = "second",
-                    icon = icon("th")),
-                menuItem(
-                    "User Information",
-                    tabName = "third",
-                    icon = icon("info-circle")))}
+                menuItem("All Transaction",tabName = "dashboard",icon = icon("dashboard")),
+                menuItem("Banking Transaction",tabName = "second",icon = icon("university")),
+                menuItem("Category Analytic",tabName = "second",icon = icon("chart-pie")),
+                menuItem("Cards Analytic",tabName = "second",icon = icon("chart-bar")),
+                menuItem("User Information",tabName = "fifth",icon = icon("info-circle")),
+                menuItem("Help",tabName = "sixth",icon = icon("question-circle")),
+                menuItem("Setting",tabName = "seventh",icon = icon("cog"))
+                )}
     })
     # End output$sidebarpanel
     
@@ -367,7 +363,7 @@ server <- function(input, output, session) {
                         UserBankingUI),
                 
                 # Third tab
-                tabItem(tabName = "third",
+                tabItem(tabName = "fifth",
                         UserInformationUI))
         }
         # Call the loginpage again if fail to identify user
