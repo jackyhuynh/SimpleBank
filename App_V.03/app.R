@@ -60,6 +60,9 @@ USER <- reactiveValues(login = login,
 # Component: UI
 # Variable: Global
 ui <- dashboardPage(
+
+    
+    
     # @Swetha
     #
     # Function: Top header, sidebar, and body for the Dashboard
@@ -210,19 +213,17 @@ server <- function(input, output, session) {
     # Function: UI Component for the User Information Page
     # Component: UI, Hold UI Component for UserInformation
     # Variable: Local
-    UserInformationUI <- fluidRow(box(
-        width = 12, 
-        tags$div(
-            tags$h2("User Account Information"),
-            DT::dataTableOutput("userInformation")
-        ),
-        br(),tags$hr(),
-        tags$div(
-            tags$h2("User Cards Info"),
-            DT::dataTableOutput("cardInformation")
-        ),
+    UserInformationUI <- fluidPage(
+        # Add CSS UI theme, can easily change theme by change 
+        # the theme name inside shinytheme()
+        theme = shinytheme("flatly"),
+        tags$em(tags$h3("User Account Information", class = "text-primary")),
+        box( width = 12,tags$div(DT::dataTableOutput("userInformation"))),
+        br(),
+        tags$em(tags$h3("User Cards Info", class = "text-primary")),
+        box(width = 12,tags$div(DT::dataTableOutput("cardInformation"))),
         printMainAuthority()
-    ))
+    )
     
     
     UserBankingUI <- fluidRow()
@@ -238,6 +239,7 @@ server <- function(input, output, session) {
     output$body <- renderUI({
         # Allow user login if suceed
         if (USER$login == TRUE) {
+            
             tabItems(
                 # First tab
                 tabItem(tabName = "dashboard", class = "active",
@@ -266,11 +268,17 @@ server <- function(input, output, session) {
     # Component: UI, where the regular user interact with data and UI
     # Variable: Local
     welcomePage <- fluidPage(
+        # Add CSS UI theme, can easily change theme by change 
+        # the theme name inside shinytheme()
+        theme = shinytheme("flatly"),
+        tags$em(tags$h3("Transactions List", class = "text-primary")),br(),
         DT::dataTableOutput("transtable2"),
         printWhiteSpace(),
-        tags$em(tags$h3("Deep Analyzing", class = "text-primary")),
+        tags$em(tags$h3("Transaction Map", class = "text-primary")),br(),
         sidebarLayout(
-            sidebarPanel(),
+            sidebarPanel(
+                noteTransactionMap()
+            ),
             mainPanel(
                 leafletOutput("transMap"))
         ),
@@ -372,6 +380,11 @@ server <- function(input, output, session) {
     })
     
     
+    # @Truc
+    # Function:  output$transMap, function take the user data transaction and
+    #            populate the transaction map from user transactions
+    # Component: Logic, UI
+    # Variable: Local
     output$transMap <- renderLeaflet({
         userLocation <- UserTransaction()
         userLocation <-
