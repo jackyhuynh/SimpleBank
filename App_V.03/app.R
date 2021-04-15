@@ -774,9 +774,32 @@ server <- function(input, output, session) {
         par(old.par)
     })
     
-    output$IncomeExpense<-plotOutput({
-        
-    })
+    
+    # TotalAmount<-reactive({
+    #     UserInfo<-UserInformation()
+    #     
+    #     # User Transaction
+    #     UserTrans<-UserTransaction()
+    #     
+    #     Type<-c('Income','Expense')
+    #     Amount<-c((UserInfo$income*3),
+    #         sum(UserTrans$Amount))
+    #     
+    #     df<-data.frame(Type,
+    #                    Amount)
+    # })
+    
+    
+    # @Truc
+    # output$IncomeExpense<-plotOutput({
+    #     # User Information
+    # 
+    #     df<-TotalAmount()
+    #     
+    #     ggplot(df, aes(y=Type, x=Amount, fill=Type)) + 
+    #         geom_bar(stat='identity',position = "stack") +
+    #         ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 60, hjust = 1))
+    # })
     
 }
 
