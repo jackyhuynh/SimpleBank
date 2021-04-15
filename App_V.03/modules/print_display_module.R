@@ -1,3 +1,7 @@
+# SET OF METHODS FOR DISPLAY HTML AND CSSS BLOCK
+
+# @Truc
+# 
 printMainAuthority <- function() {
   tags$div(
     tags$hr(),
@@ -8,6 +12,9 @@ printMainAuthority <- function() {
   )
 }
 
+
+# @Truc
+# 
 printWhiteSpace <- function(){
   tags$div(
   tags$br(),
@@ -16,7 +23,10 @@ printWhiteSpace <- function(){
   )
 }
 
-noteCategory <- function(){
+
+# @Truc
+# 
+noteTransactionType <- function(){
   tags$div(
     tags$h4("Note:"),
     tags$p("Select one of the following option:"),
@@ -28,6 +38,22 @@ noteCategory <- function(){
 }
 
 
+# @Truc
+# 
+noteTransactionMap <- function(){
+  tags$div(
+    tags$br(),
+    tags$p("Transaction Map show user's transaction over time, feature with:"),
+    tags$li("MOVE CLOSE to destination to see Store Name. "),
+    tags$li("CLICK ON marker to see the total amount over time."),
+    tags$li("ZOOM IN to see street details."),
+    tags$li("ZOOM OUT to see the over all maps."),
+    tags$br())
+}
+
+
+# @Truc
+# 
 printNote <- function(){
   tags$div(
     tags$a(href = "https://github.com/jackyhuynh", "Source: Private Data from Truc GitHub"),
@@ -37,7 +63,8 @@ printNote <- function(){
 }
 
 
-#Label mandatory fields
+# @Truc
+# Label mandatory fields
 labelMandatory <- function(label) {
   tagList(label,span("*", class = "mandatory_star")
   )}
