@@ -1,4 +1,5 @@
-# SET OF METHODS FOR DISPLAY HTML AND CSSS BLOCK
+# SET OF METHODS FOR DISPLAY HTML AND CSS BLOCK
+
 
 # @Truc
 # 
@@ -6,7 +7,7 @@ printMainAuthority <- function() {
   tags$div(
     tags$hr(),
     tags$p("Support:"),
-    tags$li("Truc Huynh business services: 800-242-7338."),
+    tags$li("Financial Freedom team business services: 800-242-7338."),
     tags$li("For online technical support, please call us at 1-877-242-7372"),
     tags$li("For help with online banking, please  contact us online")
   )
