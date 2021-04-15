@@ -18,6 +18,7 @@ library(plotly) # plot
 library(readr) # read data in
 library(tidyverse) # pipe
 library(leaflet) # map
+library("lubridate")  # For date manipulation
 
 # @ Truc
 # Source Script to support application UI, and Logic
