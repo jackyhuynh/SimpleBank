@@ -386,11 +386,16 @@ server <- function(input, output, session) {
 
     
     CardsAnalystUI<- fluidPage(
-        tags$em(tags$h3("Cards Analyzing", class = "text-primary")),
+        tags$em(tags$h3("Cards Analyzing by Total", class = "text-primary")),
         box(width = 12,
             tags$p('View up to date Spending Summary by Cards:'),
-            plotOutput("AnalyzeByCard", height = "500px")),
+            plotOutput("AnalyzeByCard", height = "100px")),
+        box(width=12,verbatimTextOutput("DisplayTotal")),
         br(),
+        tags$em(tags$h3("Cards Analyzing by Category", class = "text-primary")),
+        box(width = 12,
+            tags$p('View up to date Spending Summary by Cardsand Category:'),
+            plotOutput("AnalyzeByCardCategory", height = "400px")),
         printMainAuthority()
     )
     
@@ -735,7 +740,10 @@ server <- function(input, output, session) {
         
         ggplot(AllTransaction, aes(x = Category, y= Amount, fill = Type), xlab="Category") +
             geom_bar(stat="identity", width=.5, position = "dodge")  +
-            ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 60, hjust = 1)) 
+            theme_bw() +
+            ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 60, hjust = 1),
+                           panel.border = element_blank(), panel.grid.major = element_blank(),
+                           panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) 
     })
     # End output$categoryBarPlot
     
@@ -817,18 +825,30 @@ server <- function(input, output, session) {
     })
     
     
-    output$AnalyzeByCard<-renderPlot({
+    # @Truc
+    output$AnalyzeByCardCategory<-renderPlot({
         SpendingByCard <- aggregate(Amount ~ Category + Card ,data = UserTransaction() ,FUN = sum)
-        
         SpendingByCard$Card<-as.factor(SpendingByCard$Card)
+        ggplot(SpendingByCard, aes(x=Category, y=Amount, fill=Category)) + 
+            geom_bar(stat="identity") +
+            theme_bw() +
+            ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 60, hjust = 1),
+                           panel.border = element_blank(), panel.grid.major = element_blank(),
+                           panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))+
+            facet_grid(~ Card)
+    })
+    
+    
+    output$AnalyzeByCard<-renderPlot({
         
-        for (var in unique(SpendingByCard$Card)) {
-            dev.new()
-            print( ggplot(SpendingByCard[SpendingByCard$Card==var,], aes(x=Category, y=Amount, fill=Category)) + 
-                       geom_bar(stat="identity")+
-                       ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 60, hjust = 1))+
-                       ggtitle (as.character(var))  )
-        }
+        UserCards <- aggregate(Amount~Card,data=UserTransaction(), FUN=sum)
+        
+        ggplot(UserCards, aes(y=Card, x=Amount, fill=Card)) + 
+            geom_bar(stat='identity',position = "stack") +
+            theme_bw() +
+            ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 60, hjust = 1),
+                           panel.border = element_blank(), panel.grid.major = element_blank(),
+                           panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) 
     })
 }
 
