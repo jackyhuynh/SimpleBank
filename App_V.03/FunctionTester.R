@@ -14,27 +14,17 @@ ggplot(df, aes(y=Type, x=Amount, fill=Type)) +
 connection<-getConnection()
 UserTransaction<-getTransactionDataWithStoreName(connection,1)
 
+UserCards <- aggregate(Amount~Card,data=UserTransaction, FUN=sum)
 
 
-
-ggplot(AllTransaction, aes(x = Category, y= Amount, fill = Type), xlab="Category") +
-  geom_bar(stat="identity", width=.5, position = "dodge")  +
-  ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 60, hjust = 1))
-
-SpendingByCard <- aggregate(Amount ~ Category + Card ,data = UserTransaction ,FUN = sum)
-
-SpendingByCard$Card<-as.factor(SpendingByCard$Card)
-
-for (var in unique(SpendingByCard$Card)) {
-  dev.new()
-  print( ggplot(SpendingByCard[SpendingByCard$Card==var,], aes(x=Category, y=Amount, fill=Category)) + 
-           geom_bar(stat="identity")+
-           ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 60, hjust = 1))+
-           ggtitle (as.character(var))  )
-}
+ggplot(UserCards, aes(y=Card, x=Amount, fill=Card)) + 
+  geom_bar(stat='identity',position = "stack") +
+  theme_bw() +
+  ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 60, hjust = 1),
+                 panel.border = element_blank(), panel.grid.major = element_blank(),
+                 panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) 
 
 
-ggplot(SpendingByCard, aes(Var1, Var2)) + geom_point() + facet_grid(~ Variety)
 
 # ANALYZE BY CARDS
 # Testing purpose only
