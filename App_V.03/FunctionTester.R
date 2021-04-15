@@ -7,6 +7,15 @@ connection<-getConnection()
 
 UserTransaction<-getTransactionDataWithStoreName(connection,1)
 
+connection<-getConnection()
+debitTrans<-getTransactionWithType(connection,1,"Debit")
+
+connection<-getConnection()
+creditTrans<-getTransactionWithType(connection,1,"Credit")
+
+
+
+
 
 
 
