@@ -180,8 +180,8 @@ server <- function(input, output, session) {
             sidebarMenu(
                 menuItem("All Transaction",tabName = "dashboard",icon = icon("dashboard")),
                 menuItem("Banking Transaction",tabName = "second",icon = icon("university")),
-                menuItem("Category Analytic",tabName = "second",icon = icon("chart-pie")),
-                menuItem("Cards Analytic",tabName = "second",icon = icon("chart-bar")),
+                menuItem("Category Analytic",tabName = "third",icon = icon("chart-pie")),
+                menuItem("Cards Analytic",tabName = "fourth",icon = icon("chart-bar")),
                 menuItem("User Information",tabName = "fifth",icon = icon("info-circle")),
                 menuItem("Help",tabName = "sixth",icon = icon("question-circle")),
                 menuItem("Setting",tabName = "seventh",icon = icon("cog"))
@@ -339,6 +339,22 @@ server <- function(input, output, session) {
     )
     
     
+    CategoryAnalystUI<-fluidPage(
+        tags$em(tags$h3("Spending Summary by Category", class = "text-primary")),
+        box(width = 12,
+            tags$p('View up to date Spending Summary:'),
+            plotOutput("categoryBarPlot", height = "500px")),
+        br(),
+        tags$em(tags$h3("Spending & Category Analyzing", class = "text-primary")),
+        box(width=12,),
+        printMainAuthority()
+    )
+    
+    
+    CardsAnalystUI<- fluidPage(
+        
+    )
+    
     # @Truc @Swetha
     #
     # Function: UI Component for the welcome page
@@ -351,21 +367,13 @@ server <- function(input, output, session) {
         if (USER$login == TRUE) {
             
             tabItems(
-                # First tab
-                tabItem(tabName = "dashboard", class = "active",
-                        
-                        # Fluid Page for the main User Home Page
-                        AllTransactionUI),
-                
-                # Second tab
-                tabItem(tabName = "second", 
-                        
-                        # Fluid Page for the banking Home Page
-                        UserBankingUI),
-                
-                # Third tab
-                tabItem(tabName = "fifth",
-                        UserInformationUI))
+                tabItem(tabName = "dashboard", class = "active", AllTransactionUI), # First tab
+                tabItem(tabName = "second",UserBankingUI), # Second tab
+                tabItem(tabName = "third", CategoryAnalystUI), # Third tab
+                tabItem(tabName = "fourth", CardsAnalystUI), # Fourth tab
+                tabItem(tabName = "fifth", UserInformationUI), # Fifth tab
+                tabItem(tabName = "sixth"),
+                tabItem(tabName = "seventh"))
         }
         # Call the loginpage again if fail to identify user
         else {
@@ -672,6 +680,25 @@ server <- function(input, output, session) {
     output$lineplotInfo <- renderText({
         paste0("Amount: $ ", round(as.numeric(input$lineplot_click$y),2))
     })
+    
+    
+    ###########################################
+    #CATEGORY ANALYST
+    ###########################################
+    
+    # @Truc
+    # Function:  output$categoryBarPlot
+    # Component: Logic, create CATEGORY BAR PLOT
+    # Variable: Local 
+    output$categoryBarPlot <- renderPlot({
+        # generate bins based on input$bins from ui.R
+        AllTransaction <- aggregate(Amount~Category+Type, data=UserTransaction(), FUN=sum)
+        
+        ggplot(AllTransaction, aes(x = Category, y= Amount, fill = Type), xlab="Category") +
+            geom_bar(stat="identity", width=.5, position = "dodge")  +
+            ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 60, hjust = 1)) 
+    })
+    # End output$categoryBarPlot
 }
 
 
