@@ -6,18 +6,30 @@ View(categoriesList)
 connection<-getConnection()
 
 UserTransaction<-getTransactionDataWithStoreName(connection,1)
+
 conn <- getConnection()
+
 UserInfo<-getUserInfo(1,conn)
-UserInfo$income
-Expense<-sum(UserTransaction$Amount)
+
+max(UserTransaction$Date)
 
 
-date_1 <-min(UserTransaction$Date)           # Create example dates
-date_2 <- max(UserTransaction$Date)
+Type<-c('Income','Expense')
+Amount<-c(UserInfo$income*interval(
+                 min(UserTransaction$Date),
+                 max(UserTransaction$Date)) 
+                 %/% months(1),
+                 sum(UserTransaction$Amount))
 
-Income<-UserInfo$income*interval(date_1, date_2) %/% months(1)    # Apply interval & months
-Chart<-c(Income,Expense)
-# 52
+df<-data.frame(Type,
+               Amount)
+
+ggplot(df, aes(y=Type, x=Amount, fill=Type)) + 
+  geom_bar(stat='identity',position = "stack") +
+  ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 60, hjust = 1))
+
+
+
 
 
 # ANALYZE BY CARDS
