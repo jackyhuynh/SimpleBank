@@ -386,7 +386,12 @@ server <- function(input, output, session) {
 
     
     CardsAnalystUI<- fluidPage(
-        
+        tags$em(tags$h3("Cards Analyzing", class = "text-primary")),
+        box(width = 12,
+            tags$p('View up to date Spending Summary by Cards:'),
+            plotOutput("AnalyzeByCard", height = "500px")),
+        br(),
+        printMainAuthority()
     )
     
     # @Truc @Swetha
@@ -771,7 +776,7 @@ server <- function(input, output, session) {
             angle = 45, col = viridis::viridis_pal(option = "magma", direction = -1)(length(creditTrans$Amount)),
             labels = head(scales::percent(as.numeric(creditTrans$Amount/sum(creditTrans$Amount))),-1),
             # NEVER DISPLAY OVERLAPPING LABELS
-            cex = 0.7, border = "white",main="Debit Transactions"
+            cex = 0.7, border = "white",main="Credit Transactions"
         )
         legend(
             1.5,.7,creditTrans$Category,
