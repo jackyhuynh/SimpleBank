@@ -29,7 +29,6 @@ source("modules/user_checking_accounts.R")
 # Source Script to support application UI, Logic on Login Page
 source("modules/login_module.R")
 
-
 # @Wrucha
 # Source for setup and communicate with database system
 source("modules/DataClasses.R")
@@ -517,6 +516,9 @@ server <- function(input, output, session) {
     }
     # End of validateCredential function
     
+    ######################################################    
+    # @ SET OF USER INFORMATION DISPLAY (USER INFO PANEL)
+    ######################################################    
     
     # @Truc
     # Function:  output$userInformation 
@@ -545,7 +547,12 @@ server <- function(input, output, session) {
     })
     # End output$cardInformation 
     
+    
+    ######################################################
+    # @ SET OF TRANSACTION DISPLAY (ALL TRANSACTION PANEL)
+    ######################################################
    
+    
     # @Truc
     # Function:  output$transtable2 
     # Component: Logic, UI
@@ -585,8 +592,6 @@ server <- function(input, output, session) {
         DT::datatable(UserData.Tidy[, input$show_trans, drop = FALSE])
     })
     # End output$bankTable
-    
-    
     
     
     # @Truc
@@ -699,6 +704,7 @@ server <- function(input, output, session) {
     })
     # End selected_User function
     
+    
     # @Truc
     # Function:  output$lineplot
     # Component: Logic, Plot3: create the plot of analyze by type
@@ -740,7 +746,7 @@ server <- function(input, output, session) {
     
     
     ###########################################
-    #CATEGORY ANALYST
+    #@ SET OF LOGIC FOR CATEGORY ANALYST PANEL
     ###########################################
     
     # @Truc
@@ -806,27 +812,35 @@ server <- function(input, output, session) {
         )
         par(old.par)
     })
+    # End output$piePlotDebit
     
     
     # @Truc
+    # Function:  output$Expense
+    # Component: Logic, return the sum of user expense
+    # Variable: Local
     output$Expense<-renderText({
-        # User Information
         paste0("Amount = $ ", round(as.numeric(sum(UserTransaction()$Amount)),2),
                ", From ",  min(UserTransaction()$Date),
-               " To ",max(UserTransaction()$Date)
-               
-               )})
+               " To ",max(UserTransaction()$Date))})
     
     
+    # @Truc
+    # Function:  output$Income
+    # Component: Logic, return the sum of user income
+    # Variable: Local
     output$Income<-renderText({
-        # User Information
-        
         Income<- UserInformation()$income*(interval(min(UserTransaction()$Date),max(UserTransaction()$Date))%/% months(1))
         paste0("Amount = $ ", round(as.numeric(Income),2),
                ", From ",  min(UserTransaction()$Date),
                " To ",max(UserTransaction()$Date))
         })
     
+    
+    # @Truc
+    # Function:  output$piePlotDebit
+    # Component: Logic, return the different between Income and expense.
+    # Variable: Local
     output$Diffrential<-renderText({
         # User Information
         Income<- as.numeric(UserInformation()$income*(interval(min(UserTransaction()$Date),max(UserTransaction()$Date))%/% months(1)))
@@ -835,6 +849,12 @@ server <- function(input, output, session) {
                ", From ",  min(UserTransaction()$Date),
                " To ",max(UserTransaction()$Date))
     })
+    
+    
+    #######################################
+    #@ SET OF LOGIC FOR CARDS ANALYST PANEL
+    #######################################
+    
     
     
     output$DisplayTotalCards<-renderTable({
@@ -857,9 +877,7 @@ server <- function(input, output, session) {
     
     
     output$AnalyzeByCard<-renderPlot({
-        
         UserCards <- aggregate(Amount~Card,data=UserTransaction(), FUN=sum)
-        
         ggplot(UserCards, aes(y=Card, x=Amount, fill=Card)) + 
             geom_bar(stat='identity',position = "stack") +
             theme_bw() +
