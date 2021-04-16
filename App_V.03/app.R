@@ -117,6 +117,13 @@ server <- function(input, output, session) {
         getTransactionDataWithStoreName(conn,USER$id)})
     
     
+    #load responses_df and make reactive to inputs
+    responses_df <- reactive({
+        input$submit_edit  #make reactive to
+        UserTransaction()
+    })
+    
+    
     # @Truc 
     #
     # Function: IMPORTANT: GET USER DATA FOR USER INFORMATION
@@ -436,8 +443,54 @@ server <- function(input, output, session) {
         }
     })
     # End output$body
-
     
+    #Form for data entry
+    entry_form <- function(button_id) {
+        showModal(modalDialog(div(
+            id = ("entry_form"),
+            tags$head(tags$style(".modal-dialog{ width:400px}")),
+            tags$head(tags$style(
+                HTML(".shiny-split-layout > div {overflow: visible}")
+            )),
+            fluidPage(
+                fluidRow(
+                    textInput(
+                        "Amount",
+                        labelMandatory("Store"),
+                        placeholder = ""
+                    ),
+                    selectInput(
+                        "Category",
+                        labelMandatory("Category"),
+                        multiple = FALSE,
+                        choices = c('a','b','c')
+                    ),
+                    actionButton(button_id, "Submit")
+                ),
+                easyClose = TRUE
+            )
+        )))
+    }
+    
+    
+    #edit data
+    observeEvent(input$edit_button, priority = 20, {
+        SQL_df <- UserTransaction()
+        showModal(if (length(input$transtable2_rows_selected) > 1) {
+            modalDialog(title = "Warning",
+                        paste("Please select only one row."),
+                        easyClose = TRUE)
+        } else if (length(input$transtable2_rows_selected) < 1) {
+            modalDialog(title = "Warning",
+                        paste("Please select a row."),
+                        easyClose = TRUE)
+        })
+        if (length(input$transtable2_rows_selected) == 1) {
+            entry_form("submit_edit")
+            updateTextInput(session, "Amount", value = SQL_df[input$transtable2_rows_selected,"Amount"])
+            updateTextAreaInput(session, "Category", value = SQL_df[input$transtable2_rows_selected, "Category"])
+        }
+    })
     
     # @Truc
     # Function:  AllTransactionUI 
@@ -448,7 +501,11 @@ server <- function(input, output, session) {
         # the theme name inside shinytheme()
         theme = shinytheme("flatly"),
         tags$em(tags$h3("Transactions List", class = "text-primary")),
-        box(width=12,DT::dataTableOutput("transtable2")),
+        
+        box(width=12,
+            actionButton("edit_button", "Edit Category", icon("edit")),br(),
+            DT::dataTableOutput("transtable2")),
+        
         br(),
         tags$em(tags$h3("Transaction Map", class = "text-primary")),
         box(width=12,sidebarLayout(
@@ -550,12 +607,45 @@ server <- function(input, output, session) {
     ######################################################
    
     
+    #save form data into data_frame format
+    formData <- reactive({
+        formData <- data.frame(
+            row_id = UUIDgenerate(),
+            Amount =  input$Amount,
+            Category = input$Category,
+            stringsAsFactors = FALSE
+        )
+        return(formData)
+    })
+    
+    
+    observeEvent(input$submit, priority = 20, {
+        appendData(formData())
+        shinyjs::reset("entry_form")
+        removeModal()
+    })
+    
+    
+    observeEvent(input$submit_edit, priority = 20, {
+        SQL_df <- UserTransaction()
+        row_selection <-
+            SQL_df[input$transtable2_row_last_clicked, "row_id"]
+        dbExecute(
+            pool,
+            sprintf(
+                'UPDATE "responses_df" SET "subCategory" = ? WHERE "row_id" = ("%s")',
+                row_selection
+            ),
+            param = list(input$subCategory)
+        )
+        removeModal()
+    })
     # @Truc
     # Function:  output$transtable2 
     # Component: Logic, UI
     # Variable: Local
     output$transtable2 <- DT::renderDataTable({
-        df<-UserTransaction()
+        df<-responses_df()
         df[,c('Type','Date','Time','Store Name', 'Card','Category','Amount')]
     })
     
