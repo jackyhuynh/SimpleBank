@@ -114,6 +114,20 @@ getUserID <- function(username, password, connection){
 }
 
 
+##GET ALL CATEGORY NAMES 
+getCategoryList <- function(connection){
+  query <- sprintf("select category_id as cid, category_name as Category from category where deleted=1;");
+  rs = dbSendQuery(connection, query);
+  categoryList = dbFetch(rs, n=-1);
+  
+  # Clean up the connection
+  # Prevent Open Connection and injection
+  dbClearResult(rs)
+  dbDisconnect(connection) # Clean up the connection
+  print(paste("Log: Number of categories returned: ", nrow(categoryList)));
+  return(categoryList);
+}
+
 # @Truc
 #
 # Logic: Get the User Information from User ID
