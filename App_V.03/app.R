@@ -22,7 +22,6 @@ library("lubridate")  # For date manipulation
 
 # @ Truc
 # Source Script to support application UI, and Logic
-source("modules/charts_module.R")
 source("modules/print_display_module.R")
 source("modules/user_checking_accounts.R")
 
@@ -399,8 +398,24 @@ server <- function(input, output, session) {
         printMainAuthority()
     )
     
-    # @Truc @Swetha
-    #
+    
+    HelpUI<-fluidPage(
+        tags$em(tags$h3("Help Pages", class = "text-primary")),
+        box(width = 12,
+            tags$p('Look at the bottom for Help:'),
+            printMainAuthority()),
+    )
+    
+    
+    SettingUI<-fluidPage(
+        tags$em(tags$h3("Setting Pages", class = "text-primary")),
+        box(width = 12,
+            tags$p('Setting pages in under maintaince Please come back at another time'),
+            printMainAuthority()),
+    )
+    
+    
+    # @Truc
     # Function: UI Component for the welcome page
     # Component: UI, Hold majority part of user Welcome Page UI
     #            All Chart for user Analyst
@@ -416,8 +431,8 @@ server <- function(input, output, session) {
                 tabItem(tabName = "third", CategoryAnalystUI), # Third tab
                 tabItem(tabName = "fourth", CardsAnalystUI), # Fourth tab
                 tabItem(tabName = "fifth", UserInformationUI), # Fifth tab
-                tabItem(tabName = "sixth"),
-                tabItem(tabName = "seventh"))
+                tabItem(tabName = "sixth", HelpUI),
+                tabItem(tabName = "seventh", SettingUI))
         }
         # Call the loginpage again if fail to identify user
         else {
@@ -597,9 +612,7 @@ server <- function(input, output, session) {
     # Variable: Local 
     selected_User1 <- reactive({
         req(input$date1)
-        validate(need(
-            !is.na(input$date1[1]) &
-                !is.na(input$date1[2]),
+        validate(need(!is.na(input$date1[1]) &!is.na(input$date1[2]),
             "Error: Please provide both a start and an end date."
         ))
         validate(
