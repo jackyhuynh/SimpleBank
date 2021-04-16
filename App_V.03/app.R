@@ -18,7 +18,7 @@ library(plotly) # plot
 library(readr) # read data in
 library(tidyverse) # pipe
 library(leaflet) # map
-library("lubridate")  # For date manipulation
+library(lubridate)  # For date manipulation
 
 # @ Truc
 # Source Script to support application UI, and Logic
@@ -33,7 +33,7 @@ source("modules/login_module.R")
 # Source for setup and communicate with database system
 source("modules/DataClasses.R")
 source("modules/TransactionFunctions.R")
-source("modules/UserFunctions.R")
+#source("modules/UserFunctions.R")
 
 
 # @Truc
