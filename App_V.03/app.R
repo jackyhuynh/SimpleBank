@@ -20,20 +20,17 @@ library(tidyverse) # pipe
 library(leaflet) # map
 library(lubridate)  # For date manipulation
 
-# @ Truc
+# @ Truc 
 # Source Script to support application UI, and Logic
 source("modules/print_display_module.R")
-source("modules/user_checking_accounts.R")
+
+# @ Wrucha
+# Source Script to SQL
+source("modules/sql_api.R")
 
 # @ Swetha
 # Source Script to support application UI, Logic on Login Page
 source("modules/login_module.R")
-
-# @Wrucha
-# Source for setup and communicate with database system
-source("modules/DataClasses.R")
-source("modules/TransactionFunctions.R")
-#source("modules/UserFunctions.R")
 
 
 # @Truc
