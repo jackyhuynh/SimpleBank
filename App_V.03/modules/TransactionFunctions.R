@@ -1,5 +1,6 @@
 ##CREATE CONNECTION TO DATABASE
 
+
 ##Only change user, password and host
 getConnection <- function(){
   connection = dbConnect(MySQL(), user = 'root', password = 'Myskhongbiet88', dbname = 'credit_card_analysis2',
@@ -33,9 +34,9 @@ order by t.transaction_id;", userId)
 }
 
 
-
+# @Truc
+# This function is used to get the debit or credit transaction
 getTransactionWithType <- function(connection, userId, TransType){
-  
   query <- sprintf("select t.transaction_id as tid, t.amount as Amount, t.date_of_transaction as 'Date',
  t.transaction_type as 'Type', c.category_name as 'Category' from user_transaction_user_id_%s as t inner join category as c  on (c.category_id = t.category_id_fk)
 where t.deleted=1  and c.deleted=1 and t.transaction_type='%s'
@@ -52,66 +53,6 @@ order by t.transaction_id;", userId,TransType)
 
 
 
-# @ Truc
-# This is the function that I used for prototype.
-getTransactions <- function(user_id, connection){
-  user_id=1
-  query <- sprintf("select * from user_transaction_sample")
-  rs <- dbSendQuery(connection, query)
-  allTransaction <- dbFetch(rs, n=-1)
-  allTransaction$date <-as.Date(allTransaction$date,format = "%m/%d/%Y")
-  dbClearResult(rs)
-  dbDisconnect(connection)
-  
-  return(allTransaction)
-}
 
 
 
-# @Truc
-# Get all the locations
-getLocations <- function(connection){
-  query <- sprintf("select * from locations")
-  rs <- dbSendQuery(connection, query)
-  FWlocations <- dbFetch(rs, n=-1)
-  dbClearResult(rs)
-  dbDisconnect(connection)
-  return(FWlocations)
-}
-
-
-# @Truc
-# Get the Total Income and Total Expense during a time period
-getIncomeAndExpense <- function(connection, user_id){
-  
-  # Get the total Expense since account is open
-  query1<-sprintf("SELECT sum(amount) FROM credit_card_analysis2.user_transaction_user_id_%s;",user_id)
-  rs <- dbSendQuery(connection, query1)
-  Expense<-dbFetch(rs)
-  dbClearResult(rs)
-  
-  # Get the months between 2 date
-  query2<-sprintf("SELECT date_of_transaction FROM credit_card_analysis2.user_transaction_user_id_%s;",user_id)
-  rs <- dbSendQuery(connection, query2)
-  DateBetween<-dbFetch(rs)
-  dbClearResult(rs)
-  DateBetween$date_of_transaction <- as.Date(DateBetween$date_of_transaction,format = "%Y-%m-%d")
-  MonthBetween<- interval(min(DateBetween$date_of_transaction),max(DateBetween$date_of_transaction))%/% months(1)
-  
-  # Get the total Income between 2 date
-  query3<-sprintf("SELECT income FROM credit_card_analysis2.user_details where user_id=%s;",user_id)
-  rs <- dbSendQuery(connection, query3)
-  Income<-dbFetch(rs)
-  dbClearResult(rs)
-  
-  # Combine the value into 1 data frame
-  Income$income <- Income$income*MonthBetween
-  df <- cbind(Income,Expense)
-  colnames(df)<- c('Income','Expense')
-  dbDisconnect(connection)
-  
-  Type<-c('Income','Expense')
-  Amount<- c(df[,1],df[,2])
-  
-  return(data.frame(Type,Amount))
-  }
