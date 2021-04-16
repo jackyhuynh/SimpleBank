@@ -1,6 +1,6 @@
 ##CREATE CONNECTION TO DATABASE
 
-
+# @ Wrucha
 ##Only change user, password and host
 getConnection <- function(){
   connection = dbConnect(MySQL(), user = 'root', password = 'Myskhongbiet88', dbname = 'credit_card_analysis2',
