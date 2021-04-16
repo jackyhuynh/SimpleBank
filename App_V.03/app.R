@@ -662,6 +662,8 @@ server <- function(input, output, session) {
 
         removeModal()
     })
+    
+    
     # @Truc
     # Function:  output$transtable2 
     # Component: Logic, UI
