@@ -136,7 +136,7 @@ getCategoryList <- function(connection){
 getUserInfo <- function(userid, connection){
   # Get the location list
   rs <-dbSendQuery(connection,
-                   paste0("select * from user_details where user_id='",userid,"'"))
+                   paste0("select * from user_details where deleted=1 and user_id='",userid,"'"))
   
   currentUser <- dbFetch(rs)
   
@@ -156,7 +156,7 @@ getUserInfo <- function(userid, connection){
 # Variable: Global Function
 getAllUserCards<-function(userid, connection){
   query <- paste0(
-    "select * from card_details where user_id_fk='",
+    "select * from card_details where deleted=1 and user_id_fk='",
     userid,
     "'"
   )
