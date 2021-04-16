@@ -1,6 +1,4 @@
-
-
-
+# @Wrucha
 ##USER AUTHENTICATION
 getUserID <- function(username, password, connection){
   query <- sprintf("select user_id from user_details where login_username= '%s' 
@@ -25,7 +23,7 @@ getUserID <- function(username, password, connection){
 
 
 # @Truc
-# Get the User Info from User ID
+# Get the User Information from User ID
 getUserInfo <- function(userid, connection){
   # Get the location list
   rs <-dbSendQuery(connection,
@@ -43,7 +41,7 @@ getUserInfo <- function(userid, connection){
 
 
 # @Truc
-# Get all the user cards
+# Get all the user cards from user id
 getAllUserCards<-function(userid, connection){
   query <- paste0(
     "select * from card_details where user_id_fk='",
