@@ -69,7 +69,21 @@ server <- function(input, output, session) {
     id = 1
     USER <- reactiveValues(login = login,
                            id=id)
+    # get the transactionlist
+    connection<-getConnection()
+    TransactionList <- getCategoryList(connection)
+    
 
+    
+    getCategoryIdFromCategoryName <- function(CategoryName)
+    {
+        for (i in 1:nrow(TransactionList)) {
+            if (TransactionList[i, ]$Category == CategoryName)
+                return (TransactionList[i, ]$cid)
+        }
+        return (0)
+    }
+    
     
     # @Swetha 
     #
@@ -455,15 +469,20 @@ server <- function(input, output, session) {
             fluidPage(
                 fluidRow(
                     textInput(
+                        "Store",
+                        labelMandatory("Store Name"),
+                        placeholder = ""
+                    ),
+                    textInput(
                         "Amount",
-                        labelMandatory("Store"),
+                        labelMandatory("Amount"),
                         placeholder = ""
                     ),
                     selectInput(
                         "Category",
                         labelMandatory("Category"),
                         multiple = FALSE,
-                        choices = c('a','b','c')
+                        choices = TransactionList$Category
                     ),
                     actionButton(button_id, "Submit")
                 ),
@@ -487,7 +506,8 @@ server <- function(input, output, session) {
         })
         if (length(input$transtable2_rows_selected) == 1) {
             entry_form("submit_edit")
-            updateTextInput(session, "Amount", value = SQL_df[input$transtable2_rows_selected,"Amount"])
+            updateTextInput(session, "Store", value = SQL_df[input$transtable2_rows_selected,'Store Name'])
+            updateTextInput(session, "Amount", value = paste('$ ',as.character(SQL_df[input$transtable2_rows_selected,"Amount"])))
             updateTextAreaInput(session, "Category", value = SQL_df[input$transtable2_rows_selected, "Category"])
         }
     })
@@ -611,6 +631,7 @@ server <- function(input, output, session) {
     formData <- reactive({
         formData <- data.frame(
             row_id = UUIDgenerate(),
+            Store = input$`Store Name`,
             Amount =  input$Amount,
             Category = input$Category,
             stringsAsFactors = FALSE
@@ -630,14 +651,15 @@ server <- function(input, output, session) {
         SQL_df <- UserTransaction()
         row_selection <-
             SQL_df[input$transtable2_row_last_clicked, "row_id"]
-        dbExecute(
-            pool,
-            sprintf(
-                'UPDATE "responses_df" SET "subCategory" = ? WHERE "row_id" = ("%s")',
-                row_selection
-            ),
-            param = list(input$subCategory)
-        )
+        
+        categoryId<-getCategoryIdFromCategoryName((input$Category))
+        
+        
+        connection<-getConnection()
+        
+        UpdateCategoryForTransaction(USER$id, categoryId, row_selection, connections)
+        
+
         removeModal()
     })
     # @Truc
