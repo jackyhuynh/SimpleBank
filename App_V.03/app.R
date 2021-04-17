@@ -67,8 +67,11 @@ server <- function(input, output, session) {
     # Validate everytime user login
     login = FALSE
     id = 1
+    register = FALSE
+    
     USER <- reactiveValues(login = login,
                            id=id)
+    
     # get the transactionlist
     connection<-getConnection()
     TransactionList <- getCategoryList(connection)
