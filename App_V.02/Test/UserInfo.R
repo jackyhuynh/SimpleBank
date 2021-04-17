@@ -4,11 +4,15 @@ library(shiny)
 # Get the connection from the database
 connection <- getConnection()
 
-value<-getUserID('davis_miles','password123', connection)
+value<-getUserID('inewton','pwd123', connection)
 
-connection <- getConnection()
+# Get the location list
+rs <-dbSendQuery(connection,
+        paste0("select * from user_details where user_id='",value,"'"))
 
-currentUser <- getUserInfo(value,connection)
+currentUser <- dbFetch(rs)
+
+dbDisconnect(connection)
 
 #Label mandatory fields
 labelMandatory <- function(label) {
@@ -27,13 +31,20 @@ ui <- fluidPage(
         id="User Information",
         
         tags$h2("Personal Information"),br(),
-        textInput(
-              "fullName",labelMandatory("Full Name"), placeholder = currentUser[[2]],width = '420px'),
-        textInput(
-              "address","Address", placeholder = currentUser[[3]],width = '420px'),
         tags$div(
           splitLayout(
-            cellWidths = c("200px","20", "200px"),
+            cellWidths = c("200px","20", "250px"),
+            cellArgs = list(style = "vertical-align: top"),
+            textInput(
+              "fullName",labelMandatory("Full Name"), placeholder = currentUser[[2]],width = '200px'),
+            tags$div(),
+            textInput(
+              "address","Address", placeholder = currentUser[[3]],width = '200px')
+          )
+        ),
+        tags$div(
+          splitLayout(
+            cellWidths = c("200px","20", "250px"),
             cellArgs = list(style = "vertical-align: top"),
             textInput(
               "fullName","Birthday", placeholder = currentUser[[5]],width = '200px'),
@@ -45,7 +56,7 @@ ui <- fluidPage(
         tags$h2("Account Information"),br(),
         tags$div(
           splitLayout(
-            cellWidths = c("200px","20", "200px"),
+            cellWidths = c("200px","20", "250px"),
             cellArgs = list(style = "vertical-align: top"),
             textInput(
               "fullName",labelMandatory("User Name"), placeholder = currentUser[[6]],width = '200px'),
@@ -54,8 +65,6 @@ ui <- fluidPage(
               "address",labelMandatory("Password Name"), placeholder = currentUser[[7]],width = '200px')
           ))
       )))
-
-
 )
 
 server <- function(input, output) {
