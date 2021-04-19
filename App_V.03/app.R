@@ -30,6 +30,7 @@ source("modules/print_display_module.R")
 # @ Wrucha
 # Source Script to SQL
 source("modules/sql_api.R")
+source("modules/DataClasses.R")
 
 # @ Swetha
 # Source Script to support application UI, Logic on Login Page
