@@ -78,17 +78,5 @@ credentials = data.frame(
 
 
 
-#Form for data entry
-register_form <- function() {
-  showModal(modalDialog(div(
-    id = ("register_form"),
-    tags$head(tags$style(".modal-dialog{ width:400px}")),
-    tags$head(tags$style(
-      HTML(".shiny-split-layout > div {overflow: visible}")
-    ))
-    
-    ,fluidPage(),
-    easyClose = TRUE
-  )))
-}
+
 
