@@ -8,11 +8,6 @@ setClass("category", slots=list(categoryId="numeric", categoryName="character"))
 
 
 
-##class for sub-category
-#setClass("sub-category", slots=list(sub_categoryId="numeric", sub_category_store_name="character", 
-#                                   category_id="numeric"));
-
-
 ##Class for location
 setClass("location", slots=list(locationId="numeric", name="character",
                                 latitude="character", longitude="character",
