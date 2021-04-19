@@ -620,148 +620,148 @@ server <- function(input, output, session) {
         easyClose = TRUE
     ))))
     
-    
-    observeEvent(input$registerButton, {
-        #    obsC <- observe({
-        if ( USER$register == FALSE & isValid == FALSE) {
-            if (!is.null(input$registerButton)) {
-                if (input$registerButton > 0) {
-                    #   req(input$userName)
-                    msg1 <- ""
-                    msg2 <- ""
-                    msg3 <- ""
-                    msg4 <- ""
-                    msg5 <- ""
-                    msg6 <- ""
-                    msg7 <- ""
-                    msg8 <- ""
-                    msg9 <- ""
-                    isValid <- TRUE
-                    
-                    if (input$userName == "") {
-                        msg1 <- "Please Enter a Valid User Name.\n"
-                        print(msg1)
-                    }
-                    
-                    Username <- isolate(input$userName)
-                    if (input$passwd == "") {
-                        msg2 <- "Please Enter a Valid Password.\n"
-                        print(msg2)
-                    }
-                    Password <- isolate(input$passwd)
-                    if (input$rpasswd == "") {
-                        msg3 <- "Please Re-Enter a Valid Password.\n"
-                        print(msg3)
-                    }
-                    if (input$rpasswd != Password) {
-                        msg4 <- "Passwords not matching.\n"
-                        print(msg4)
-                    }
-                    RetypePassword <- isolate(input$rpasswd)
-                    
-                    NameOnCreditCard <- isolate(input$ccname)
-                    if (input$ccname == "") {
-                        msg9 <- "Please enter Card holder's Name.\n"
-                        print(msg9)
-                    }
-                    
-                    
-                    EmailID <- isolate(input$email)
-                    emailregex <- "^[A-Za-z0-9+_.-]+@(.+)$"
-                    if (!grepl(emailregex, EmailID)) {
-                        msg6 <- "Please enter a valid EmailID#.\n"
-                        print(msg6)
-                    }
-                    
-                    SSN <- isolate(input$ssn)
-                    ssnregex <-
-                        "^\\d{9}$"
-                    # without dashes in between
-                    #   ssnregex <- "^\\d{3}-\\d{2}-\\d{4}$"; # with dashes in between
-                    if (!grepl(ssnregex, SSN)) {
-                        msg7 <- "Please enter a valid SSN#.\n"
-                        print(msg7)
-                    }
-                    
-                    MobileNumber <- isolate(input$mnumber)
-                    phoneregex <-
-                        "^\\s*(\\+\\s*1(-?|\\s+))*[0-9]{3}\\s*-?\\s*[0-9]{3}\\s*-?\\s*[0-9]{4}$"
-                    if (!grepl(phoneregex, MobileNumber)) {
-                        msg5 <- "Please enter a valid Phone#.\n"
-                        print(msg5)
-                    }
-                    
-                    CREDICARDNUMBER <- isolate(input$ccnum)
-                    ccnregex <-
-                        "^(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14})$" ##For visa CC
-                    if (!grepl(ccnregex, CREDICARDNUMBER)) {
-                        msg8 <- "Please enter a valid Credit Card#.\n"
-                        print(msg8)
-                    }
-                    
-                    EXPIRYDATE <- isolate(input$expiry)
-                    
-                    # if(lngth(which(credentials$username_id==Username))==1) {
-                    pasmatch  <-
-                        credentials["passod"][which(credentials$username_id == Username), ]
-                    # concatenate two strings using paste function
-                    result = paste(msg1,
-                                   msg2,
-                                   msg3,
-                                   msg4,
-                                   msg5,
-                                   msg6,
-                                   msg7,
-                                   msg8,
-                                   msg9,
-                                   sep = "")
-                    
-                    if (!is.null(result) && nchar(result) > 0) {
-                        shinyalert(result,
-                                   type = "error")
-                        print("Something wrong.")
-                        isValid <- FALSE
-                        return(NULL)
-                    }
-                    isValid <- TRUE
-                    # pasverify <- password_verify(pasmatch, Password)
-                    regverify <-
-                        register(
-                            Username,
-                            Password,
-                            MobileNumber,
-                            EmailID,
-                            SSN,
-                            CREDICARDNUMBER,
-                            NameOnCreditCard,
-                            EXPIRYDATE
-                        )
-                    # regverify <- TRUE
-                    if (regverify) {
-                        USER$register <- TRUE
-                        print("User Registered Successfully!!")
-                    } else {
-                        shinyjs::toggle(
-                            id = "nomatch",
-                            anim = TRUE,
-                            time = 1,
-                            animType = "fade"
-                        )
-                        shinyjs::delay(
-                            3000,
-                            shinyjs::toggle(
-                                id = "nomatch",
-                                anim = TRUE,
-                                time = 1,
-                                animType = "fade"
-                            )
-                        )
-                    }
-                    
-                }
-            }
-        }
-    })
+    # 
+    # observeEvent(input$registerButton, {
+    #     #    obsC <- observe({
+    #     if ( USER$register == FALSE & isValid == FALSE) {
+    #         if (!is.null(input$registerButton)) {
+    #             if (input$registerButton > 0) {
+    #                 #   req(input$userName)
+    #                 msg1 <- ""
+    #                 msg2 <- ""
+    #                 msg3 <- ""
+    #                 msg4 <- ""
+    #                 msg5 <- ""
+    #                 msg6 <- ""
+    #                 msg7 <- ""
+    #                 msg8 <- ""
+    #                 msg9 <- ""
+    #                 isValid <- TRUE
+    #                 
+    #                 if (input$userName == "") {
+    #                     msg1 <- "Please Enter a Valid User Name.\n"
+    #                     print(msg1)
+    #                 }
+    #                 
+    #                 Username <- isolate(input$userName)
+    #                 if (input$passwd == "") {
+    #                     msg2 <- "Please Enter a Valid Password.\n"
+    #                     print(msg2)
+    #                 }
+    #                 Password <- isolate(input$passwd)
+    #                 if (input$rpasswd == "") {
+    #                     msg3 <- "Please Re-Enter a Valid Password.\n"
+    #                     print(msg3)
+    #                 }
+    #                 if (input$rpasswd != Password) {
+    #                     msg4 <- "Passwords not matching.\n"
+    #                     print(msg4)
+    #                 }
+    #                 RetypePassword <- isolate(input$rpasswd)
+    #                 
+    #                 NameOnCreditCard <- isolate(input$ccname)
+    #                 if (input$ccname == "") {
+    #                     msg9 <- "Please enter Card holder's Name.\n"
+    #                     print(msg9)
+    #                 }
+    #                 
+    #                 
+    #                 EmailID <- isolate(input$email)
+    #                 emailregex <- "^[A-Za-z0-9+_.-]+@(.+)$"
+    #                 if (!grepl(emailregex, EmailID)) {
+    #                     msg6 <- "Please enter a valid EmailID#.\n"
+    #                     print(msg6)
+    #                 }
+    #                 
+    #                 SSN <- isolate(input$ssn)
+    #                 ssnregex <-
+    #                     "^\\d{9}$"
+    #                 # without dashes in between
+    #                 #   ssnregex <- "^\\d{3}-\\d{2}-\\d{4}$"; # with dashes in between
+    #                 if (!grepl(ssnregex, SSN)) {
+    #                     msg7 <- "Please enter a valid SSN#.\n"
+    #                     print(msg7)
+    #                 }
+    #                 
+    #                 MobileNumber <- isolate(input$mnumber)
+    #                 phoneregex <-
+    #                     "^\\s*(\\+\\s*1(-?|\\s+))*[0-9]{3}\\s*-?\\s*[0-9]{3}\\s*-?\\s*[0-9]{4}$"
+    #                 if (!grepl(phoneregex, MobileNumber)) {
+    #                     msg5 <- "Please enter a valid Phone#.\n"
+    #                     print(msg5)
+    #                 }
+    #                 
+    #                 CREDICARDNUMBER <- isolate(input$ccnum)
+    #                 ccnregex <-
+    #                     "^(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14})$" ##For visa CC
+    #                 if (!grepl(ccnregex, CREDICARDNUMBER)) {
+    #                     msg8 <- "Please enter a valid Credit Card#.\n"
+    #                     print(msg8)
+    #                 }
+    #                 
+    #                 EXPIRYDATE <- isolate(input$expiry)
+    #                 
+    #                 # if(lngth(which(credentials$username_id==Username))==1) {
+    #                 pasmatch  <-
+    #                     credentials["passod"][which(credentials$username_id == Username), ]
+    #                 # concatenate two strings using paste function
+    #                 result = paste(msg1,
+    #                                msg2,
+    #                                msg3,
+    #                                msg4,
+    #                                msg5,
+    #                                msg6,
+    #                                msg7,
+    #                                msg8,
+    #                                msg9,
+    #                                sep = "")
+    #                 
+    #                 if (!is.null(result) && nchar(result) > 0) {
+    #                     shinyalert(result,
+    #                                type = "error")
+    #                     print("Something wrong.")
+    #                     isValid <- FALSE
+    #                     return(NULL)
+    #                 }
+    #                 isValid <- TRUE
+    #                 # pasverify <- password_verify(pasmatch, Password)
+    #                 regverify <-
+    #                     register(
+    #                         Username,
+    #                         Password,
+    #                         MobileNumber,
+    #                         EmailID,
+    #                         SSN,
+    #                         CREDICARDNUMBER,
+    #                         NameOnCreditCard,
+    #                         EXPIRYDATE
+    #                     )
+    #                 # regverify <- TRUE
+    #                 if (regverify) {
+    #                     USER$register <- TRUE
+    #                     print("User Registered Successfully!!")
+    #                 } else {
+    #                     shinyjs::toggle(
+    #                         id = "nomatch",
+    #                         anim = TRUE,
+    #                         time = 1,
+    #                         animType = "fade"
+    #                     )
+    #                     shinyjs::delay(
+    #                         3000,
+    #                         shinyjs::toggle(
+    #                             id = "nomatch",
+    #                             anim = TRUE,
+    #                             time = 1,
+    #                             animType = "fade"
+    #                         )
+    #                     )
+    #                 }
+    #                 
+    #             }
+    #         }
+    #     }
+    # })
     
     #edit data
     observeEvent(input$edit_button, priority = 20, {
