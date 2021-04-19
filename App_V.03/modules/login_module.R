@@ -77,8 +77,14 @@ credentials = data.frame(
 
 #Form for data entry
 register_form <- function() {
-  showModal(modalDialog(
-    div(
+  showModal(modalDialog(div(
+    id = ("register_form"),
+    tags$head(tags$style(".modal-dialog{ width:400px}")),
+    tags$head(tags$style(
+      HTML(".shiny-split-layout > div {overflow: visible}")
+    ))
+    
+    ,fluidPage(div(
       id = "uregistration",
       style = "width: 500px; max-width: 100%; margin: 0 auto; padding: 20px;",
       wellPanel(
@@ -174,7 +180,7 @@ register_form <- function() {
         )),
         #  plotOutput('plot')
       )
-    )
-  ))
+    ))
+  )))
 }
 
