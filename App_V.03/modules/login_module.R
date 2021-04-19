@@ -55,11 +55,7 @@ loginpage <-
                                             padding-top: 5px;font-size:16px;",
             class = "text-center"
           )
-        )),
-        br()
-      )
-    )
-  )
+        )),br())))
 # End Main Login UI
 
 
