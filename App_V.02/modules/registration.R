@@ -414,7 +414,7 @@ if (interactive()) {
                 rs =   dbSendStatement(
                     connection,
                     paste0(
-                        "insert INTO USERS (USERID,PASSWORD,CREATED_DATE,UPDATED_DATE,SSN,CREDITCARD_NUM,EMAILID,NAME_ON_CC,MOBILENUM,EXPIRY_DATE)
+                        "insert INTO USERS_ (USERID,PASSWORD,CREATED_DATE,UPDATED_DATE,SSN,CREDITCARD_NUM,EMAILID,NAME_ON_CC,MOBILENUM,EXPIRY_DATE)
  values('",
                         username ,
                         "','",
