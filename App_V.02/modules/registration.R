@@ -21,6 +21,20 @@ library(shinyFeedback)
 library(ggplot2)
 
 
+addNewUser <- function(connection, userObject){
+  
+  query <- sprintf("insert into user_details(name_on_card, address, user_ssn, date_of_birth, login_username, login_password) values('%s', '%s', '%s', STR_TO_DATE ('%s','%s'), '%s', '%s');", userObject@name, userObject@address, userObject@ssn, userObject@dob, "%m/%d/%Y", userObject@username, userObject@password);
+  rs = dbSendStatement(connection, query);
+  print(paste("Log: User record inserted success:", dbHasCompleted(rs)));
+  return(dbHasCompleted(rs)); 
+};
+
+
+##Create Classes used 
+setClass("user", slots=list(userid="numeric", name="character", ssn="numeric", address="character", dob="character", username="character", password="character"));
+
+
+
 if (interactive()) {
     fieldsMandatory <-
         c(
@@ -156,23 +170,9 @@ if (interactive()) {
     server <- function(input, output, session) {
         register = FALSE
         data <- reactiveValues()
-        #values <- reactiveValues(A=1)
-        USER <- reactiveValues(register = register)
-       # validFiles = c("registration.R")
         
-        # obsB <- observe({
-        #     # check if all mandatory fields have a value
-        #     mandatoryFilled <-
-        #         vapply(fieldsMandatory,
-        #                function(x) {
-        #                    !is.null(input[[x]]) && input[[x]] != ""
-        #                },
-        #                logical(1))
-        #     mandatoryFilled <- all(mandatoryFilled)
-        #
-        #     # enable/disable the register button
-        #     shinyjs::toggleState(id = "register", condition = mandatoryFilled)
-        # })
+        USER <- reactiveValues(register = register)
+
         
         isValid <- FALSE
         observeEvent(input$register, {
@@ -255,7 +255,7 @@ if (interactive()) {
                         
                         EXPIRYDATE <- isolate(input$expiry)
                         
-                        # if(lngth(which(credentials$username_id==Username))==1) {
+
                         pasmatch  <-
                             credentials["passod"][which(credentials$username_id == Username), ]
                         # concatenate two strings using paste function
@@ -290,7 +290,8 @@ if (interactive()) {
                                 NameOnCreditCard,
                                 EXPIRYDATE
                             )
-                        # regverify <- TRUE
+
+                        
                         if (regverify) {
                             USER$register <- TRUE
                             print("User Registered Successfully!!")
@@ -316,6 +317,7 @@ if (interactive()) {
                 }
             }
         })
+        
         output$value <- renderText({
             input$email
         })
@@ -372,17 +374,6 @@ if (interactive()) {
                 uregistration
             }
         })
-        #
-        # output$results <-  DT::renderDataTable({
-        #     datatable(iris, options = list(autoWidth = TRUE,
-        #                                    searching = FALSE))
-        # })
-        #
-        # output$results2 <-  DT::renderDataTable({
-        #     datatable(mtcars,
-        #               options = list(autoWidth = TRUE,
-        #                              searching = FALSE))
-        # })
         
         register <-
             function(username,
@@ -402,39 +393,19 @@ if (interactive()) {
                 print(CREDITCARDNUMBER)
                 print(CREDITCARDNAME)
                 print(EXPIRYDATE)
-                drv <- dbDriver("MySQL")
+
                 isRegistered <- FALSE
                 connection <-
                   dbConnect(MySQL(), user = 'root', password = 'Myskhongbiet88', dbname = 'credit_card_analysis2',
                             host = 'localhost');
-                print(connection)
-                # rs = dbSendStatement(connection, query);
-                # print(paste("Log: User record inserted success:", dbHasCompleted(rs)));
-                # return(dbHasCompleted(rs)); 
-                rs =   dbSendStatement(
-                    connection,
-                    paste0(
-                        "insert INTO USERS_ (USERID,PASSWORD,CREATED_DATE,UPDATED_DATE,SSN,CREDITCARD_NUM,EMAILID,NAME_ON_CC,MOBILENUM,EXPIRY_DATE)
- values('",
-                        username ,
-                        "','",
-                        passwrd,
-                        "',CURDATE(),CURDATE(),'",
-                        SSN,
-                        "','",
-                        CREDITCARDNUMBER,
-                        "','",
-                        EmailID,
-                        "','",
-                        CREDITCARDNAME,
-                        "','",
-                        MobileNumber,
-                        "','",
-                        EXPIRYDATE,
-                        "')"
-                    )
-                )
-                isRegistered <- (dbHasCompleted(rs));
+                
+                
+                
+          
+                userObj <- new("user", name=CREDITCARDNAME, ssn=SSN, username=username, password=passwrd, dob="01/21/1975", address="Londn, England");
+                
+                
+                isRegistered <- addNewUser(connection, userObj);
                 print(paste("Log: User record inserted success:", isRegistered));
              #   print(data)
                 dbDisconnect(connection)
