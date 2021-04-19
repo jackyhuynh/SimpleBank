@@ -526,10 +526,12 @@ server <- function(input, output, session) {
         tags$em(tags$h3("Transactions List", class = "text-primary")),
         
         box(width=12,
-            actionButton("edit_button", "Edit Category", icon("edit")),br(),
-            DT::dataTableOutput("transtable2")),
+            actionButton("edit_button", "Edit Category", icon("edit"))),
+            
+        tags$br(),
+        box(width=12, DT::dataTableOutput("transtable2")),
         
-        br(),
+
         tags$em(tags$h3("Transaction Map", class = "text-primary")),
         box(width=12,sidebarLayout(
             sidebarPanel( noteTransactionMap()),
