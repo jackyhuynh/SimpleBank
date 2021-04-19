@@ -34,11 +34,14 @@ if (interactive()) {
             "Name On Credit Card",
             "EXPIRY DATE"
         )
+    
     labelMandatory <- function(label) {
         tagList(label,
                 span("*", class = "mandatory_star"))
     }
+    
     appCSS <- ".mandatory_star { color: red; }"
+    
     # User Registration screen
     uregistration <-
         div(
@@ -402,13 +405,8 @@ if (interactive()) {
                 drv <- dbDriver("MySQL")
                 isRegistered <- FALSE
                 connection <-
-                    dbConnect(
-                        drv,
-                        user = 'root',
-                        password = 'admin',
-                        dbname = 'creditcard_data_analysis',
-                        host = 'localhost'
-                    )
+                  dbConnect(MySQL(), user = 'root', password = 'Myskhongbiet88', dbname = 'credit_card_analysis2',
+                            host = 'localhost');
                 print(connection)
                 # rs = dbSendStatement(connection, query);
                 # print(paste("Log: User record inserted success:", dbHasCompleted(rs)));
