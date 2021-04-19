@@ -71,9 +71,11 @@ server <- function(input, output, session) {
     login = FALSE
     id = 1
     register = FALSE
+    isValid <- FALSE
     
     USER <- reactiveValues(login = login,
-                           id=id)
+                           id=id,
+                           register=register)
     
     # get the transactionlist
     connection<-getConnection()
@@ -497,8 +499,269 @@ server <- function(input, output, session) {
         )))
     }
     
+    #Form for data entry
+    register_form <- function() {
+        showModal(modalDialog(div(
+            id = ("register_form"),
+            tags$head(tags$style(".modal-dialog{ width:400px}")),
+            tags$head(tags$style(
+                HTML(".shiny-split-layout > div {overflow: visible}")
+            ))
+            
+            ,fluidPage(),
+            easyClose = TRUE
+        )))
+    }
     
-    observeEvent(input$registerButton, priority = 20,{showModal(register_form())})
+    observeEvent(input$registerButton, priority = 20,showModal(modalDialog(div(
+        id = ("register_form"),
+        tags$head(tags$style(".modal-dialog{ width:400px}")),
+        tags$head(tags$style(
+            HTML(".shiny-split-layout > div {overflow: visible}")))
+        ,fluidPage(
+            div(
+                id = "uregistration",
+                style = "width: 500px; max-width: 100%; margin: 0 auto; padding: 20px;",
+                wellPanel(
+                    tags$h2("REGISTRATION FORM", class = "text-center", style = "padding-top: 0;color:#333; font-weight:600;"),
+                    #textInput("name", labelMandatory("Name"), "")
+                    textInput(
+                        "userName",
+                        placeholder = "Username",
+                        value="username",
+                        label = tagList(icon("user"), labelMandatory("Username"))
+                        
+                    ),
+                    passwordInput(
+                        "passwd",
+                        placeholder = "Password",
+                        value="pass1",
+                        label = tagList(icon("unlock-alt"), labelMandatory("Password"))
+                    ),
+                    passwordInput(
+                        "rpasswd",
+                        placeholder = "Retype Password",
+                        value="pass1",
+                        label = tagList(icon("unlock-alt"), labelMandatory("Retype Password"))
+                    ),
+                    numericInput("mnumber", value = '3120690807', labelMandatory("Mobile Number")),
+                    textInput(
+                        "email",
+                        placeholder = "email",
+                        value="vgs_Raju@rediffmail.com",
+                        label = tagList(icon("user"), labelMandatory("EmailID"))
+                    ),
+                    # verbatimTextOutput("value"),
+                    numericInput(
+                        "ssn",
+                        labelMandatory("SSN"),
+                        value = '312069087',
+                        min = 9,
+                        max = 9,
+                        step = 9
+                    ),
+                    textInput(
+                        "ccnum",
+                        placeholder = "CreditCardNumber",
+                        value = '4312069087312069',
+                        label = tagList(icon("credit-card"), labelMandatory("CREDITCARD NUMBER"))
+                    ),
+                    #   numericInput("ccnum","CREDITCARD NUMBER",value = 0,min = 16,max=16),
+                    textInput(
+                        "ccname",
+                        placeholder = "CCNAME",
+                        value = 'Name onthe Card',
+                        label = tagList(icon("user"), labelMandatory("Name On Credit Card"))
+                    ),
+                    dateInput(
+                        "expiry",
+                        labelMandatory("EXPIRY DATE"),
+                        value = NULL,
+                        format = " yyyy-mm-dd ",
+                        startview = "month",
+                        weekstart = 0,
+                        language = "en",
+                        width = NULL,
+                        autoclose = TRUE,
+                        datesdisabled = NULL,
+                        daysofweekdisabled = NULL
+                    ),
+                    
+                    
+                ),
+                # div (class="form-body",
+                # Card Number
+                #    input (type ="text", class="card-number", placeholder="Card Number")),
+                
+                div(
+                    style = "text-align: center;",
+                    useShinyalert(),
+                    # Set up shinyalert
+                    actionButton(
+                        "register",
+                        "REGISTER",
+                        style = "color: white; background-color:#3c8dbc;
+                         padding: 10px 15px; width: 150px; cursor: pointer;
+                         font-size: 18px; font-weight: 600;"
+                    ),
+                    shinyjs::hidden(div(
+                        id = "nomatch",
+                        tags$p(
+                            "Registration Failed!",
+                            style = "color: red; font-weight: 600;
+                                    padding-top: 5px;font-size:16px;",
+                            class = "text-center"
+                        )
+                    )),
+                    #  plotOutput('plot')
+                )
+            )
+        ),
+        easyClose = TRUE
+    ))))
+    
+    
+    observeEvent(input$registerButton, {
+        #    obsC <- observe({
+        if ( USER$register == FALSE & isValid == FALSE) {
+            if (!is.null(input$registerButton)) {
+                if (input$registerButton > 0) {
+                    #   req(input$userName)
+                    msg1 <- ""
+                    msg2 <- ""
+                    msg3 <- ""
+                    msg4 <- ""
+                    msg5 <- ""
+                    msg6 <- ""
+                    msg7 <- ""
+                    msg8 <- ""
+                    msg9 <- ""
+                    isValid <- TRUE
+                    
+                    if (input$userName == "") {
+                        msg1 <- "Please Enter a Valid User Name.\n"
+                        print(msg1)
+                    }
+                    
+                    Username <- isolate(input$userName)
+                    if (input$passwd == "") {
+                        msg2 <- "Please Enter a Valid Password.\n"
+                        print(msg2)
+                    }
+                    Password <- isolate(input$passwd)
+                    if (input$rpasswd == "") {
+                        msg3 <- "Please Re-Enter a Valid Password.\n"
+                        print(msg3)
+                    }
+                    if (input$rpasswd != Password) {
+                        msg4 <- "Passwords not matching.\n"
+                        print(msg4)
+                    }
+                    RetypePassword <- isolate(input$rpasswd)
+                    
+                    NameOnCreditCard <- isolate(input$ccname)
+                    if (input$ccname == "") {
+                        msg9 <- "Please enter Card holder's Name.\n"
+                        print(msg9)
+                    }
+                    
+                    
+                    EmailID <- isolate(input$email)
+                    emailregex <- "^[A-Za-z0-9+_.-]+@(.+)$"
+                    if (!grepl(emailregex, EmailID)) {
+                        msg6 <- "Please enter a valid EmailID#.\n"
+                        print(msg6)
+                    }
+                    
+                    SSN <- isolate(input$ssn)
+                    ssnregex <-
+                        "^\\d{9}$"
+                    # without dashes in between
+                    #   ssnregex <- "^\\d{3}-\\d{2}-\\d{4}$"; # with dashes in between
+                    if (!grepl(ssnregex, SSN)) {
+                        msg7 <- "Please enter a valid SSN#.\n"
+                        print(msg7)
+                    }
+                    
+                    MobileNumber <- isolate(input$mnumber)
+                    phoneregex <-
+                        "^\\s*(\\+\\s*1(-?|\\s+))*[0-9]{3}\\s*-?\\s*[0-9]{3}\\s*-?\\s*[0-9]{4}$"
+                    if (!grepl(phoneregex, MobileNumber)) {
+                        msg5 <- "Please enter a valid Phone#.\n"
+                        print(msg5)
+                    }
+                    
+                    CREDICARDNUMBER <- isolate(input$ccnum)
+                    ccnregex <-
+                        "^(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14})$" ##For visa CC
+                    if (!grepl(ccnregex, CREDICARDNUMBER)) {
+                        msg8 <- "Please enter a valid Credit Card#.\n"
+                        print(msg8)
+                    }
+                    
+                    EXPIRYDATE <- isolate(input$expiry)
+                    
+                    # if(lngth(which(credentials$username_id==Username))==1) {
+                    pasmatch  <-
+                        credentials["passod"][which(credentials$username_id == Username), ]
+                    # concatenate two strings using paste function
+                    result = paste(msg1,
+                                   msg2,
+                                   msg3,
+                                   msg4,
+                                   msg5,
+                                   msg6,
+                                   msg7,
+                                   msg8,
+                                   msg9,
+                                   sep = "")
+                    
+                    if (!is.null(result) && nchar(result) > 0) {
+                        shinyalert(result,
+                                   type = "error")
+                        print("Something wrong.")
+                        isValid <- FALSE
+                        return(NULL)
+                    }
+                    isValid <- TRUE
+                    # pasverify <- password_verify(pasmatch, Password)
+                    regverify <-
+                        register(
+                            Username,
+                            Password,
+                            MobileNumber,
+                            EmailID,
+                            SSN,
+                            CREDICARDNUMBER,
+                            NameOnCreditCard,
+                            EXPIRYDATE
+                        )
+                    # regverify <- TRUE
+                    if (regverify) {
+                        USER$register <- TRUE
+                        print("User Registered Successfully!!")
+                    } else {
+                        shinyjs::toggle(
+                            id = "nomatch",
+                            anim = TRUE,
+                            time = 1,
+                            animType = "fade"
+                        )
+                        shinyjs::delay(
+                            3000,
+                            shinyjs::toggle(
+                                id = "nomatch",
+                                anim = TRUE,
+                                time = 1,
+                                animType = "fade"
+                            )
+                        )
+                    }
+                    
+                }
+            }
+        }
+    })
     
     #edit data
     observeEvent(input$edit_button, priority = 20, {
