@@ -20,6 +20,9 @@ library(tidyverse) # pipe
 library(leaflet) # map
 library(lubridate)  # For date manipulation
 
+library(shinyalert)
+library(shinyFeedback)
+
 # @ Truc 
 # Source Script to support application UI, and Logic
 source("modules/print_display_module.R")
@@ -494,6 +497,8 @@ server <- function(input, output, session) {
         )))
     }
     
+    
+    observeEvent(input$registerButton, priority = 20,{showModal(register_form())})
     
     #edit data
     observeEvent(input$edit_button, priority = 20, {
