@@ -43,6 +43,15 @@ getConnection <- function(){
 };
 
 
+addNewUser <- function(connection, userObject){
+  
+  query <- sprintf("insert into user_details(name_on_card, address, user_ssn, date_of_birth, login_username, login_password) values('%s', '%s', '%s', STR_TO_DATE ('%s','%s'), '%s', '%s');", userObject@name, userObject@address, userObject@ssn, userObject@dob, "%m/%d/%Y", userObject@username, userObject@password);
+  rs = dbSendStatement(connection, query);
+  print(paste("Log: User record inserted success:", dbHasCompleted(rs)));
+  return(dbHasCompleted(rs)); 
+};
+
+
 # @ Wrucha
 ## 1. GET ALL TRANSACTION DATA
 getTransactionDataWithStoreName <- function(connection, userId){
