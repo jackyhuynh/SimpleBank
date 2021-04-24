@@ -19,4 +19,4 @@ setClass("transactions", slots=list(transactionId="numeric", categoryId="numeric
                                     transactionType="character", cardId="numeric"));
 
 ##Class for Card
-setClass("card", slots=list(cardId="numeric", userId="numeric", cardNumber="numeric", expirationDate="character"))
+setClass("card", slots=list(cardId="numeric", userId="numeric", cardNumber="numeric", expirationDate="character", cardName="character"))
