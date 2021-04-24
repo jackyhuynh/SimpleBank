@@ -8,6 +8,14 @@ addNewUser <- function(connection, userObject){
     return(dbHasCompleted(rs)); 
 };
 
+##Class for Card
+setClass("card", slots=list(cardId="numeric", userId="numeric", cardNumber="numeric", expirationDate="character", cardName="character"))
+
+## Add New Card to the database
+addNewCard <- function(connection, cardObject){
+  query <- sprintf("insert into card_details(user_id_fk, credit_card_number, expiration_date, name_of_card) values('%s', '%s', STR_TO_DATE ('%s','%s'), '%s');", cardObject@user, userObject@address, userObject@ssn, userObject@dob, "%m/%d/%Y", userObject@username, userObject@password)
+}
+
 
 ##UPDATE EXISTING USER 
 updateUserDetails <- function(connection, userObject){
