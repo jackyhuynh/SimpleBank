@@ -96,7 +96,7 @@ if (interactive()) {
     
     server <- function(input, output, session) {
         register = FALSE
-        data <- reactiveValues()
+        #data <- reactiveValues()
         
         USER <- reactiveValues(register = register)
 
