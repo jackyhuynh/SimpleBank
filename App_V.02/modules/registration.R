@@ -21,20 +21,97 @@ library(shinyFeedback)
 library(ggplot2)
 
 
+createNewUserTransactionTable <- function(username, password){
+  connection <- getConnection();
+  query <- sprintf("select user_id from user_details where login_username= '%s'
+                   and login_password= '%s' and deleted=1;", username, password);
+  rs = dbSendQuery(connection, query);
+  data = fetch(rs, n= -1);
+  if(nrow(data) == 1){
+    userId <- head(data, n=1);
+    query <- sprintf("create table user_transaction_user_id_%s( transaction_id int not null auto_increment, card_id_fk int, category_id_fk int, locationid_id_fk int, amount double, date_of_transaction varchar(20), time_of_transaction time, transaction_type enum('Credit', 'Debit'), deleted int default 1, primary key (transaction_id), foreign key (card_id_fk) references card_details(card_id), foreign key (category_id_fk) references category(category_id), foreign key (locationid_id_fk) references locations(location_id) )auto_increment=1;", userId);
+    rs = dbSendStatement(connection, query);
+    dbDisconnect(connection);
+  } else{
+    print(paste("Log : Not found user:", username));
+    dbDisconnect(connection);
+    return(0)
+  }
+}
+
+
+##ADD NEW USER 
+
 addNewUser <- function(connection, userObject){
-  query <- sprintf("insert into user_details(name_on_card, address, user_ssn, date_of_birth, login_username, login_password) values('%s', '%s', '%s', STR_TO_DATE ('%s','%s'), '%s', '%s');", userObject@name, userObject@address, userObject@ssn, userObject@dob, "%m/%d/%Y", userObject@username, userObject@password);
+  
+  query <- sprintf("insert into user_details(name_on_card, address, user_ssn, date_of_birth, login_username, login_password,income) 
+                   values('%s', '%s', '%s', '%s', '%s', '%s', '%s');", 
+                   userObject@name, userObject@address, userObject@ssn, userObject@dob, userObject@username, userObject@password, userObject@income);
   rs = dbSendStatement(connection, query);
-  print(paste("Log: User record inserted success:", dbHasCompleted(rs)));
-  return(dbHasCompleted(rs)); 
+  result<-dbHasCompleted(rs)
+  print(paste("Log: User record inserted success:",result ));
+  
+  # Clear all the result
+  dbClearResult(rs)
+  dbDisconnect(connection)
+  
+  return(result); 
 };
 
+
+##USER AUTHENTICATION
+getUserID <- function(username, password, connection){
+  query <- sprintf("select user_id from user_details where login_username= '%s' 
+                   and login_password= '%s' and deleted=1;", username, password);
+  
+  rs = dbSendQuery(connection, query);
+  data = fetch(rs, n= -1);  
+  dbClearResult(rs)
+  dbDisconnect(connection)
+  
+  if(nrow(data) == 1){
+    print(paste("Log: Success found user:", username));
+    return(data)
+  } else{
+    print(paste("Log : Not found user:", username));
+    return(0)
+  }
+}
+
+## Add New Card to the database
+addNewCard <- function(connection, cardObject){
+  query <- sprintf("insert into card_details(user_id_fk, credit_card_number, expiration_date, name_of_card) 
+                   values('%s', '%s','%s' , '%s');", 
+                   cardObject@userId, cardObject@cardNumber, cardObject@expirationDate, cardObject@cardName)
+  
+  rs = dbSendStatement(connection, query);
+  result<-dbHasCompleted(rs)
+  print(paste("Log: Card inserted success:",result ));
+  
+  # Clear all the result
+  dbClearResult(rs)
+  dbDisconnect(connection)
+  
+  return(result); 
+}
+
+
+##Class for Card
+setClass("card", slots=list(cardId="numeric", userId="numeric", cardNumber="numeric", expirationDate="character", cardName="character"))
+
+
 ##Create Classes used 
-setClass("user", slots=list(userid="numeric", name="character", ssn="numeric", address="character", dob="character", username="character", password="character"));
+setClass("user", slots=list(userid="numeric", name="character",  address="character",ssn="numeric", dob="character", username="character", password="character", income="numeric"));
 
-
+##Only change user, password and host
+getConnection <- function(){
+  connection = dbConnect(MySQL(), user = 'root', password = 'Myskhongbiet88', dbname = 'credit_card_analysis2',
+                         host = 'localhost');
+  return(connection);
+};
 
 if (interactive()) {
-    fieldsMandatory <-c("Username", "Password","Retype Password", "Mobile Number", " EmailID", "SSN", "CREDITCARD NUMBER","Name On Credit Card","EXPIRY DATE")
+    # fieldsMandatory <-c("Username", "Password","Retype Password", "Mobile Number", " EmailID", "SSN", "CREDITCARD NUMBER","Name On Credit Card","EXPIRY DATE")
     
     labelMandatory <- function(label) {
         tagList(label,span("*", class = "mandatory_star"))}
@@ -45,46 +122,37 @@ if (interactive()) {
     uregistration <-
         div(
             id = "uregistration",
-            style = "width: 500px; max-width: 100%; margin: 0 auto; padding: 20px;",
+            style = "width: 600px; max-width: 100%; margin: 0 auto; padding: 20px;",
             
-              box(width = 12,              
-                  tags$h2("REGISTRATION FORM", class = "text-center", style = "padding-top: 0;color:#333; font-weight:600;"),
-              box(width=12,
-                  
-                  tags$h4("Login information"),
-                  
+            box(width = 12,
+                tags$h2("REGISTRATION FORM", class = "text-center", style = "padding-top: 0;color:#333; font-weight:600;"),
+            
+                box(width=12,
+                  tags$h4("Login information", class = "text-center"),
                   textInput("userName", label = tagList(icon("user"), labelMandatory("Username"))),
-                  
                   passwordInput( "passwd",label = tagList(icon("unlock-alt"), labelMandatory("Password"))),
-                  
                   passwordInput("rpasswd",label = tagList(icon("unlock-alt"), labelMandatory("Retype Password"))), ),
-                  
-                  
-              box(width=12,
+               
+                box(width=12,
+                  tags$h4("Account information", class = "text-center"),
                   numericInput("mnumber", value = '', labelMandatory("Mobile Number")),
-                  
                   textInput("email",label = tagList(icon("user"), labelMandatory("EmailID"))),
-                  
-                  numericInput("ssn",labelMandatory("SSN"),value = '',min = 9,max = 9, step = 9),
-                  
-                  textInput("useradress", labelMandatory("Full Address"))),
-             
-
-              box(width=12,
-                  
-                  tags$h4("Card information"),
-                  
-                  textInput("ccnum",label = tagList(icon("credit-card"), labelMandatory("CREDIT CARD NUMBER"))),
-                  
-                  textInput( "ccname",label = tagList(icon("user"), labelMandatory("Name On Credit Card"))),
-                  
-                  dateInput("expiry",labelMandatory("EXPIRY DATE"),
+                  dateInput("birthdate",labelMandatory("Date of Birth"),
                             value = NULL, format = " yyyy-mm-dd ", startview = "month", weekstart = 0,
                             language = "en",width = NULL, autoclose = TRUE, datesdisabled = NULL,daysofweekdisabled = NULL),
-                  ) ),
+                  numericInput("ssn",labelMandatory("SSN"),value = '',min = 9,max = 9, step = 9),
+                  numericInput("income",labelMandatory("Monthly Income"),value = '',min = 9,max = 9, step = 9),
+                  textInput("useradress", labelMandatory("Full Address"))),
+             
+                box(width=12,
+                  tags$h4("Credit Card information",class = "text-center"),
+                  textInput("ccnum",label = tagList(icon("credit-card"), labelMandatory("CREDIT CARD NUMBER"))),
+                  textInput( "ccname",label = tagList(icon("user"), labelMandatory("Name On Credit Card"))),
+                  dateInput("expiry",labelMandatory("EXPIRATION DATE"),
+                            value = NULL, format = " yyyy-mm-dd ", startview = "month", weekstart = 0,
+                            language = "en",width = NULL, autoclose = TRUE, datesdisabled = NULL,daysofweekdisabled = NULL),
+                )),
 
-            
-            
             div(style = "text-align: center;",
                 useShinyalert(),
                 # Set up shinyalert
@@ -97,8 +165,7 @@ if (interactive()) {
                     tags$p("Registration Failed!",
                         style = "color: red; font-weight: 600;
                                     padding-top: 5px;font-size:16px;",
-                        class = "text-center"))))
-        )
+                        class = "text-center")))))
     
     
     header <-
@@ -108,17 +175,13 @@ if (interactive()) {
         dashboardBody(shinyjs::useShinyjs(),
                       shinyjs::inlineCSS(appCSS),
                       uiOutput("body"))
-    ui <-
-        dashboardPage(header, sidebar, body, skin = "blue", useShinyalert())
+    ui <-dashboardPage(header, sidebar, body, skin = "blue", useShinyalert())
     
     server <- function(input, output, session) {
         register = FALSE
-        #data <- reactiveValues()
-        
         USER <- reactiveValues(register = register)
-
-        
         isValid <- FALSE
+        
         observeEvent(input$register, {
             #    obsC <- observe({
             if (USER$register == FALSE & isValid == FALSE) {
@@ -199,6 +262,12 @@ if (interactive()) {
                         
                         EXPIRYDATE <- isolate(input$expiry)
                         
+                        UserBirthDate <- isolate(input$birthdate)
+                          
+                        UserAddress <- isolate(input$useradress)
+                        
+                        UserIncome <- isolate(input$income)
+                        
 
                         # pasmatch  <-
                         #     credentials["passod"][which(credentials$username_id == Username), ]
@@ -217,8 +286,8 @@ if (interactive()) {
                         
                         regverify <-
                             register(
-                                Username,Password,MobileNumber,EmailID,SSN,CREDICARDNUMBER,NameOnCreditCard,EXPIRYDATE
-                            )
+                                Username,Password,MobileNumber,EmailID,SSN,CREDICARDNUMBER,
+                                NameOnCreditCard,EXPIRYDATE,UserBirthDate, UserAddress, UserIncome)
 
                         
                         if (regverify) {
@@ -266,46 +335,36 @@ if (interactive()) {
                     # First tab
                     tabItem(
                         tabName = "dashboard",class = "active",
-                        fluidRow(box(width = 12, dataTableOutput('results') ))
-                    ),
-                    
+                        fluidRow(box(width = 12, dataTableOutput('results') ))),
                     # Second tab
                     tabItem(tabName = "second",
-                            fluidRow(box(width = 12, dataTableOutput('results2'))))
-                )
+                            fluidRow(box(width = 12, dataTableOutput('results2')))))
                 
             }
             else { uregistration}
         })
         
-        register <- function(username,passwrd,MobileNumber,EmailID,SSN,CREDITCARDNUMBER,CREDITCARDNAME,EXPIRYDATE) {
-          
-          # Debugging only  
-          # print("inside register")
-          # print(username)
-          # print(passwrd)
-          # print(MobileNumber)
-          # print(EmailID)
-          # print(SSN)
-          # print(CREDITCARDNUMBER)
-          # print(CREDITCARDNAME)
-          # print(EXPIRYDATE)
+        # This function register user
+        register <- function(username,passwrd,MobileNumber,EmailID,SSN,CREDITCARDNUMBER,
+                             CREDITCARDNAME,EXPIRYDATE,UserBirthDate, UserAddress, UserIncome) {
 
-          isRegistered <- FALSE
-          connection <- dbConnect(MySQL(), user = 'root', password = 'Myskhongbiet88', 
-                                  dbname = 'credit_card_analysis2', host = 'localhost');
+            isRegistered <- FALSE
+            connection <- getConnection()
           
-          userObj <- new("user", name=CREDITCARDNAME, ssn=SSN, username=username, 
-                         password=passwrd, dob="01/21/1975", address="Londn, England");
+            userObj <- new("user", name=CREDITCARDNAME, ssn=SSN, username=username, 
+                         password=passwrd, dob=as.character(UserBirthDate), address=UserAddress, income=as.numeric(UserIncome));
           
-          isRegistered <- addNewUser(connection, userObj);
+            isRegistered <- addNewUser(connection, userObj);
           
-          print(paste("Log: User record inserted success:", isRegistered));
-
-                dbDisconnect(connection)
-                return(isRegistered)
+            connection <- getConnection() # Create new connection
+            cardObj<- new("card", userId=as.numeric(getUserID(username,passwrd,connection)), cardNumber=as.numeric(CREDITCARDNUMBER), 
+                          expirationDate=as.character(EXPIRYDATE), cardName=CREDITCARDNAME)
+            
+            connection <- getConnection() # Create new connection
+            CardRegistered <- addNewCard(connection,cardObj)
+            createNewUserTransactionTable(username,passwrd)
+            return(isRegistered&&CardRegistered)
       }# End of register function
-        
     }
 }
 runApp(list(ui = ui, server = server), launch.browser = TRUE)
