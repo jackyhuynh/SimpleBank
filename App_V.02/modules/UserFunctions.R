@@ -2,18 +2,33 @@
 
 addNewUser <- function(connection, userObject){
   
-  query <- sprintf("insert into user_details(name_on_card, address, user_ssn, date_of_birth, login_username, login_password) values('%s', '%s', '%s', STR_TO_DATE ('%s','%s'), '%s', '%s');", userObject@name, userObject@address, userObject@ssn, userObject@dob, "%m/%d/%Y", userObject@username, userObject@password);
+  query <- sprintf("insert into user_details(name_on_card, address, user_ssn, date_of_birth, login_username, login_password) values('%s', '%s', '%s', '%s', '%s', '%s');", userObject@name, userObject@address, userObject@ssn, userObject@dob, userObject@dob, userObject@username, userObject@password);
   rs = dbSendStatement(connection, query);
-  print(paste("Log: User record inserted success:", dbHasCompleted(rs)));
-    return(dbHasCompleted(rs)); 
+  result<-dbHasCompleted(rs)
+  print(paste("Log: User record inserted success:",result ));
+  
+  # Clear all the result
+  dbClearResult(rs)
+  dbDisconnect(connection)
+  
+  return(result); 
 };
 
-##Class for Card
-setClass("card", slots=list(cardId="numeric", userId="numeric", cardNumber="numeric", expirationDate="character", cardName="character"))
 
 ## Add New Card to the database
 addNewCard <- function(connection, cardObject){
-  query <- sprintf("insert into card_details(user_id_fk, credit_card_number, expiration_date, name_of_card) values('%s', '%s', STR_TO_DATE ('%s','%s'), '%s');", cardObject@user, userObject@address, userObject@ssn, userObject@dob, "%m/%d/%Y", userObject@username, userObject@password)
+  query <- sprintf("insert into card_details(user_id_fk, credit_card_number, expiration_date, name_of_card) values('%s', '%s', STR_TO_DATE ('%s','%s'), '%s');", 
+                   cardObject@userId, cardObject@cardNumber, "%m/%d/%Y", cardObject@cardName)
+  
+  rs = dbSendStatement(connection, query);
+  result<-dbHasCompleted(rs)
+  print(paste("Log: Card inserted success:",result ));
+  
+  # Clear all the result
+  dbClearResult(rs)
+  dbDisconnect(connection)
+  
+  return(result); 
 }
 
 
@@ -45,7 +60,8 @@ confrimUserCredentails <- function(userObject, connection){
 
   rs = dbSendQuery(connection, query);
   data = fetch(rs, n= -1);  
-  
+  dbClearResult(rs)
+  dbDisconnect(connection)
   if(nrow(data) == 1){
     print(paste("Log: Success found user:", userObject@username));
     return(TRUE)
@@ -73,6 +89,8 @@ getUserID <- function(username, password, connection){
   
   rs = dbSendQuery(connection, query);
   data = fetch(rs, n= -1);  
+  dbClearResult(rs)
+  dbDisconnect(connection)
   
   if(nrow(data) == 1){
     print(paste("Log: Success found user:", username));
