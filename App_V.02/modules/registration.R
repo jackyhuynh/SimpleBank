@@ -45,27 +45,39 @@ if (interactive()) {
             id = "uregistration",
             style = "width: 500px; max-width: 100%; margin: 0 auto; padding: 20px;",
             wellPanel(
-                tags$h2("REGISTRATION FORM", class = "text-center", style = "padding-top: 0;color:#333; font-weight:600;"),
+              tags$h2("REGISTRATION FORM", class = "text-center", style = "padding-top: 0;color:#333; font-weight:600;"),
+              box(width=12,
+                  
+                  tags$h4("User information"),
+                  
+                  textInput("userName", label = tagList(icon("user"), labelMandatory("Username"))),
+                  
+                  passwordInput( "passwd",label = tagList(icon("unlock-alt"), labelMandatory("Password"))),
+                  
+                  passwordInput("rpasswd",label = tagList(icon("unlock-alt"), labelMandatory("Retype Password"))),
+                  
+                  numericInput("mnumber", value = '', labelMandatory("Mobile Number")),
+                  
+                  textInput("email",label = tagList(icon("user"), labelMandatory("EmailID"))),
+                  
+                  numericInput("ssn",labelMandatory("SSN"),value = '',min = 9,max = 9, step = 9),
+              ),
                 
-                textInput("userName", label = tagList(icon("user"), labelMandatory("Username"))),
                 
-                passwordInput( "passwd",label = tagList(icon("unlock-alt"), labelMandatory("Password"))),
-                
-                passwordInput("rpasswd",label = tagList(icon("unlock-alt"), labelMandatory("Retype Password"))),
-                
-                numericInput("mnumber", value = '', labelMandatory("Mobile Number")),
-                
-                textInput("email",label = tagList(icon("user"), labelMandatory("EmailID"))),
 
-                numericInput("ssn",labelMandatory("SSN"),value = '',min = 9,max = 9, step = 9),
-                
-                textInput("ccnum",label = tagList(icon("credit-card"), labelMandatory("CREDITCARD NUMBER"))),
-                
-                textInput( "ccname",label = tagList(icon("user"), labelMandatory("Name On Credit Card"))),
-                
-                dateInput("expiry",labelMandatory("EXPIRY DATE"),
-                    value = NULL, format = " yyyy-mm-dd ", startview = "month", weekstart = 0,
-                    language = "en",width = NULL, autoclose = TRUE, datesdisabled = NULL,daysofweekdisabled = NULL),),
+              box(width=12,
+                  
+                  tags$h4("Card information"),
+                  
+                  textInput("ccnum",label = tagList(icon("credit-card"), labelMandatory("CREDITCARD NUMBER"))),
+                  
+                  textInput( "ccname",label = tagList(icon("user"), labelMandatory("Name On Credit Card"))),
+                  
+                  dateInput("expiry",labelMandatory("EXPIRY DATE"),
+                            value = NULL, format = " yyyy-mm-dd ", startview = "month", weekstart = 0,
+                            language = "en",width = NULL, autoclose = TRUE, datesdisabled = NULL,daysofweekdisabled = NULL),
+                  )
+                ),
             
             div(style = "text-align: center;",
                 useShinyalert(),
@@ -183,39 +195,24 @@ if (interactive()) {
                         EXPIRYDATE <- isolate(input$expiry)
                         
 
-                        pasmatch  <-
-                            credentials["passod"][which(credentials$username_id == Username), ]
+                        # pasmatch  <-
+                        #     credentials["passod"][which(credentials$username_id == Username), ]
+                        
                         # concatenate two strings using paste function
-                        result = paste(msg1,
-                                       msg2,
-                                       msg3,
-                                       msg4,
-                                       msg5,
-                                       msg6,
-                                       msg7,
-                                       msg8,
-                                       msg9,
-                                       sep = "")
+                        result = paste(msg1, msg2,msg3,msg4, msg5,msg6, msg7,msg8,msg9,sep = "")
                         
                         if (!is.null(result) && nchar(result) > 0) {
-                            shinyalert(result,
-                                       type = "error")
+                            shinyalert(result, type = "error")
                             print("Something wrong.")
                             isValid <- FALSE
                             return(NULL)
                         }
                         isValid <- TRUE
                         # pasverify <- password_verify(pasmatch, Password)
+                        
                         regverify <-
                             register(
-                                Username,
-                                Password,
-                                MobileNumber,
-                                EmailID,
-                                SSN,
-                                CREDICARDNUMBER,
-                                NameOnCreditCard,
-                                EXPIRYDATE
+                                Username,Password,MobileNumber,EmailID,SSN,CREDICARDNUMBER,NameOnCreditCard,EXPIRYDATE
                             )
 
                         
@@ -224,30 +221,19 @@ if (interactive()) {
                             print("User Registered Successfully!!")
                         } else {
                             shinyjs::toggle(
-                                id = "nomatch",
-                                anim = TRUE,
-                                time = 1,
-                                animType = "fade"
+                                id = "nomatch",anim = TRUE, time = 1,animType = "fade"
                             )
-                            shinyjs::delay(
-                                3000,
+                            shinyjs::delay(3000,
                                 shinyjs::toggle(
-                                    id = "nomatch",
-                                    anim = TRUE,
-                                    time = 1,
-                                    animType = "fade"
-                                )
-                            )
+                                    id = "nomatch",anim = TRUE,time = 1,animType = "fade"))
                         }
-                        
                     }
                 }
             }
         })
         
-        output$value <- renderText({
-            input$email
-        })
+        output$value <- renderText({input$email})
+        
         output$logoutbtn <- renderUI({
             req(USER$register)
             tags$li(
@@ -255,22 +241,14 @@ if (interactive()) {
                   href = "javascript:window.location.reload(true)"),
                 class = "dropdown",
                 style = "background-color: #eee !important; border: 0;
-                    font-weight: bold; margin:5px; padding: 10px;"
-            )
+                    font-weight: bold; margin:5px; padding: 10px;")
         })
         
         output$sidebarpanel <- renderUI({
             if (USER$register == TRUE) {
                 sidebarMenu(
-                    menuItem(
-                        "Main Page",
-                        tabName = "dashboard",
-                        icon = icon("dashboard")
-                    ),
-                    menuItem(
-                        "Second Page",
-                        tabName = "second",
-                        icon = icon("th")
+                    menuItem("Main Page",tabName = "dashboard", icon = icon("dashboard")),
+                    menuItem("Second Page",tabName = "second", icon = icon("th")
                     )
                     
                 )
@@ -282,61 +260,46 @@ if (interactive()) {
                 tabItems(
                     # First tab
                     tabItem(
-                        tabName = "dashboard",
-                        class = "active",
-                        fluidRow(box(
-                            width = 12, dataTableOutput('results')
-                        ))
+                        tabName = "dashboard",class = "active",
+                        fluidRow(box(width = 12, dataTableOutput('results') ))
                     ),
                     
                     # Second tab
                     tabItem(tabName = "second",
-                            fluidRow(
-                                box(width = 12, dataTableOutput('results2'))
-                            ))
+                            fluidRow(box(width = 12, dataTableOutput('results2'))))
                 )
                 
             }
-            else {
-                uregistration
-            }
+            else { uregistration}
         })
         
-        register <-
-            function(username,
-                     passwrd,
-                     MobileNumber,
-                     EmailID,
-                     SSN,
-                     CREDITCARDNUMBER,
-                     CREDITCARDNAME,
-                     EXPIRYDATE) {
-                print("inside register")
-                print(username)
-                print(passwrd)
-                print(MobileNumber)
-                print(EmailID)
-                print(SSN)
-                print(CREDITCARDNUMBER)
-                print(CREDITCARDNAME)
-                print(EXPIRYDATE)
+        register <- function(username,passwrd,MobileNumber,EmailID,SSN,CREDITCARDNUMBER,CREDITCARDNAME,EXPIRYDATE) {
+          
+          # Debugging only  
+          # print("inside register")
+          # print(username)
+          # print(passwrd)
+          # print(MobileNumber)
+          # print(EmailID)
+          # print(SSN)
+          # print(CREDITCARDNUMBER)
+          # print(CREDITCARDNAME)
+          # print(EXPIRYDATE)
 
-                isRegistered <- FALSE
-                connection <-
-                  dbConnect(MySQL(), user = 'root', password = 'Myskhongbiet88', dbname = 'credit_card_analysis2',
-                            host = 'localhost');
-                
+          isRegistered <- FALSE
+          connection <- dbConnect(MySQL(), user = 'root', password = 'Myskhongbiet88', 
+                                  dbname = 'credit_card_analysis2', host = 'localhost');
+          
+          userObj <- new("user", name=CREDITCARDNAME, ssn=SSN, username=username, 
+                         password=passwrd, dob="01/21/1975", address="Londn, England");
+          
+          isRegistered <- addNewUser(connection, userObj);
+          
+          print(paste("Log: User record inserted success:", isRegistered));
 
-                userObj <- new("user", name=CREDITCARDNAME, ssn=SSN, username=username, password=passwrd, dob="01/21/1975", address="Londn, England");
-                
-                
-                isRegistered <- addNewUser(connection, userObj);
-                print(paste("Log: User record inserted success:", isRegistered));
-             #   print(data)
                 dbDisconnect(connection)
                 return(isRegistered)
-            }
-        # End of register function
+      }# End of register function
         
     }
 }
