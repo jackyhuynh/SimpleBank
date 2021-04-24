@@ -31,6 +31,8 @@ addNewUser <- function(connection, userObject){
 ##Create Classes used 
 setClass("user", slots=list(userid="numeric", name="character", ssn="numeric", address="character", dob="character", username="character", password="character"));
 
+
+
 if (interactive()) {
     fieldsMandatory <-c("Username", "Password","Retype Password", "Mobile Number", " EmailID", "SSN", "CREDITCARD NUMBER","Name On Credit Card","EXPIRY DATE")
     
@@ -44,40 +46,44 @@ if (interactive()) {
         div(
             id = "uregistration",
             style = "width: 500px; max-width: 100%; margin: 0 auto; padding: 20px;",
-            wellPanel(
-              tags$h2("REGISTRATION FORM", class = "text-center", style = "padding-top: 0;color:#333; font-weight:600;"),
+            
+              box(width = 12,              
+                  tags$h2("REGISTRATION FORM", class = "text-center", style = "padding-top: 0;color:#333; font-weight:600;"),
               box(width=12,
                   
-                  tags$h4("User information"),
+                  tags$h4("Login information"),
                   
                   textInput("userName", label = tagList(icon("user"), labelMandatory("Username"))),
                   
                   passwordInput( "passwd",label = tagList(icon("unlock-alt"), labelMandatory("Password"))),
                   
-                  passwordInput("rpasswd",label = tagList(icon("unlock-alt"), labelMandatory("Retype Password"))),
+                  passwordInput("rpasswd",label = tagList(icon("unlock-alt"), labelMandatory("Retype Password"))), ),
                   
+                  
+              box(width=12,
                   numericInput("mnumber", value = '', labelMandatory("Mobile Number")),
                   
                   textInput("email",label = tagList(icon("user"), labelMandatory("EmailID"))),
                   
                   numericInput("ssn",labelMandatory("SSN"),value = '',min = 9,max = 9, step = 9),
-              ),
-                
-                
+                  
+                  textInput("useradress", labelMandatory("Full Address"))),
+             
 
               box(width=12,
                   
                   tags$h4("Card information"),
                   
-                  textInput("ccnum",label = tagList(icon("credit-card"), labelMandatory("CREDITCARD NUMBER"))),
+                  textInput("ccnum",label = tagList(icon("credit-card"), labelMandatory("CREDIT CARD NUMBER"))),
                   
                   textInput( "ccname",label = tagList(icon("user"), labelMandatory("Name On Credit Card"))),
                   
                   dateInput("expiry",labelMandatory("EXPIRY DATE"),
                             value = NULL, format = " yyyy-mm-dd ", startview = "month", weekstart = 0,
                             language = "en",width = NULL, autoclose = TRUE, datesdisabled = NULL,daysofweekdisabled = NULL),
-                  )
-                ),
+                  ) ),
+
+            
             
             div(style = "text-align: center;",
                 useShinyalert(),
@@ -91,8 +97,7 @@ if (interactive()) {
                     tags$p("Registration Failed!",
                         style = "color: red; font-weight: 600;
                                     padding-top: 5px;font-size:16px;",
-                        class = "text-center"))),
-            )
+                        class = "text-center"))))
         )
     
     
