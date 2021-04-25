@@ -69,14 +69,16 @@ ui <- dashboardPage(
 # Variable: Global
 server <- function(input, output, session) {
     # Validate everytime user login
-    login = FALSE
+    login <- FALSE
     id = 1
-    register = FALSE
+    register <- FALSE
     isValid <- FALSE
+    save <- FALSE
     
     USER <- reactiveValues(login = login,
                            id=id,
-                           register=register)
+                           register=register,
+                           save = save)
     
     # get the transactionlist
     connection<-getConnection()
@@ -362,8 +364,6 @@ server <- function(input, output, session) {
     )
     
     
-    
-    
     UserBankingUI <- fluidPage(
         tags$em(tags$h3("User Bank Account", class = "text-primary")),
         box(width = 12,
@@ -485,7 +485,177 @@ server <- function(input, output, session) {
                 ),easyClose = TRUE))))
     }# End entryform
     
-
+    
+    observeEvent(input$forgotPassword, priority = 21, showModal(modalDialog(
+        div(
+            id="forgotPassword_form",
+            tags$head(tags$style(".modal-dialog{ width:500px}")),
+            tags$head(tags$style(
+                HTML(".shiny-split-layout > div {overflow: visible}")))
+            ,fluidPage(
+                tags$h2("RESET PASSWORD", class = "text-center", style = "padding-top: 0;color:#333; font-weight:600;"),
+                textInput(
+                    "userid",
+                    placeholder = "Enter User Id",
+                    label = tagList(icon("user"), "User Id")
+                ),
+                passwordInput(
+                    "npasswd",
+                    placeholder = "Enter new password",
+                    label = tagList(icon("unlock-alt"), "New Password")
+                ),
+                passwordInput(
+                    "rpasswd",
+                    placeholder = "Retype Password",
+                    label = tagList(icon("unlock-alt"), "Retype Password")
+                ),
+                br(),
+                div(
+                    style = "text-align: center;",
+                    useShinyalert(),
+                    actionButton("save","SAVE",
+                                 style = "color: white; background-color:#3c8dbc;
+                                 padding: 10px 15px; width: 150px; cursor: pointer;
+                                 font-size: 18px; font-weight: 600;"
+                    ),br(),
+                    
+                    shinyjs::hidden(div(
+                        id = "nomatch",
+                        tags$p(
+                            "Password update failed.Please enter valid username and try again!",
+                            style = "color: red; font-weight: 600;
+                                            padding-top: 5px;font-size:16px;",
+                            class = "text-center"
+                        ),)),
+                )
+            ),easyClose = TRUE
+            
+        )
+    )))
+    
+    
+    # @Swetha
+    observeEvent(input$save, {
+        if (USER$save == FALSE & isValid == FALSE) {
+            if (!is.null(input$save)) {
+                if (input$save > 0) {
+                    msg1 <- ""
+                    msg2 <- ""
+                    msg3 <- ""
+                    msg4 <- ""
+                    
+                    isValid <- TRUE
+                    
+                    if (input$userid == "") {
+                        msg1 <- "Please Enter a Valid User Id.\n"
+                        print(msg1)
+                    }
+                    userid <- isolate(input$userid)
+                    
+                    
+                    if (input$npasswd == "") {
+                        msg2 <- "Please Enter a Valid Password.\n"
+                        print(msg2)
+                    }
+                    npasswd <- isolate(input$npasswd)
+                    
+                    if (input$rpasswd == "") {
+                        msg3 <- "Please Re-Enter a Valid Password.\n"
+                        print(msg3)
+                    }
+                    rpasswd <- isolate(input$rpasswd)
+                    
+                    if (input$rpasswd != npasswd) {
+                        msg4 <- "Passwords not matching.\n"
+                        print(msg4)
+                    }
+                    # concatenate two strings using paste function
+                    result = paste(msg1,
+                                   msg2,
+                                   msg3,
+                                   msg4,
+                                   sep = "")
+                    if (!is.null(result) && nchar(result) > 0) {
+                        shinyalert(result, type = "error")
+                        print("Something wrong.")
+                        isValid <- FALSE
+                        result <- ""
+                        return(NULL)
+                    }
+                    isValid <- TRUE
+                    pswdUpdated <- updatePassword(userid, npasswd)
+                    
+                    if (pswdUpdated) {
+                        USER$save <- TRUE
+                        
+                    } else {
+                        shinyjs::toggle(
+                            id = "nomatch",
+                            anim = TRUE,
+                            time = 1,
+                            animType = "fade"
+                        )
+                        shinyjs::delay(
+                            3000,
+                            shinyjs::toggle(
+                                id = "nomatch",
+                                anim = TRUE,
+                                time = 1,
+                                animType = "fade"
+                            )
+                        )
+                    }
+                    
+                }
+            }
+        }
+    })
+    
+    
+    updatePassword <- function(userid, npasswrd) {
+        print("inside updatePassword")
+        print(npasswrd)
+        drv <- dbDriver("MySQL")
+        isUpdated <- 0
+        mydb <- getConnection()
+        isUpdated <- updateUserDetails(mydb, userid, npasswrd)
+        
+        
+        if (isUpdated >= 1) {
+            shinyalert("Password Updated Successfully!!")
+            isValid <- TRUE
+        }
+        else {
+            print("Password Update Failed")
+            isValid <- FALSE
+        }
+        
+        return(isValid)
+    }
+    
+    ##UPDATE EXISTING USER
+    updateUserDetails <- function(connection, userid, npasswrd) {
+        ##Update user_details
+        
+        
+        query <-
+            sprintf(
+                "update user_details set login_password='%s' where login_username='%s'",
+                npasswrd,
+                userid
+            )
+        
+        rs = dbSendStatement(connection, query)
+        isSaved <- (dbGetRowsAffected(rs))
+        print(paste("Log: User record updated success:", isSaved))
+        dbClearResult(rs)
+        dbDisconnect(connection)
+        return(isSaved)
+        
+    }
+    
+    
+    
     # @Swetha @Truc
     # 
     observeEvent(input$registerButton, priority = 20,showModal(modalDialog(div(
@@ -736,7 +906,7 @@ server <- function(input, output, session) {
             
         tags$br(),
         box(width=12, DT::dataTableOutput("transtable2")),
-        
+        verbatimTextOutput("RowSelected"),
 
         tags$em(tags$h3("Transaction Map", class = "text-primary")),
         box(width=12,sidebarLayout(
@@ -857,13 +1027,15 @@ server <- function(input, output, session) {
     
     
     observeEvent(input$submit_edit, priority = 20, {
-        SQL_df <- UserTransaction()
-        row_selection <-
-            SQL_df[input$transtable2_row_last_clicked, "row_id"]
         
+        row_selection <-as.numeric(input$transtable2_row_last_clicked)
         categoryId<-getCategoryIdFromCategoryName((input$Category))
         connection<-getConnection()
-        UpdateCategoryForTransaction(USER$id, categoryId, row_selection, connections)
+        print(row_selection)
+        print(USER$id)
+        print(categoryId)
+        print(connection)
+        #UpdateCategoryForTransaction(USER$id, categoryId, row_selection, connection)
         removeModal()
     })
     
@@ -874,7 +1046,8 @@ server <- function(input, output, session) {
     # Variable: Local
     output$transtable2 <- DT::renderDataTable({
         df<-responses_df()
-        df[,c('Type','Date','Time','Store Name', 'Card','Category','Amount')]
+        datatable(df[,c('Type','Date','Time','Store Name', 'Card','Category','Amount')],
+                  selection = 'single')
     })
     
     
@@ -1129,6 +1302,11 @@ server <- function(input, output, session) {
                ", From ",  min(UserTransaction()$Date),
                " To ",max(UserTransaction()$Date))})
     
+    output$RowSelected<-renderText({
+       
+        
+        paste0("Row= ",  input$transtable2_rows_selected)})
+    
     
     # @Truc
     # Function:  output$Income
@@ -1191,6 +1369,10 @@ server <- function(input, output, session) {
                            panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) 
     })
 }
+
+
+connection<-getConnection()
+UpdateCategoryForTransaction(1, 18, 1, connection)
 
 
 # @Swetha @Truc
