@@ -467,41 +467,27 @@ server <- function(input, output, session) {
     })
     # End output$body
     
-    #Form for data entry
+    
+    # @Truc
+    # Form for data entry
     entry_form <- function(button_id) {
         showModal(modalDialog(div(
             id = ("entry_form"),
             tags$head(tags$style(".modal-dialog{ width:400px}")),
             tags$head(tags$style(
-                HTML(".shiny-split-layout > div {overflow: visible}")
-            )),
-            fluidPage(
-                fluidRow(
-                    textInput(
-                        "Store",
-                        labelMandatory("Store Name"),
-                        placeholder = ""
-                    ),
-                    textInput(
-                        "Amount",
-                        labelMandatory("Amount"),
-                        placeholder = ""
-                    ),
-                    selectInput(
-                        "Category",
-                        labelMandatory("Category"),
-                        multiple = FALSE,
-                        choices = TransactionList$Category
-                    ),
+                HTML(".shiny-split-layout > div {overflow: visible}"))),
+            fluidPage(fluidRow(
+                    textInput("Store",labelMandatory("Store Name"),placeholder = ""),
+                    textInput("Amount",labelMandatory("Amount"),placeholder = ""),
+                    selectInput("Category",labelMandatory("Category"),multiple = FALSE,
+                        choices = TransactionList$Category),
                     actionButton(button_id, "Submit")
-                ),
-                easyClose = TRUE
-            )
-        )))
-    }
+                ),easyClose = TRUE))))
+    }# End entryform
     
 
-    
+    # @Swetha @Truc
+    # 
     observeEvent(input$registerButton, priority = 20,showModal(modalDialog(div(
         id = ("register_form"),
         tags$head(tags$style(".modal-dialog{ width:800px}")),
@@ -554,16 +540,17 @@ server <- function(input, output, session) {
                                                style = "color: red; font-weight: 600;
                                     padding-top: 5px;font-size:16px;",
                                                class = "text-center")))))
-        ),
-        easyClose = TRUE
+        ),easyClose = TRUE
     ))))
+    
     
     observeEvent(input$register, {
         #    obsC <- observe({
         if (USER$register == FALSE & isValid == FALSE) {
             if (!is.null(input$register)) {
                 if (input$register > 0) {
-                    #   req(input$userName)
+                    
+                    msg0 <- ""
                     msg1 <- ""
                     msg2 <- ""
                     msg3 <- ""
@@ -573,7 +560,15 @@ server <- function(input, output, session) {
                     msg7 <- ""
                     msg8 <- ""
                     msg9 <- ""
+                    
                     isValid <- TRUE
+                    
+                    connection<-getConnection()
+                    
+                    if (checkUserIDExist(input$registerUserName,connection) == TRUE) {
+                        msg0 <- "Username is already exist.\n"
+                        print(msg0)
+                    }
                     
                     if (input$registerUserName == "") {
                         msg1 <- "Please Enter a Valid User Name.\n"
@@ -645,7 +640,7 @@ server <- function(input, output, session) {
                     UserIncome <- isolate(input$income)
                     
                     # concatenate two strings using paste function
-                    result = paste(msg1, msg2,msg3,msg4, msg5,msg6, msg7,msg8,msg9,sep = "")
+                    result = paste(msg0,msg1, msg2,msg3,msg4, msg5,msg6, msg7,msg8,msg9,sep = "")
                     
                     if (!is.null(result) && nchar(result) > 0) {
                         shinyalert(result, type = "error")
@@ -725,6 +720,7 @@ server <- function(input, output, session) {
         }
     })
     
+    
     # @Truc
     # Function:  AllTransactionUI 
     # Component: UI, where the regular user interact with data and UI
@@ -747,7 +743,6 @@ server <- function(input, output, session) {
             sidebarPanel( noteTransactionMap()),
             mainPanel(leafletOutput("transMap")))),
         printMainAuthority()
-        
     )
     
     
@@ -788,14 +783,8 @@ server <- function(input, output, session) {
         if (!dbHasCompleted(rs)) {
             chunk <- dbFetch(rs, n = 1)
             
-            if (nrow(chunk) == 1) {
-                #print("Authentication SUCCESSFUL")
-                isValid <- TRUE
-            }
-            else {
-                #print("Authentication FAILED")
-                isValid <- FALSE
-            }
+            if (nrow(chunk) == 1) {isValid <- TRUE}
+            else {isValid <- FALSE}
         }
         
         # Clear the connection and stop the application
@@ -817,8 +806,7 @@ server <- function(input, output, session) {
         df<-UserInformation()
         datatable(
             df[,c("name_on_card", "address", "date_of_birth", "login_username", "login_password", "income")],
-            options = list(autoWidth = TRUE,searching = FALSE)
-        )
+            options = list(autoWidth = TRUE,searching = FALSE))
     })
     # End output$userInformation
     
@@ -861,10 +849,12 @@ server <- function(input, output, session) {
         removeModal()
     })
     
+    
     observeEvent(input$register, priority = 20, {
         shinyjs::reset("register_form")
         removeModal()
     })
+    
     
     observeEvent(input$submit_edit, priority = 20, {
         SQL_df <- UserTransaction()
@@ -872,12 +862,8 @@ server <- function(input, output, session) {
             SQL_df[input$transtable2_row_last_clicked, "row_id"]
         
         categoryId<-getCategoryIdFromCategoryName((input$Category))
-
         connection<-getConnection()
-        
         UpdateCategoryForTransaction(USER$id, categoryId, row_selection, connections)
-        
-
         removeModal()
     })
     
@@ -995,7 +981,7 @@ server <- function(input, output, session) {
     output$lineplot1Info <- renderText({
         paste0("Amount = $ ", round(as.numeric(input$lineplot1_click$y),2))
     })
-    # End 
+    # End output$lineplot1Info
     
     
     # @Truc
@@ -1041,25 +1027,15 @@ server <- function(input, output, session) {
     output$lineplot <- renderPlot({
         color = "#434343"
         par(mar = c(4, 4, 1, 1))
-        plot(
-            x = selected_User()$date,
-            y = selected_User()$amount,
-            type = "o",
-            xlab = "Date",
-            ylab = "Amount",
-            col = color,
-            fg = color,
-            col.lab = color,
-            col.axis = color
-        )
+        plot(x = selected_User()$date,y = selected_User()$amount,
+            type = "o",xlab = "Date",ylab = "Amount",col = color,fg = color,
+            col.lab = color,col.axis = color)
         # Display only if smoother is checked
         if (input$smoother) {
-            smooth_curve <-
-                lowess(
+            smooth_curve <-lowess(
                     x = as.numeric(selected_User()$date),
                     y = selected_User()$amount,
-                    f = input$f
-                )
+                    f = input$f)
             lines(smooth_curve, col = "#E6553A", lwd = 3)
         }
     })
