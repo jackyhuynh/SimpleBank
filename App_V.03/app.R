@@ -1029,13 +1029,15 @@ server <- function(input, output, session) {
     observeEvent(input$submit_edit, priority = 20, {
         
         row_selection <-as.numeric(input$transtable2_row_last_clicked)
-        categoryId<-getCategoryIdFromCategoryName((input$Category))
+        categoryId<-as.numeric(getCategoryIdFromCategoryName((input$Category)))
         connection<-getConnection()
+        
         print(row_selection)
         print(USER$id)
         print(categoryId)
         print(connection)
-        #UpdateCategoryForTransaction(USER$id, categoryId, row_selection, connection)
+        
+        UpdateCategoryForTransaction(as.numeric(USER$id), categoryId, row_selection, connection)
         removeModal()
     })
     
@@ -1371,8 +1373,7 @@ server <- function(input, output, session) {
 }
 
 
-connection<-getConnection()
-UpdateCategoryForTransaction(1, 18, 1, connection)
+
 
 
 # @Swetha @Truc
