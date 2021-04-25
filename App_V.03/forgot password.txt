@@ -1,0 +1,202 @@
+library(shiny)
+library(shinydashboard)
+library(shinythemes) # themes for css
+library(dplyr)
+library(shinyjs)
+library(sodium)
+library(shinyauthr)
+library(RMySQL)
+library(sqldf)
+library(readr) # read data in
+library(shiny.router)# link different panels
+library(shinyalert)
+library(shinyFeedback)
+
+
+source("modules/sql_api.R")
+
+
+fppage <-
+    div(
+        id = "fppage",
+        style = "width: 500px; max-width: 100%; margin: 0 auto; padding: 20px;",
+        wellPanel(
+            tags$h2("RESET PASSWORD", class = "text-center", style = "padding-top: 0;color:#333; font-weight:600;"),
+            textInput(
+                "userid",
+                placeholder = "Enter User Id",
+                label = tagList(icon("user"), "User Id")
+            ),
+            passwordInput(
+                "npasswd",
+                placeholder = "Enter new password",
+                label = tagList(icon("unlock-alt"), "New Password")
+            ),
+            passwordInput(
+                "rpasswd",
+                placeholder = "Retype Password",
+                label = tagList(icon("unlock-alt"), "Retype Password")
+            ),
+            br(),
+            div(
+                style = "text-align: center;",
+                useShinyalert(),
+                actionButton(
+                    "save",
+                    "SAVE",
+                    style = "color: white; background-color:#3c8dbc;
+                                 padding: 10px 15px; width: 150px; cursor: pointer;
+                                 font-size: 18px; font-weight: 600;"
+                ),
+                br(),
+                
+                shinyjs::hidden(div(
+                    id = "nomatch",
+                    tags$p(
+                        "Password update failed.Please enter valid username and try again!",
+                        style = "color: red; font-weight: 600;
+                                            padding-top: 5px;font-size:16px;",
+                        class = "text-center"
+                    ),
+                    
+                )),
+            )
+        )
+    )
+
+
+server <- function(input, output, session) {
+    ##Router
+    router$server(input, output, session, clicks = reactive(input$clicks))
+    save = FALSE
+    USER <- reactiveValues(save = save)
+    
+    isValid <- FALSE
+    # observe({
+    observeEvent(input$save, {
+        if (USER$save == FALSE & isValid == FALSE) {
+            if (!is.null(input$save)) {
+                if (input$save > 0) {
+                    msg1 <- ""
+                    msg2 <- ""
+                    msg3 <- ""
+                    msg4 <- ""
+                    
+                    isValid <- TRUE
+                    
+                    if (input$userid == "") {
+                        msg1 <- "Please Enter a Valid User Id.\n"
+                        print(msg1)
+                    }
+                    userid <- isolate(input$userid)
+                    
+                    
+                    if (input$npasswd == "") {
+                        msg2 <- "Please Enter a Valid Password.\n"
+                        print(msg2)
+                    }
+                    npasswd <- isolate(input$npasswd)
+                    
+                    if (input$rpasswd == "") {
+                        msg3 <- "Please Re-Enter a Valid Password.\n"
+                        print(msg3)
+                    }
+                    rpasswd <- isolate(input$rpasswd)
+                    
+                    if (input$rpasswd != npasswd) {
+                        msg4 <- "Passwords not matching.\n"
+                        print(msg4)
+                    }
+                    # concatenate two strings using paste function
+                    result = paste(msg1,
+                                   msg2,
+                                   msg3,
+                                   msg4,
+                                   sep = "")
+                    if (!is.null(result) && nchar(result) > 0) {
+                        shinyalert(result, type = "error")
+                        print("Something wrong.")
+                        isValid <- FALSE
+                        result <- ""
+                        return(NULL)
+                    }
+                    isValid <- TRUE
+                    pswdUpdated <- updatePassword(userid, npasswd)
+                    
+                    if (pswdUpdated) {
+                        USER$save <- TRUE
+                        
+                    } else {
+                        shinyjs::toggle(
+                            id = "nomatch",
+                            anim = TRUE,
+                            time = 1,
+                            animType = "fade"
+                        )
+                        shinyjs::delay(
+                            3000,
+                            shinyjs::toggle(
+                                id = "nomatch",
+                                anim = TRUE,
+                                time = 1,
+                                animType = "fade"
+                            )
+                        )
+                    }
+                    
+                }
+            }
+        }
+    })
+    
+    output$body <- renderUI({
+        req(fppage)
+        #javascript:window.location.reload(true)
+        
+    })
+    
+    updatePassword <- function(userid, npasswrd) {
+        print("inside updatePassword")
+        print(npasswrd)
+        drv <- dbDriver("MySQL")
+        isUpdated <- 0
+        mydb <- getConnection()
+        isUpdated <- updateUserDetails(mydb, userid, npasswrd)
+        
+        
+        if (isUpdated >= 1) {
+            shinyalert("Password Updated Successfully!!")
+            isValid <- TRUE
+        }
+        else {
+            print("Password Update Failed")
+            isValid <- FALSE
+        }
+        
+        return(isValid)
+    }
+    
+    ##UPDATE EXISTING USER
+    updateUserDetails <- function(connection, userid, npasswrd) {
+        ##Update user_details
+        
+        
+        query <-
+            sprintf(
+                "update user_details set login_password='%s' where login_username='%s'",
+                npasswrd,
+                userid
+            )
+        
+        rs = dbSendStatement(connection, query)
+        isSaved <- (dbGetRowsAffected(rs))
+        print(paste("Log: User record updated success:", isSaved))
+        dbClearResult(rs)
+        dbDisconnect(connection)
+        return(isSaved)
+        
+    }
+    
+}
+
+runApp(list(ui = ui, server = server), launch.browser = TRUE)
