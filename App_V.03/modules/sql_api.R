@@ -117,7 +117,14 @@ createNewUserTransactionTable <- function(username, password){
   data = fetch(rs, n= -1);
   if(nrow(data) == 1){
     userId <- head(data, n=1);
-    query <- sprintf("create table user_transaction_user_id_%s( transaction_id int not null auto_increment, card_id_fk int, category_id_fk int, locationid_id_fk int, amount double, date_of_transaction varchar(20), time_of_transaction time, transaction_type enum('Credit', 'Debit'), deleted int default 1, primary key (transaction_id), foreign key (card_id_fk) references card_details(card_id), foreign key (category_id_fk) references category(category_id), foreign key (locationid_id_fk) references locations(location_id) )auto_increment=1;", userId);
+    query <- sprintf("create table user_transaction_user_id_%s( transaction_id int not null auto_increment, 
+                     card_id_fk int, category_id_fk int, locationid_id_fk int, amount double, 
+                     date_of_transaction varchar(20), time_of_transaction time, 
+                     transaction_type enum('Credit', 'Debit'), deleted int default 1, 
+                     primary key (transaction_id), foreign key (card_id_fk) references card_details(card_id), 
+                     foreign key (category_id_fk) references category(category_id), foreign key (locationid_id_fk) 
+                     references locations(location_id) )auto_increment=1;", userId);
+    
     rs = dbSendStatement(connection, query);
     dbDisconnect(connection);
   } else{
@@ -275,7 +282,7 @@ checkUserIDExist <- function(username, connection){
 
 ##UPDATE TRANSACTION CATEGRORY
 
-UpdateCategoryForTransaction <- function(user_id, categoryId, transactionId,connections){
+UpdateCategoryForTransaction <- function(user_id, categoryId, transactionId,connection){
   
   ##Update user_details
   query <- sprintf("update user_transaction_user_id_%s set category_id_fk = %s where transaction_id = %s and deleted=1",
@@ -290,3 +297,4 @@ UpdateCategoryForTransaction <- function(user_id, categoryId, transactionId,conn
   
   return(value)
 }
+
