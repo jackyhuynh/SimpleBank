@@ -80,18 +80,19 @@ server <- function(input, output, session) {
                            register=register,
                            save = save)
     
+    # @Truc
     # get the transactionlist
     connection<-getConnection()
     TransactionList <- getCategoryList(connection)
     
 
-    
+    # @Truc
+    # get The Category Name
     getCategoryIdFromCategoryName <- function(CategoryName)
     {
         for (i in 1:nrow(TransactionList)) {
             if (TransactionList[i, ]$Category == CategoryName)
-                return (TransactionList[i, ]$cid)
-        }
+                return (TransactionList[i, ]$cid) }
         return (0)
     }
     
@@ -1027,20 +1028,25 @@ server <- function(input, output, session) {
     
     
     observeEvent(input$submit_edit, priority = 20, {
-        
-        row_selection <-as.numeric(input$transtable2_row_last_clicked)
+        row_selection <-input$transtable2_row_last_clicked
         categoryId<-as.numeric(getCategoryIdFromCategoryName((input$Category)))
+
+        # print(as.numeric(USER$id))
+        # print(categoryId)
+        # print(row_selection)
+        # print(connection)
+        
         connection<-getConnection()
-        
-        print(row_selection)
-        print(USER$id)
-        print(categoryId)
-        print(connection)
-        
         UpdateCategoryForTransaction(as.numeric(USER$id), categoryId, row_selection, connection)
+
         removeModal()
     })
     
+    
+    # updateCategory<-function(categoryId,row_selection){
+    #     connection<-getConnection()
+    #     UpdateCategoryForTransaction(as.numeric(USER$id), categoryId, row_selection, connection)
+    # }
     
     # @Truc
     # Function:  output$transtable2 
@@ -1050,6 +1056,7 @@ server <- function(input, output, session) {
         df<-responses_df()
         datatable(df[,c('Type','Date','Time','Store Name', 'Card','Category','Amount')],
                   selection = 'single')
+        
     })
     
     
@@ -1305,8 +1312,6 @@ server <- function(input, output, session) {
                " To ",max(UserTransaction()$Date))})
     
     output$RowSelected<-renderText({
-       
-        
         paste0("Row= ",  input$transtable2_rows_selected)})
     
     
@@ -1371,9 +1376,6 @@ server <- function(input, output, session) {
                            panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) 
     })
 }
-
-
-
 
 
 # @Swetha @Truc
