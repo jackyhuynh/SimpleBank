@@ -65,9 +65,12 @@ getConnection <- function(){
 ##ADD NEW USER
 addNewUser <- function(connection, userObject){
   
-  query <- sprintf("insert into user_details(name_on_card, address, user_ssn, date_of_birth, login_username, login_password,income) 
-                   values('%s', '%s', '%s', '%s', '%s', '%s', '%s');", 
-                   userObject@name, userObject@address, userObject@ssn, userObject@dob, userObject@username, userObject@password, userObject@income);
+  query <- sprintf("insert into user_details(name_on_card, address, user_ssn, 
+                    date_of_birth, login_username, login_password,income) 
+                    values('%s', '%s', '%s', '%s', '%s', '%s', '%s');", 
+                    userObject@name, userObject@address, userObject@ssn, userObject@dob, 
+                    userObject@username, userObject@password, userObject@income);
+  
   rs = dbSendStatement(connection, query);
   result<-dbHasCompleted(rs)
   print(paste("Log: User record inserted success:",result ));
@@ -125,10 +128,7 @@ createNewUserTransactionTable <- function(username, password){
 }
 
 
-
-
 # @Truc
-#
 # Logic: Get the User Information from User ID
 # Component: Logic
 # Variable: Global Function
@@ -149,7 +149,6 @@ getUserInfo <- function(userid, connection){
 
 
 # @Truc
-#
 # Get all the user cards with user id
 # Component: Logic
 # Variable: Global Function
@@ -166,8 +165,6 @@ getAllUserCards<-function(userid, connection){
   
   return(cards)
 }
-
-
 
 
 # @Truc
@@ -187,9 +184,6 @@ addNewCard <- function(connection, cardObject){
   
   return(result); 
 }
-
-
-
 
 
 # @ Wrucha
@@ -239,8 +233,6 @@ order by t.transaction_id;", userId,TransType)
 }
 
 
-
-
 # @Wrucha
 ##GET ALL CATEGORY NAMES 
 getCategoryList <- function(connection){
@@ -257,8 +249,25 @@ getCategoryList <- function(connection){
 }
 
 
-
-
-connection<-getConnection()
-
-
+# @Truc
+##USER AUTHENTICATION
+checkUserIDExist <- function(username, connection){
+  query <- sprintf("select user_id from user_details where login_username= '%s' 
+                   and deleted=1;", username);
+  
+  rs <- dbSendQuery(connection, query);
+  data <- fetch(rs, n= -1);  
+  
+  # Clean up the connection
+  # Prevent Open Connection and injection
+  dbClearResult(rs)
+  dbDisconnect(connection) # Clean up the connection
+  
+  if(nrow(data) == 1){
+    print(paste("Log: Username is exist:", username));
+    return(TRUE)
+  } else{
+    print(paste("Log : Username is not exist:", username));
+    return(FALSE)
+  }
+}
