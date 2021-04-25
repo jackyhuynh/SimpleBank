@@ -39,14 +39,13 @@ loginpage <-
                                  font-size: 18px; font-weight: 600;"),
             tags$div(),
             actionButton("registerButton","REGISTER",
-              
               style = "color: white; background-color:#3c8dbc;
                                  padding: 10px 15px; width: 150px; cursor: pointer;
                                  font-size: 18px; font-weight: 600;")
           )
         ),
           
-        
+        # Hidden string for user notification
         shinyjs::hidden(div(
           id = "nomatch",
           tags$p(
@@ -55,7 +54,16 @@ loginpage <-
                                             padding-top: 5px;font-size:16px;",
             class = "text-center"
           )
-        )),br())))
+        )),br(),br(),
+        
+        tags$p(
+          "Click forgot password to reset your password!",style="color: red"),
+        tags$div(
+          actionLink("forgotPassword", "FORGOT PASSWORD",
+                     style="color: black; width: 150px; cursor: pointer;
+                                 font-size: 18px; font-weight: 600;")
+        )
+        )))
 # End Main Login UI
 
 
