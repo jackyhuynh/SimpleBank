@@ -1,3 +1,17 @@
+##Class for Card
+setClass("card", slots=list(cardId="numeric", userId="numeric", cardNumber="numeric", 
+                            expirationDate="character", cardName="character"))
+
+
+##Create Classes used 
+setClass("user", slots=list(userid="numeric", name="character",  address="character",
+                            ssn="numeric", dob="character", username="character", password="character", income="numeric"));
+
+#########################################################
+# @USER BANK DATA
+#########################################################
+
+
 # @ Truc
 #
 # Name: geUsertBankTrans
@@ -43,13 +57,139 @@ getConnection <- function(){
 };
 
 
+#########################################################
+# @METHOD TO MODIFY USER, AND USER ID RETRIVE INFO
+#########################################################
+
+# @ Wrucha
+##ADD NEW USER
 addNewUser <- function(connection, userObject){
   
-  query <- sprintf("insert into user_details(name_on_card, address, user_ssn, date_of_birth, login_username, login_password) values('%s', '%s', '%s', STR_TO_DATE ('%s','%s'), '%s', '%s');", userObject@name, userObject@address, userObject@ssn, userObject@dob, "%m/%d/%Y", userObject@username, userObject@password);
+  query <- sprintf("insert into user_details(name_on_card, address, user_ssn, date_of_birth, login_username, login_password,income) 
+                   values('%s', '%s', '%s', '%s', '%s', '%s', '%s');", 
+                   userObject@name, userObject@address, userObject@ssn, userObject@dob, userObject@username, userObject@password, userObject@income);
   rs = dbSendStatement(connection, query);
-  print(paste("Log: User record inserted success:", dbHasCompleted(rs)));
-  return(dbHasCompleted(rs)); 
+  result<-dbHasCompleted(rs)
+  print(paste("Log: User record inserted success:",result ));
+  
+  # Clear all the result
+  dbClearResult(rs)
+  dbDisconnect(connection)
+  
+  return(result); 
 };
+
+
+# @Wrucha
+##USER AUTHENTICATION
+getUserID <- function(username, password, connection){
+  query <- sprintf("select user_id from user_details where login_username= '%s' 
+                   and login_password= '%s' and deleted=1;", username, password);
+  
+  rs <- dbSendQuery(connection, query);
+  data <- fetch(rs, n= -1);  
+  
+  # Clean up the connection
+  # Prevent Open Connection and injection
+  dbClearResult(rs)
+  dbDisconnect(connection) # Clean up the connection
+  
+  if(nrow(data) == 1){
+    print(paste("Log: Success found user:", username));
+    return(data)
+  } else{
+    print(paste("Log : Not found user:", username));
+    return(0)
+  }
+}
+
+
+# @Wrucha
+##CREATE NEW TABLE BASED IN USER ID
+createNewUserTransactionTable <- function(username, password){
+  connection <- getConnection();
+  query <- sprintf("select user_id from user_details where login_username= '%s'
+                   and login_password= '%s' and deleted=1;", username, password);
+  rs = dbSendQuery(connection, query);
+  data = fetch(rs, n= -1);
+  if(nrow(data) == 1){
+    userId <- head(data, n=1);
+    query <- sprintf("create table user_transaction_user_id_%s( transaction_id int not null auto_increment, card_id_fk int, category_id_fk int, locationid_id_fk int, amount double, date_of_transaction varchar(20), time_of_transaction time, transaction_type enum('Credit', 'Debit'), deleted int default 1, primary key (transaction_id), foreign key (card_id_fk) references card_details(card_id), foreign key (category_id_fk) references category(category_id), foreign key (locationid_id_fk) references locations(location_id) )auto_increment=1;", userId);
+    rs = dbSendStatement(connection, query);
+    dbDisconnect(connection);
+  } else{
+    print(paste("Log : Not found user:", username));
+    dbDisconnect(connection);
+    return(0)
+  }
+}
+
+
+
+
+# @Truc
+#
+# Logic: Get the User Information from User ID
+# Component: Logic
+# Variable: Global Function
+getUserInfo <- function(userid, connection){
+  # Get the location list
+  rs <-dbSendQuery(connection,
+                   paste0("select * from user_details where deleted=1 and user_id='",userid,"'"))
+  
+  currentUser <- dbFetch(rs)
+  
+  # Clean up the connection
+  # Prevent Open Connection and injection
+  dbClearResult(rs)
+  dbDisconnect(connection) 
+  
+  return (currentUser)
+}
+
+
+# @Truc
+#
+# Get all the user cards with user id
+# Component: Logic
+# Variable: Global Function
+getAllUserCards<-function(userid, connection){
+  query <- paste0(
+    "select * from card_details where deleted=1 and user_id_fk='",userid,"'")
+  rs <- dbSendQuery(connection, query)
+  cards <- dbFetch(rs, n=-1)
+  
+  # Clean up the connection
+  # Prevent Open Connection and injection
+  dbClearResult(rs)
+  dbDisconnect(connection)
+  
+  return(cards)
+}
+
+
+
+
+# @Truc
+## Add New Card to the database
+addNewCard <- function(connection, cardObject){
+  query <- sprintf("insert into card_details(user_id_fk, credit_card_number, expiration_date, name_of_card) 
+                   values('%s', '%s','%s' , '%s');", 
+                   cardObject@userId, cardObject@cardNumber, cardObject@expirationDate, cardObject@cardName)
+  
+  rs = dbSendStatement(connection, query);
+  result<-dbHasCompleted(rs)
+  print(paste("Log: Card inserted success:",result ));
+  
+  # Clear all the result
+  dbClearResult(rs)
+  dbDisconnect(connection)
+  
+  return(result); 
+}
+
+
+
 
 
 # @ Wrucha
@@ -99,30 +239,9 @@ order by t.transaction_id;", userId,TransType)
 }
 
 
+
+
 # @Wrucha
-##USER AUTHENTICATION
-getUserID <- function(username, password, connection){
-  query <- sprintf("select user_id from user_details where login_username= '%s' 
-                   and login_password= '%s' and deleted=1;", username, password);
-  
-  rs <- dbSendQuery(connection, query);
-  data <- fetch(rs, n= -1);  
-  
-  # Clean up the connection
-  # Prevent Open Connection and injection
-  dbClearResult(rs)
-  dbDisconnect(connection) # Clean up the connection
-  
-  if(nrow(data) == 1){
-    print(paste("Log: Success found user:", username));
-    return(data)
-  } else{
-    print(paste("Log : Not found user:", username));
-    return(0)
-  }
-}
-
-
 ##GET ALL CATEGORY NAMES 
 getCategoryList <- function(connection){
   query <- sprintf("select category_id as cid, category_name as Category from category where deleted=1;");
@@ -137,49 +256,9 @@ getCategoryList <- function(connection){
   return(categoryList);
 }
 
-# @Truc
-#
-# Logic: Get the User Information from User ID
-# Component: Logic
-# Variable: Global Function
-getUserInfo <- function(userid, connection){
-  # Get the location list
-  rs <-dbSendQuery(connection,
-                   paste0("select * from user_details where deleted=1 and user_id='",userid,"'"))
-  
-  currentUser <- dbFetch(rs)
-  
-  # Clean up the connection
-  # Prevent Open Connection and injection
-  dbClearResult(rs)
-  dbDisconnect(connection) 
-  
-  return (currentUser)
-}
 
 
-# @Truc
-#
-# Get all the user cards with user id
-# Component: Logic
-# Variable: Global Function
-getAllUserCards<-function(userid, connection){
-  query <- paste0(
-    "select * from card_details where deleted=1 and user_id_fk='",
-    userid,
-    "'"
-  )
-  rs <- dbSendQuery(connection, query)
-  cards <- dbFetch(rs, n=-1)
-  
-  # Clean up the connection
-  # Prevent Open Connection and injection
-  dbClearResult(rs)
-  dbDisconnect(connection)
-  
-  return(cards)
-}
 
-
+connection<-getConnection()
 
 
