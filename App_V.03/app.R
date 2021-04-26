@@ -486,7 +486,8 @@ server <- function(input, output, session) {
                 ),easyClose = TRUE))))
     }# End entryform
     
-    
+    # @Swetha
+    # Form for 'Forgot Password'
     observeEvent(input$forgotPassword, priority = 21, showModal(modalDialog(
         div(
             id="forgotPassword_form",
@@ -658,7 +659,7 @@ server <- function(input, output, session) {
     
     
     # @Swetha @Truc
-    # 
+    # Form for User Registration
     observeEvent(input$registerButton, priority = 20,showModal(modalDialog(div(
         id = ("register_form"),
         tags$head(tags$style(".modal-dialog{ width:800px}")),
