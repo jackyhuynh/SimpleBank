@@ -1,12 +1,3 @@
-##Class for Card
-setClass("card", slots=list(cardId="numeric", userId="numeric", cardNumber="numeric", 
-                            expirationDate="character", cardName="character"))
-
-
-##Create Classes used 
-setClass("user", slots=list(userid="numeric", name="character",  address="character",
-                            ssn="numeric", dob="character", username="character", password="character", income="numeric"));
-
 #########################################################
 # @USER BANK DATA
 #########################################################
