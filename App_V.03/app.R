@@ -1179,6 +1179,7 @@ server <- function(input, output, session) {
         validate(need(input$date[1] < input$date[2],
                       "Error: Start date should be earlier than end date."))
         
+        
         if (input$type == 'DEBIT'){
             UserDebit <-aggregate(select(UserData.Tidy[UserData.Tidy$details == 'DEBIT',],-details)['amount'],
                                   by = select(UserData.Tidy[UserData.Tidy$details == 'DEBIT',],-details)['date'],sum)
