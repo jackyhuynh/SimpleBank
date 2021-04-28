@@ -908,7 +908,7 @@ server <- function(input, output, session) {
             
         tags$br(),
         box(width=12, DT::dataTableOutput("transtable2")),
-        verbatimTextOutput("RowSelected"),
+        
 
         tags$em(tags$h3("Transaction Map", class = "text-primary")),
         box(width=12,sidebarLayout(
@@ -1311,9 +1311,6 @@ server <- function(input, output, session) {
         paste0("Amount = $ ", round(as.numeric(sum(UserTransaction()$Amount)),2),
                ", From ",  min(UserTransaction()$Date),
                " To ",max(UserTransaction()$Date))})
-    
-    output$RowSelected<-renderText({
-        paste0("Row= ",  input$transtable2_rows_selected)})
     
     
     # @Truc
