@@ -37,6 +37,103 @@ source("modules/DataClasses.R")
 source("modules/login_module.R")
 
 
+# @Swetha
+#
+# Name: Main login screen
+# Function: UI Component for Login Screen
+# Component: UI
+# Variable: Global
+
+
+
+loginpage <-
+    div(id = "loginpage",
+        
+        style = "width: 800px;height:800px; max-width: 100%;max-height: 100%; margin: 0 auto",
+        box( width=12,style="margin: 0 auto;",
+                 tags$img(src = "https://media.istockphoto.com/vectors/financial-analyst-business-finance-development-and-management-vector-id1139383454?k=6&m=1139383454&s=612x612&w=0&h=eZoUgg34gXVokvsbKLTKoj1ydi96MRKsOPl8LWKQlbo=",
+                          style ="width: 600px;height:300px;display: block;margin-left: auto;margin-right: auto;
+                          padding-top: 10px;padding-bottom: 10px;"),
+             
+        div(
+            style = "width: 500px; max-width: 100%; margin: 0 auto; padding: 20px;",
+            
+            
+            wellPanel(
+                tags$h2("LOG IN", class = "text-center", style = "padding-top: 0;color:#333; font-weight:600;"),
+                textInput(
+                    "userName",
+                    placeholder = "Username",
+                    label = tagList(icon("user"), "Username")
+                ),
+                passwordInput(
+                    "passwd",
+                    placeholder = "Password",
+                    label = tagList(icon("unlock-alt"), "Password")
+                ),
+                br(),
+                div(
+                    style = "text-align: center;",
+                    
+                    br(),
+                    
+                    tags$div(
+                        splitLayout(
+                            cellWidths = c("200px","15", "200px"),
+                            cellArgs = list(style = "vertical-align: top"),
+                            actionButton( "login","SIGN IN",
+                                          style = "color: white; background-color:#3c8dbc;
+                                 padding: 10px 15px; width: 150px; cursor: pointer;
+                                 font-size: 18px; font-weight: 600;"),
+                            tags$div(),
+                            actionButton("registerButton","REGISTER",
+                                         style = "color: white; background-color:#3c8dbc;
+                                 padding: 10px 15px; width: 150px; cursor: pointer;
+                                 font-size: 18px; font-weight: 600;")
+                        )
+                    ),
+                    
+                    # Hidden string for user notification
+                    shinyjs::hidden(div(
+                        id = "nomatch",
+                        tags$p(
+                            "Incorrect username or password!",
+                            style = "color: red; font-weight: 600;
+                                            padding-top: 5px;font-size:16px;",
+                            class = "text-center"
+                        )
+                    )),br(),br(),
+                    
+                    tags$p(
+                        "Click forgot password to reset your password!",style="color: red"),
+                    tags$div(
+                        actionLink("forgotPassword", "FORGOT PASSWORD",
+                                   style="color: black; width: 150px; cursor: pointer;
+                                 font-size: 18px; font-weight: 600;")
+                    )
+                )))))
+# End Main Login UI
+
+
+#  @Swetha
+# 
+# Function: Ignore lines 64-68 as they contain static user data
+# Component: UI
+# Variable: Global
+credentials = data.frame(
+    username_id = c("myuser", "myuser1"),
+    passod   = sapply(c("mypass", "mypass1"), password_store),
+    permission  = c("basic", "advanced"),
+    stringsAsFactors = F
+)
+
+
+
+
+
+
+
+
 # @Truc
 #
 # Function: getConnection, Create User data banking Account
