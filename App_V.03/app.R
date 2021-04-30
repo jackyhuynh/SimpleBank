@@ -53,7 +53,7 @@ loginpage <-
         box( width=12,style="margin: 0 auto;",
                  tags$img(src = "https://media.istockphoto.com/vectors/financial-analyst-business-finance-development-and-management-vector-id1139383454?k=6&m=1139383454&s=612x612&w=0&h=eZoUgg34gXVokvsbKLTKoj1ydi96MRKsOPl8LWKQlbo=",
                           style ="width: 600px;height:300px;display: block;margin-left: auto;margin-right: auto;
-                          padding-top: 10px;padding-bottom: 10px;"),
+                          padding-top: 20px;padding-bottom: 15px;"),
              
         div(
             style = "width: 500px; max-width: 100%; margin: 0 auto; padding: 20px;",
