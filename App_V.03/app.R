@@ -462,6 +462,11 @@ server <- function(input, output, session) {
     )
     
     
+    # @Truc
+    # Function:  UserBankingUI 
+    # Component: UI, Hold all the component of UserBanking UI which is the transaction list
+    #             the 3 chart that out put to the User Bankingg Page (3 tabs panel)
+    # Variable: Local
     UserBankingUI <- fluidPage(
         tags$em(tags$h3("User Bank Account", class = "text-primary")),
         box(width = 12,
@@ -484,6 +489,12 @@ server <- function(input, output, session) {
     )
     
     
+    # @Truc
+    # Function:  CategoryAnalystUI 
+    # Component: UI Component that contain the UI and Logic component to create
+    #           the Category Analyst UI: included categoryBarPlot, piePlotDebit
+    #           and Income VS. Expense Panel
+    # Variable: Local
     CategoryAnalystUI<-fluidPage(
         tags$em(tags$h3("Spending Summary by Category", class = "text-primary")),
         box(width = 12,
@@ -507,7 +518,12 @@ server <- function(input, output, session) {
     )
     
 
-    
+    # @Truc
+    # Function:  CardsAnalystUI 
+    # Component: UI, Component that contain the whole UI and Logic component that
+    #             create the Analyze by Cards Page, include: "AnalyzeByCard" plot
+    #             and AnalyzeByCardCategory plot
+    # Variable: Local
     CardsAnalystUI<- fluidPage(
         tags$em(tags$h3("Cards Analyzing by Total", class = "text-primary")),
         box(width = 12,
@@ -523,6 +539,10 @@ server <- function(input, output, session) {
     )
     
     
+    # @Truc
+    # Function:  HelpUI 
+    # Component: UI, Component for the Help Page
+    # Variable: Local
     HelpUI<-fluidPage(
         tags$em(tags$h3("Help Pages", class = "text-primary")),
         box(width = 12,
@@ -531,6 +551,10 @@ server <- function(input, output, session) {
     )
     
     
+    # @Truc
+    # Function:  SettingUI 
+    # Component: UI, Component for the Help Page
+    # Variable: Local
     SettingUI<-fluidPage(
         tags$em(tags$h3("Setting Pages", class = "text-primary")),
         box(width = 12,
@@ -583,6 +607,7 @@ server <- function(input, output, session) {
                 ),easyClose = TRUE))))
     }# End entryform
     
+    
     # @Swetha
     # Form for 'Forgot Password'
     observeEvent(input$forgotPassword, priority = 21, showModal(modalDialog(
@@ -634,6 +659,10 @@ server <- function(input, output, session) {
     
     
     # @Swetha
+    # Function: observeEvent for the save button
+    # Component: Logic, validate and verify user info before add user to the database
+    #             Support the Forgot Password Component
+    # Variable: Local
     observeEvent(input$save, {
         if (USER$save == FALSE & isValid == FALSE) {
             if (!is.null(input$save)) {
@@ -711,6 +740,11 @@ server <- function(input, output, session) {
     })
     
     
+    
+    # @Swetha
+    # Function: updatePassword for the login page
+    # Component: Logic, validate and verify update user password
+    # Variable: Local
     updatePassword <- function(userid, npasswrd) {
         print("inside updatePassword")
         print(npasswrd)
@@ -732,17 +766,14 @@ server <- function(input, output, session) {
         return(isValid)
     }
     
+    
+    # @Swetha
     ##UPDATE EXISTING USER
     updateUserDetails <- function(connection, userid, npasswrd) {
         ##Update user_details
-        
-        
         query <-
-            sprintf(
-                "update user_details set login_password='%s' where login_username='%s'",
-                npasswrd,
-                userid
-            )
+            sprintf("update user_details set login_password='%s' where login_username='%s'",
+                npasswrd,userid)
         
         rs = dbSendStatement(connection, query)
         isSaved <- (dbGetRowsAffected(rs))
@@ -750,13 +781,16 @@ server <- function(input, output, session) {
         dbClearResult(rs)
         dbDisconnect(connection)
         return(isSaved)
-        
     }
     
     
     
     # @Swetha @Truc
     # Form for User Registration
+    # Function: observeEvent for the registerButton button
+    # Component: UI Component for validate and verify user info before add user to the database
+    #             Support the Add New User Component/Registration Page
+    # Variable: Local
     observeEvent(input$registerButton, priority = 20,showModal(modalDialog(div(
         id = ("register_form"),
         tags$head(tags$style(".modal-dialog{ width:800px}")),
@@ -813,6 +847,12 @@ server <- function(input, output, session) {
     ))))
     
     
+    # @Swetha @Truc
+    # Form for User Registration
+    # Function: observeEvent for the register button
+    # Component: Logic validation and verify user info before add user to the database
+    #             Support the Add New User Component/Registration Page
+    # Variable: Local
     observeEvent(input$register, {
         #    obsC <- observe({
         if (USER$register == FALSE & isValid == FALSE) {
@@ -945,7 +985,10 @@ server <- function(input, output, session) {
     })
     
     
-    # This function register user
+    # @Swetha
+    # Function: This function register user
+    # Component: Logic, insert new user to the database
+    # Variable: Local
     register <- function(username,passwrd,MobileNumber,EmailID,SSN,CREDITCARDNUMBER,
                          CREDITCARDNAME,EXPIRYDATE,UserBirthDate, UserAddress, UserIncome) {
         
@@ -969,7 +1012,10 @@ server <- function(input, output, session) {
     
     
     
-    #edit data
+    # @Swetha
+    # Function: This function enable user to edit the transaction Category
+    # Component: Logic, observe the user click and transfer choosen data to the new form
+    # Variable: Local
     observeEvent(input$edit_button, priority = 20, {
         SQL_df <- UserTransaction()
         showModal(if (length(input$transtable2_rows_selected) > 1) {
@@ -1099,7 +1145,10 @@ server <- function(input, output, session) {
     ######################################################
    
     
-    #save form data into data_frame format
+    # @Truc
+    # Function:  save form data into data_frame format
+    # Component: Logic form data
+    # Variable: Local  
     formData <- reactive({
         formData <- data.frame(
             row_id = UUIDgenerate(),
@@ -1112,6 +1161,10 @@ server <- function(input, output, session) {
     })
     
     
+    # @Truc
+    # Function:  observeEvent submit button
+    # Component: Logic, Clear the entry form
+    # Variable: Local  
     observeEvent(input$submit, priority = 20, {
         appendData(formData())
         shinyjs::reset("entry_form")
@@ -1119,6 +1172,11 @@ server <- function(input, output, session) {
     })
     
     
+    
+    # @Truc
+    # Function:  obsrve register button
+    # Component: Logic, Clear the register form
+    # Variable: Local 
     observeEvent(input$register, priority = 20, {
         shinyjs::reset("register_form")
         removeModal()
@@ -1128,24 +1186,13 @@ server <- function(input, output, session) {
     observeEvent(input$submit_edit, priority = 20, {
         row_selection <-input$transtable2_row_last_clicked
         categoryId<-as.numeric(getCategoryIdFromCategoryName((input$Category)))
-
-        # print(as.numeric(USER$id))
-        # print(categoryId)
-        # print(row_selection)
-        # print(connection)
-        
         connection<-getConnection()
         UpdateCategoryForTransaction(as.numeric(USER$id), categoryId, row_selection, connection)
-
         removeModal()
     })
     
     
-    # updateCategory<-function(categoryId,row_selection){
-    #     connection<-getConnection()
-    #     UpdateCategoryForTransaction(as.numeric(USER$id), categoryId, row_selection, connection)
-    # }
-    
+
     # @Truc
     # Function:  output$transtable2 
     # Component: Logic, UI
@@ -1442,13 +1489,19 @@ server <- function(input, output, session) {
     #######################################
     
     
-    
+    # @Truc
+    # Function:  output$DisplayTotalCards
+    # Component: Logic, the list of user cards.
+    # Variable: Local
     output$DisplayTotalCards<-renderTable({
         UserCards <- aggregate(Amount~Card,data=UserTransaction(), FUN=sum)
     })
     
     
     # @Truc
+    # Function:  output$AnalyzeByCardCategory
+    # Component: Logic, dis play each user cards in each charts.
+    # Variable: Local
     output$AnalyzeByCardCategory<-renderPlot({
         SpendingByCard <- aggregate(Amount ~ Category + Card ,data = UserTransaction() ,FUN = sum)
         SpendingByCard$Card<-as.factor(SpendingByCard$Card)
@@ -1462,6 +1515,10 @@ server <- function(input, output, session) {
     })
     
     
+    # @Truc
+    # Function:  output$AnalyzeByCard
+    # Component: Logic, create The chart with all the card comparison 
+    # Variable: Local
     output$AnalyzeByCard<-renderPlot({
         UserCards <- aggregate(Amount~Card,data=UserTransaction(), FUN=sum)
         ggplot(UserCards, aes(y=Card, x=Amount, fill=Card)) + 
