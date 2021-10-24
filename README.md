@@ -5,7 +5,7 @@ The Expense Tracking and Analysis is a web application that built with Microsoft
 Its function is fairly simple, Expense Tracking allows user to track their expense in that month (or a period). The app will category the user’s expense base on a server’s database. The user also has the power to change the expense category, track their expense, change user profile, card details, personal info, and so much more. The Expense Tracking and Analysis also feature with AI to advise user with better spending habit (base on a user’s database and machine learning methodologies)
 
 ## Team member:
-    - Truc Huynh (TrucDev)
+    - Truc Huynh
     - Wrucha Nanal
     - Kristina Bond
     - Swetha Gidugu
