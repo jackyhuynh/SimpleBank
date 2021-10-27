@@ -28,8 +28,6 @@ The Expense Tracking and Analysis is a web application that built with R Shiny, 
 
 [R Shiny](https://shiny.rstudio.com/)
   
-  
- <iframe height="400" width="100%" frameborder="no" src="https://datasciencegenie.shinyapps.io/MyShinyApp/"> </iframe>
 
 
     
