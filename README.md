@@ -28,7 +28,7 @@ Its function is fairly simple, Expense Tracking allows user to track their expen
 ## Technology:
 [Microsoft AI platform](https://docs.microsoft.com/en-us/archive/msdn-magazine/2017/connect/artificial-intelligence-getting-started-with-microsoft-ai)
 
-
+[R Shiny](https://shiny.rstudio.com/)
   
 
 
