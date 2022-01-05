@@ -1,17 +1,19 @@
 # @ Author: Truc, Swetha, Wrucha
-packages = c("shiny","shinydashboard","shinythemes","dplyr","DT","shinyjs","sodium",
-             "odbc","RMySQL","sqldf","ggplot2","plotly","readr","tidyverse","leaflet",
-             "lubdricate","shinyalert","shinyFeedback","shinyauthr")
 
-package.check <- lapply(
-  packages,
-  FUN = function(x) {
-    if (!require(x, character.only = TRUE)) {
-      install.packages(x, dependencies = TRUE)
-      library(x, character.only = TRUE)
-    }
-  }
-)
+# Please run this to install all the packages before run the App
+# packages = c("shiny","shinydashboard","shinythemes","dplyr","DT","shinyjs","sodium",
+#              "odbc","RMySQL","sqldf","ggplot2","plotly","readr","tidyverse","leaflet",
+#              "lubdricate","shinyalert","shinyFeedback","shinyauthr")
+# 
+# package.check <- lapply(
+#   packages,
+#   FUN = function(x) {
+#     if (!require(x, character.only = TRUE)) {
+#       install.packages(x, dependencies = TRUE)
+#       library(x, character.only = TRUE)
+#     }
+#   }
+# )
 
 # Require library
 library(shiny)
