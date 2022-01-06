@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1641403008186.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "226589846",
+    "id" : "37382DE9",
+    "lastKnownWriteTime" : 1641492196,
+    "last_content_update" : 1641492196399,
+    "path" : "~/GitHub/User_Banking_and_Expense_Analyst/App_V.03/app.R",
+    "project_path" : "app.R",
+    "properties" : {
+        "cursorPosition" : "10,47",
+        "scrollLine" : "0"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
