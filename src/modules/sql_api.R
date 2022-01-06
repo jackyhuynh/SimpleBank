@@ -50,8 +50,9 @@ getTotalBalance<- function(UserData.Tidy)
 
 # @ Wrucha
 ##Only change user, password and host
+## Please use your own MysQL Server username and password app
 getConnection <- function(){
-  connection = dbConnect(MySQL(), user = 'root', password = 'Mys@khongbiet88', dbname = 'credit_card_analysis3',
+  connection = dbConnect(MySQL(), user = 'enter root here', password = 'enter password here', dbname = 'credit_card_analysis3',
                          host = 'localhost');
   return(connection);
 };
