@@ -2,7 +2,7 @@
 
 ## [CHECK IT OUT](https://www.loom.com/share/64f48d26c0de4ebeb174e3b1dd9dac01)
 
-## Ver.03
+## Introduction:
 - This is the 3rd Version of the App. Feature with data from the database and full feature of Extracting and Centralizing data.
 - Make sure you download and set up the MySQL Server(and connect to the database that I include in the data section) otherwise app will not work
 
@@ -56,31 +56,50 @@ getConnection <- function(){
 ## Introduction
 The Expense Tracking and Analysis is a web application that built with R Shiny, JavaScript, HTML, CSS. The app features password complexity and encryption and allowing multiple users(each user have their own table) to get access to the resource with the right username and password. Expense Tracking allows user to track their expense in that month (or a period). Just like other budget application: The app will category the user’s expense base on a server’s database, display bank statements, expense statements. The user also has the power to change the expense category, track their expense, change user profile, card details, personal info, and so much more. The Expense Tracking and Analysis also feature with AI to advise user with better spending habit (base on a user’s database and machine learning methodologies). App use MySQL to host data and R technology to design front and backend. Can be deploy using Docker.
 
-## Team member:
-    - Truc Huynh
-    - Wrucha Nanal
-    - Kristina Bond
-    - Swetha Gidugu
 
+## Component:
+- Back End (Database/Sever): MySQL, R
+- Front End (Gui, Database/Client/Machine Learning): R, Python, JavaScript, HTML
+- Development Framework: R Shiny
 
-### We should be able to build the following prototype(Web application) of the system:
-    - Design a database
-    - Build GUI
-    - Dashboard which generates graphs 
-    - View the transaction and update the transaction's list.
-    - Simulate and generate the report.
+## Technology
+List of technology
+- R Studio
+- Business Analyst
+- Machine Learning
+- Data Mining
+- Data Visualization
+- Machine Learning
 
+## Getting Started
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
-### Component:
-    - Back End (Database/Sever): MySQL, R
-    - Front End (Gui, Database/Client/Machine Learning): R, Python, JavaScript, HTML
-    - Development Framework: R Shiny
+### Data:
+Information about the data
 
-## Technology:
-[Microsoft AI platform](https://docs.microsoft.com/en-us/archive/msdn-magazine/2017/connect/artificial-intelligence-getting-started-with-microsoft-ai)
+### Prerequisites
+What things you need to install the software and how to install them:
+- R CRAN Project: R is a free software environment for statistical computing and graphics. It compiles and runs on a wide variety of UNIX platforms, Windows and MacOS
+- RStudio IDE: RStudio is an integrated development environment (IDE) for R. It includes a console, syntax-highlighting editor that supports direct code execution, as well as tools for plotting, history, debugging and workspace management. Click here to see more RStudio features. RStudio is available in open source and commercial editions and runs on the desktop (Windows, Mac, and Linux) or in a browser connected to RStudio Server or RStudio Server Pro (Debian/Ubuntu, Red Hat/CentOS, and SUSE Linux)
 
-[R Shiny](https://shiny.rstudio.com/)
-  
+### Installing
+A step by step series of examples that tell you how to get a development enviroment running:
+* [Install R](https://www.r-project.org/) - If you haven't downloaded and installed R, here's how to get started.
+* [R Studio IDE](https://rstudio.com/products/rstudio/#:~:text=RStudio%20Take%20control%20of%20your%20R%20code%20RStudio,tools%20for%20plotting,%20history,%20debugging%20and%20workspace%20management.) - After that choose R Studio Desktop, and the free version (unless you have the Pro install). R free version is pretty good IDE.
+
+## Built With
+* [R Studio IDE](https://rstudio.com/products/rstudio/#:~:text=RStudio%20Take%20control%20of%20your%20R%20code%20RStudio,tools%20for%20plotting,%20history,%20debugging%20and%20workspace%20management.) 
+* [R CRAN Project](https://www.r-project.org/) 
+
+## Authors
+
+* **Truc Huynh** - *Initial work* - [TrucDev](https://github.com/jackyhuynh)
+* **Wrucha Nanal** - *Initial work* -
+* **Kristina Bond** - *Initial work* -
+* **Swetha Gidugu** - *Initial work* -
+
+## Contribute:
+This project is closed and private, no contributing.
 
 
     
