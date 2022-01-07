@@ -6,6 +6,36 @@
 - This is the 3rd Version of the App. Feature with data from the database and full feature of Extracting and Centralizing data.
 - Make sure you download and set up the MySQL Server(and connect to the database that I include in the data section) otherwise app will not work
 - Multiple user with multiple database.
+<img src="https://github.com/jackyhuynh/User_Banking_and_Expense_Analyst/blob/master/images/miniversion_AdobeCreativeCloudExpress.gif">
+
+## Structure:
+#### Diagram:
+App structure diagram:
+* Feature password salting
+* password recover
+* multiple users own their seperate data
+* register new user
+<img src="https://github.com/jackyhuynh/User_Banking_and_Expense_Analyst/blob/master/images/useCaseDiagram.PNG">
+
+#### Register Page:
+- Register new user with all the validation: cards validation, passwords validation, email validation
+<img src="https://github.com/jackyhuynh/User_Banking_and_Expense_Analyst/blob/master/images/registration-user-info.PNG">
+- verify new user
+<img src="https://github.com/jackyhuynh/User_Banking_and_Expense_Analyst/blob/master/images/registration-verification.PNG">
+- reset password:
+<img src="https://github.com/jackyhuynh/User_Banking_and_Expense_Analyst/blob/master/images/reset-password.PNG">
+
+#### Home Page:
+<img src="https://github.com/jackyhuynh/User_Banking_and_Expense_Analyst/blob/master/images/home.JPG">
+
+#### Banking Page:
+<img src="https://github.com/jackyhuynh/User_Banking_and_Expense_Analyst/blob/master/images/banking.JPG">
+
+#### Cards-analyst Page:
+<img src="https://github.com/jackyhuynh/User_Banking_and_Expense_Analyst/blob/master/images/cards-analyst.JPG">
+
+#### Category-analyst Page:
+<img src="https://github.com/jackyhuynh/User_Banking_and_Expense_Analyst/blob/master/images/category-analyst.JPG">
 
 ## Feature
 - Full connection to My SQL Server.
