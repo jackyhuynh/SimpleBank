@@ -5,6 +5,7 @@
 ## Introduction:
 - This is the 3rd Version of the App. Feature with data from the database and full feature of Extracting and Centralizing data.
 - Make sure you download and set up the MySQL Server(and connect to the database that I include in the data section) otherwise app will not work
+- Multiple user with multiple database.
 
 ## Feature
 - Full connection to My SQL Server.
