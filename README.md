@@ -26,15 +26,21 @@ App structure diagram:
 <img src="https://github.com/jackyhuynh/User_Banking_and_Expense_Analyst/blob/master/images/reset-password.PNG">
 
 #### Home Page:
+- Home page has the total expense map that caculate the total user expense at specific location (since account is open).
+- The data table that store the user's transactions.
 <img src="https://github.com/jackyhuynh/User_Banking_and_Expense_Analyst/blob/master/images/home.JPG">
 
 #### Banking Page:
+- Store the user debit and credit transaction.
+- Analyst user expense using diffrent analyst methods.
 <img src="https://github.com/jackyhuynh/User_Banking_and_Expense_Analyst/blob/master/images/banking.JPG">
 
 #### Cards-analyst Page:
+- Analyst the spending power of a credit card compare to other cards.
 <img src="https://github.com/jackyhuynh/User_Banking_and_Expense_Analyst/blob/master/images/cards-analyst.JPG">
 
 #### Category-analyst Page:
+- Analyst user expense by category.
 <img src="https://github.com/jackyhuynh/User_Banking_and_Expense_Analyst/blob/master/images/category-analyst.JPG">
 
 ## Feature
